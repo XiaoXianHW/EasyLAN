@@ -1,0 +1,16 @@
+[
+{
+  "modid": "easylan",
+  "name": "EasyLan",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://docs.axtn.net/docs/EasyLan/main",
+  "updateUrl": "",
+  "authorList": ["XiaoXian"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

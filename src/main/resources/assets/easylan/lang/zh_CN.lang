@@ -1,0 +1,36 @@
+easylan.setting=EasyLan 主设置
+easylan.back=返回
+easylan.save=保存设置
+easylan.load=加载设置
+easylan.null=
+easylan.local=本地
+easylan.public=公共
+
+easylan.text.setting1=基本限制
+easylan.text.setting2=指令支持
+easylan.text.setting3=扩展设置
+
+easylan.text.pvp=允许PVP
+easylan.text.onlineMode=正版验证
+easylan.text.spawnAnimals=生成动物
+easylan.text.spawnNPCs=生成NPC
+easylan.text.allowFlight=允许飞行
+easylan.text.whitelist=白名单
+easylan.text.ban=Ban封禁
+easylan.text.op=Op权限
+easylan.text.save=Save保存
+easylan.text.motd=Motd（服务器信息）
+easylan.text.httpApi=HttpAPI信息
+easylan.text.lanInfo=LAN设置输出
+
+easylan.text.port=端口号
+easylan.text.CtPort=自定义端口号
+easylan.text.port.used=当前端口号已被占用!
+easylan.text.port.invalid=请输入正确的端口号! （100-65535）
+
+easylan.text.maxplayer=最大玩家数
+easylan.text.maxplayer.invalid=请输入正确的最大玩家数! （2-500000）
+
+easylan.chat.CtPort=成功开启自定义端口
+easylan.chat.CtPlayer=已设定最大玩家数
+easylan.chat.isPublic=是否为公网
