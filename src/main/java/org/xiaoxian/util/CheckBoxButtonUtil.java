@@ -2,6 +2,7 @@ package org.xiaoxian.util;
 
 import net.minecraft.client.Minecraft;
 
+import javax.annotation.Nonnull;
 import java.awt.*;
 
 public class CheckBoxButtonUtil extends ButtonUtil {
@@ -13,7 +14,7 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+    public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
         super.drawButton(mc, mouseX, mouseY);
 
         Color color = this.isChecked ? Color.WHITE: Color.GRAY;
