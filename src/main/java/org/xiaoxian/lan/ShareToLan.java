@@ -68,7 +68,7 @@ public class ShareToLan {
                     try {
                         ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
                         Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.ServerConfigurationManager");
-                        Field maxplayerField = minecraftServerPlayerClass.getDeclaredField("maxPlayers");
+                        Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
                         maxplayerField.setAccessible(true);
                         maxplayerField.set(configManager, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
                         if (!LanOutput) {
