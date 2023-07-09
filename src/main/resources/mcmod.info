@@ -5,7 +5,7 @@
   "description": "",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "https://docs.axtn.net/docs/EasyLan/main",
+  "url": "https://github.com/XiaoXianHW/EasyLan",
   "updateUrl": "",
   "authorList": ["XiaoXian"],
   "credits": "",

@@ -26,7 +26,10 @@ public class EasyLan {
 
     @Mod.Instance(MOD_ID)
     public static EasyLan INSTANCE;
-    public static boolean devMode = true;
+
+    // 如果处于IDEA等开发环境，请修改此值为true，否则可能无法正常运行
+    // If you are in a development environment such as IDEA, please modify this boolean to true, otherwise it may not work properly
+    public static boolean devMode = false;
 
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;

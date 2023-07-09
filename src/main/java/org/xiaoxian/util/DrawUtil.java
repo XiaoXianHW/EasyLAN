@@ -2,8 +2,8 @@ package org.xiaoxian.util;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.VertexBuffer;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -21,13 +21,13 @@ public class DrawUtil {
         GlStateManager.color(red, green, blue, alpha);
 
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        VertexBuffer vertexbuffer = tessellator.getBuffer();
 
-        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        worldrenderer.pos(x + width, y, 0.0D).endVertex();
-        worldrenderer.pos(x, y, 0.0D).endVertex();
-        worldrenderer.pos(x, y + height, 0.0D).endVertex();
-        worldrenderer.pos(x + width, y + height, 0.0D).endVertex();
+        vertexbuffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        vertexbuffer.pos(x + width, y, 0.0D).endVertex();
+        vertexbuffer.pos(x, y, 0.0D).endVertex();
+        vertexbuffer.pos(x, y + height, 0.0D).endVertex();
+        vertexbuffer.pos(x + width, y + height, 0.0D).endVertex();
         tessellator.draw();
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

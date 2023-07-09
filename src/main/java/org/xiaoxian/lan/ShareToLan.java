@@ -7,9 +7,8 @@ import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetworkSystem;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.server.management.PlayerList;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -41,15 +40,14 @@ public class ShareToLan {
 
     @SubscribeEvent
     public void onGuiButtonClick(GuiScreenEvent.ActionPerformedEvent event) {
-        if (event.gui instanceof GuiShareToLanEdit.GuiShareToLanModified) {
-            if (event.button.id == 101) {
+        if (event.getGui() instanceof GuiShareToLanEdit.GuiShareToLanModified) {
+            if (event.getButton().id == 101) {
 
                 /* 变量区~ */
                 String fieldName = devMode ? "maxPlayers" : "field_72405_c";
                 Minecraft mc = Minecraft.getMinecraft();
                 IntegratedServer server = mc.getIntegratedServer();
-                assert server != null;
-                NetworkSystem networkSystem = MinecraftServer.getServer().getNetworkSystem();
+                NetworkSystem networkSystem = server.getNetworkSystem();
 
                 /* 判断是否自定义端口号 */
                 if (!(GuiShareToLanEdit.PortTextBox.getText().isEmpty())) {
@@ -66,11 +64,11 @@ public class ShareToLan {
                 /* 判断是否自定义最大玩家数 */
                 if (!(GuiShareToLanEdit.MaxPlayerBox.getText().isEmpty())) {
                     try {
-                        ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
-                        Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.ServerConfigurationManager");
+                        PlayerList playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList();
+                        Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.PlayerList");
                         Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
                         maxplayerField.setAccessible(true);
-                        maxplayerField.set(configManager, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
+                        maxplayerField.set(playerList, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
                         if (!LanOutput) {
                             ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPlayer") + " &f[&e" + GuiShareToLanEdit.MaxPlayerBox.getText() + "&f]");
                         }
@@ -109,7 +107,7 @@ public class ShareToLan {
                         HttpApi.set("gameType", String.valueOf(server.getGameType()));
                         HttpApi.set("maxPlayer", String.valueOf(server.getMaxPlayers()));
                         HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
-                        playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().playerEntityList;
+                        playerList = server.getPlayerList().getPlayerList();
                         List<String> playerIDs = new ArrayList<>();
                         for (EntityPlayerMP player : playerList) {
                             playerIDs.add(player.getName());
@@ -130,7 +128,7 @@ public class ShareToLan {
                     HttpApi.set("difficulty", String.valueOf(server.getDifficulty()));
                     HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
 
-                    playerList = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().playerEntityList;
+                    playerList = server.getPlayerList().getPlayerList();
                     List<String> playerIDs = new ArrayList<>();
                     for (EntityPlayerMP player : playerList) {
                         playerIDs.add(player.getName());
@@ -221,8 +219,8 @@ public class ShareToLan {
         }
 
         /* 关闭HttpAPI线程 */
-        if (event.gui instanceof GuiIngameMenu) {
-            if (event.button.id == 1) {
+        if (event.getGui() instanceof GuiIngameMenu) {
+            if (event.getButton().id == 1) {
                 if (HttpAPI) {
                      if (!(server2 == null)) {
                          HttpApi.stop();

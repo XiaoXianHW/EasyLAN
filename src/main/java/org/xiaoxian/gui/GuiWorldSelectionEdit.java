@@ -1,9 +1,8 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSelectWorld;
+import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -13,15 +12,14 @@ import java.io.IOException;
 public class GuiWorldSelectionEdit {
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        GuiScreen guiScreen = event.gui;
-        if (guiScreen instanceof GuiSelectWorld) {
-            event.gui = new GuiWorldSelectionModified(guiScreen);
+        GuiScreen guiScreen = event.getGui();
+        if (guiScreen instanceof GuiWorldSelection) {
+            event.setGui(new GuiWorldSelectionModified(event.getGui()));
         }
     }
 
-    public static class GuiWorldSelectionModified extends GuiSelectWorld {
+    public static class GuiWorldSelectionModified extends GuiWorldSelection {
 
-        Minecraft mc = Minecraft.getMinecraft();
         public GuiWorldSelectionModified(GuiScreen parentScreen) {
             super(parentScreen);
         }

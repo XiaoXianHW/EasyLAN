@@ -23,9 +23,9 @@ public class GuiShareToLanEdit {
 
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        GuiScreen guiScreen = event.gui;
+        GuiScreen guiScreen = event.getGui();
         if (guiScreen instanceof GuiShareToLan) {
-            event.gui = new GuiShareToLanEdit.GuiShareToLanModified(guiScreen);
+            event.setGui(new GuiShareToLanEdit.GuiShareToLanModified(event.getGui()));
         }
     }
 
