@@ -17,7 +17,7 @@ public class TextBoxUtil extends GuiTextField {
     private long lastUpdateTick = 20;
 
     public TextBoxUtil(int componentId, FontRenderer fontRendererInstance, int x, int y, int width, int height) {
-        super(fontRendererInstance, x, y, width, height);
+        super(componentId, fontRendererInstance, x, y, width, height);
 
         try {
             lineScrollOffsetField = GuiTextField.class.getDeclaredField(fieldName);
@@ -51,7 +51,7 @@ public class TextBoxUtil extends GuiTextField {
                     lastUpdateTick = currentTick;
                 }
             }
-            drawString(Minecraft.getMinecraft().fontRenderer, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
+            drawString(Minecraft.getMinecraft().fontRendererObj, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
         }
     }
 }

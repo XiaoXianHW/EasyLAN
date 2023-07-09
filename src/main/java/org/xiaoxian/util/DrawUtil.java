@@ -1,34 +1,37 @@
 package org.xiaoxian.util;
 
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
 public class DrawUtil {
     public static void drawRect(int x, int y, int width, int height, Color color) {
-        Tessellator tessellator = Tessellator.instance;
         float red = color.getRed() / 255.0F;
         float green = color.getGreen() / 255.0F;
         float blue = color.getBlue() / 255.0F;
         float alpha = color.getAlpha() / 255.0F;
 
-        GL11.glPushMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glColor4f(red, green, blue, alpha);
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.color(red, green, blue, alpha);
 
-        tessellator.startDrawingQuads();
-        tessellator.addVertex(x + width, y, 0.0D);
-        tessellator.addVertex(x, y, 0.0D);
-        tessellator.addVertex(x, y + height, 0.0D);
-        tessellator.addVertex(x + width, y + height, 0.0D);
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        worldrenderer.pos(x + width, y, 0.0D).endVertex();
+        worldrenderer.pos(x, y, 0.0D).endVertex();
+        worldrenderer.pos(x, y + height, 0.0D).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).endVertex();
         tessellator.draw();
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glPopMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
     }
 }

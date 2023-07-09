@@ -1,13 +1,14 @@
 package org.xiaoxian.lan;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandServerKick;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.server.*;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+
 import static org.xiaoxian.EasyLan.*;
 
 public class ServerStarting {

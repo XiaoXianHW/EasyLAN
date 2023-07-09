@@ -1,12 +1,14 @@
 package org.xiaoxian.gui;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSelectWorld;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.io.IOException;
 
 public class GuiWorldSelectionEdit {
     @SubscribeEvent
@@ -31,7 +33,7 @@ public class GuiWorldSelectionEdit {
         }
 
         @Override
-        protected void actionPerformed(GuiButton button) {
+        protected void actionPerformed(GuiButton button) throws IOException {
             if (button.id == 89) {
                 mc.displayGuiScreen(new GuiEasyLanMain(this));
             }

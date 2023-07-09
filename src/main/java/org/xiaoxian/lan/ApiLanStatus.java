@@ -77,7 +77,7 @@ public class ApiLanStatus {
         public void handle(HttpExchange t) throws IOException {
             playerIDs.clear();
             for (EntityPlayerMP player : playerList) {
-                playerIDs.add(player.getDisplayName());
+                playerIDs.add(player.getName());
             }
 
             StringBuilder sb = new StringBuilder();
