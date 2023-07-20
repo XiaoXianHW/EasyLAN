@@ -1,63 +1,135 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TranslationTextComponent;
 import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
 import java.awt.*;
-import java.io.IOException;
 
-import static org.xiaoxian.EasyLan.*;
+import static org.xiaoxian.EasyLAN.*;
 
-public class GuiEasyLanMain extends GuiScreen {
-    private GuiTextField MotdTextBox;
+public class GuiEasyLanMain extends Screen {
+    private TextFieldWidget MotdTextBox;
     private String MotdText = motd;
+    FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+    private final Screen parentScreen;
 
-    private final GuiScreen parentScreen;
-
-    public GuiEasyLanMain(GuiScreen parentScreen) {
+    public GuiEasyLanMain(Screen parentScreen) {
+        super(new TranslationTextComponent("easylan.setting"));
         this.parentScreen = parentScreen;
     }
 
     @Override
-    public void initGui() {
-        buttonList.clear();
+    public void init() {
+        buttons.clear();
+
         // 设置
-        buttonList.add(new ButtonUtil(0, this.width / 2 + 70, this.height - 25, 100, 20, I18n.format("easylan.back")));
-        buttonList.add(new ButtonUtil(1, this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.load")));
-        buttonList.add(new ButtonUtil(2, this.width / 2 - 170, this.height - 25, 100, 20, I18n.format("easylan.save")));
+        addButton(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.format("easylan.back")) {
+            public void onClick(double mouseX, double mouseY) {
+                Minecraft.getInstance().displayGuiScreen(parentScreen);
+            }
+        });
+        addButton(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.load")) {
+            public void onClick(double mouseX, double mouseY) {
+                ConfigUtil.load();
+                MotdText = motd;
+                init();
+            }
+        });
+        addButton(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.format("easylan.save")) {
+            public void onClick(double mouseX, double mouseY) {
+                SaveConfig();
+            }
+        });
 
         // 基础设置
-        buttonList.add(new CheckBoxButtonUtil(10, this.width / 2 - 95, 55, allowPVP, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(11, this.width / 2 - 95, 80, onlineMode, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(12, this.width / 2 - 95, 105, spawnAnimals, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(13, this.width / 2 - 95, 130, spawnNPCs, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(14, this.width / 2 - 95, 155, allowFlight, 20, 20));
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 55, allowPVP, 20, 20) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                allowPVP = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 80, onlineMode, 20, 20) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                onlineMode = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 105, spawnAnimals, 20, 20) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                spawnAnimals = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 130, spawnNPCs, 20, 20) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                spawnNPCs = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95,155 , allowFlight ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                allowFlight = this.isChecked();
+            }
+        });
 
         // 命令支持
-        buttonList.add(new CheckBoxButtonUtil(20, this.width / 2 + 25, 55, whiteList, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(21, this.width / 2 + 25, 80, BanCommand, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(22, this.width / 2 + 25, 105, OpCommand, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(23, this.width / 2 + 25, 130, SaveCommand, 20, 20));
+        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,55 ,whiteList ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                whiteList = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,80 ,BanCommands ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                BanCommands = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,105 ,OpCommands ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                OpCommands = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,130 ,SaveCommands ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                SaveCommands = this.isChecked();
+            }
+        });
 
         // 其他设置
-        buttonList.add(new CheckBoxButtonUtil(30, this.width / 2 + 145, 55, HttpAPI, 20, 20));
-        buttonList.add(new CheckBoxButtonUtil(31, this.width / 2 + 145, 80, LanOutput, 20, 20));
+        addButton(new CheckBoxButtonUtil(this.width /2 +145 ,55 ,HttpAPI ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                HttpAPI = this.isChecked();
+            }
+        });
+        addButton(new CheckBoxButtonUtil(this.width /2 +145 ,80 ,LanOutput ,20 ,20 ) {
+            public void onClick(double mouseX, double mouseY) {
+                this.toggleChecked();
+                LanOutput = this.isChecked();
+            }
+        });
 
         // Motd
-        MotdTextBox = new TextBoxUtil(100, fontRenderer, this.width / 2 - 70, 185, 230, 20);
+        MotdTextBox = new TextBoxUtil(fontRenderer,this.width / 2 - 70, 185, 230, 20,"");
         MotdTextBox.setMaxStringLength(100);
         MotdTextBox.setText(MotdText);
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        drawDefaultBackground();
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground();
         // 标题
         drawCenteredString(fontRenderer, I18n.format("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
@@ -83,96 +155,47 @@ public class GuiEasyLanMain extends GuiScreen {
 
         // MOTD
         drawString(fontRenderer, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        MotdTextBox.drawTextBox();
+        MotdTextBox.render(mouseX,mouseY,partialTicks);
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        if (button.id == 0) {
-            mc.displayGuiScreen(parentScreen);
-        } else if (button.id == 1) {
-            ConfigUtil.load();
-            MotdText = motd;
-            initGui();
-        } else if (button.id == 2) {
-            for (GuiButton CheckButton : buttonList) {
-                if (CheckButton instanceof CheckBoxButtonUtil) {
-                    CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) CheckButton;
-                    switch (checkBox.id) {
-                        case 10:
-                            allowPVP = checkBox.isChecked();
-                            ConfigUtil.set("pvp", String.valueOf(allowPVP));
-                            break;
-                        case 11:
-                            onlineMode = checkBox.isChecked();
-                            ConfigUtil.set("online-mode", String.valueOf(onlineMode));
-                            break;
-                        case 12:
-                            spawnAnimals = checkBox.isChecked();
-                            ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
-                            break;
-                        case 13:
-                            spawnNPCs = checkBox.isChecked();
-                            ConfigUtil.set("spawn-NPCs", String.valueOf(spawnNPCs));
-                            break;
-                        case 14:
-                            allowFlight = checkBox.isChecked();
-                            ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
-                            break;
-                        case 20:
-                            whiteList = checkBox.isChecked();
-                            ConfigUtil.set("whiteList", String.valueOf(whiteList));
-                            break;
-                        case 21:
-                            BanCommand = checkBox.isChecked();
-                            ConfigUtil.set("BanCommand", String.valueOf(BanCommand));
-                            break;
-                        case 22:
-                            OpCommand = checkBox.isChecked();
-                            ConfigUtil.set("OpCommand", String.valueOf(OpCommand));
-                            break;
-                        case 23:
-                            SaveCommand = checkBox.isChecked();
-                            ConfigUtil.set("SaveCommand", String.valueOf(SaveCommand));
-                            break;
-                        case 30:
-                            HttpAPI = checkBox.isChecked();
-                            ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
-                            break;
-                        case 31:
-                            LanOutput = checkBox.isChecked();
-                            ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            motd = MotdTextBox.getText();
-            ConfigUtil.set("Motd", motd);
-            ConfigUtil.save();
-        }
-
-        if (button instanceof CheckBoxButtonUtil) {
-            CheckBoxButtonUtil checkBox = (CheckBoxButtonUtil) button;
-            checkBox.toggleChecked();
-        }
-        super.actionPerformed(button);
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException{
-        MotdTextBox.textboxKeyTyped(typedChar, keyCode);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        MotdTextBox.keyPressed(keyCode, scanCode, modifiers);
         MotdText = MotdTextBox.getText();
-        super.keyTyped(typedChar, keyCode);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException{
+    public boolean charTyped(char typedChar, int keyCode) {
+        MotdTextBox.charTyped(typedChar, keyCode);
+        MotdText = MotdTextBox.getText();
+        return super.charTyped(typedChar, keyCode);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
         MotdText = MotdTextBox.getText();
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
+
+    public void SaveConfig() {
+        ConfigUtil.set("pvp", String.valueOf(allowPVP));
+        ConfigUtil.set("online-mode", String.valueOf(onlineMode));
+        ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
+        ConfigUtil.set("spawn-NPCs", String.valueOf(spawnNPCs));
+        ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
+        ConfigUtil.set("whiteList", String.valueOf(whiteList));
+        ConfigUtil.set("BanCommands", String.valueOf(BanCommands));
+        ConfigUtil.set("OpCommands", String.valueOf(OpCommands));
+        ConfigUtil.set("SaveCommands", String.valueOf(SaveCommands));
+        ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
+        ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
+        motd = MotdTextBox.getText();
+        ConfigUtil.set("Motd", motd);
+        ConfigUtil.save();
+    }
+
 }

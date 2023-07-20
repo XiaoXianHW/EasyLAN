@@ -1,41 +1,34 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiWorldSelection;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.WorldSelectionScreen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.io.IOException;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class GuiWorldSelectionEdit {
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        GuiScreen guiScreen = event.getGui();
-        if (guiScreen instanceof GuiWorldSelection) {
+        Screen guiScreen = event.getGui();
+        if (guiScreen instanceof WorldSelectionScreen) {
             event.setGui(new GuiWorldSelectionModified(event.getGui()));
         }
     }
 
-    public static class GuiWorldSelectionModified extends GuiWorldSelection {
+    public static class GuiWorldSelectionModified extends WorldSelectionScreen {
 
-        public GuiWorldSelectionModified(GuiScreen parentScreen) {
+        public GuiWorldSelectionModified(Screen parentScreen) {
             super(parentScreen);
         }
 
         @Override
-        public void initGui() {
-            buttonList.add(new GuiButton(89, 5, 5, 100, 20, I18n.format("easylan.setting")));
-            super.initGui();
-        }
-
-        @Override
-        protected void actionPerformed(GuiButton button) throws IOException {
-            if (button.id == 89) {
-                mc.displayGuiScreen(new GuiEasyLanMain(this));
-            }
-            super.actionPerformed(button);
+        protected void init() {
+            this.addButton(new Button(5, 5, 100, 20, I18n.format("easylan.setting"), (button) -> {
+                assert GuiWorldSelectionModified.this.minecraft != null;
+                GuiWorldSelectionModified.this.minecraft.displayGuiScreen(new GuiEasyLanMain(this));
+            }));
+            super.init();
         }
     }
 }

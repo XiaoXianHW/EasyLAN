@@ -3,7 +3,7 @@ package org.xiaoxian.lan;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -76,8 +76,8 @@ public class ApiLanStatus {
         @Override
         public void handle(HttpExchange t) throws IOException {
             playerIDs.clear();
-            for (EntityPlayerMP player : playerList) {
-                playerIDs.add(player.getName());
+            for (ServerPlayerEntity player : playerList) {
+                playerIDs.add(player.getDisplayName().getString());
             }
 
             StringBuilder sb = new StringBuilder();

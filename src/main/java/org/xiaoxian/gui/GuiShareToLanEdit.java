@@ -1,141 +1,179 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.gui.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ShareToLanScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.input.Keyboard;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 
 public class GuiShareToLanEdit {
 
-    public static GuiTextField PortTextBox;
+    public static TextFieldWidget PortTextBox;
     public static String PortText = "";
     public static String PortWarningText = "";
 
-    public static GuiTextField MaxPlayerBox;
+    public static TextFieldWidget MaxPlayerBox;
     public static String MaxPlayerText = "";
     public static String MaxPlayerWarningText = "";
 
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        GuiScreen guiScreen = event.getGui();
-        if (guiScreen instanceof GuiShareToLan) {
+        Screen guiScreen = event.getGui();
+        if (guiScreen instanceof ShareToLanScreen) {
             event.setGui(new GuiShareToLanEdit.GuiShareToLanModified(event.getGui()));
         }
     }
 
-    public static class GuiShareToLanModified extends GuiShareToLan {
+    public static class GuiShareToLanModified extends ShareToLanScreen {
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
 
-        public GuiShareToLanModified(GuiScreen parentScreen) {
+        public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
         }
 
         @Override
-        public void initGui() {
-            super.initGui();
+        public void init() {
+            super.init();
 
-            PortTextBox = new TextBoxUtil(4, fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20);
+            PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
             PortTextBox.setMaxStringLength(5);
             PortTextBox.setText(PortText);
 
-            MaxPlayerBox = new TextBoxUtil(5, fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20);
+            MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
             MaxPlayerBox.setMaxStringLength(6);
             MaxPlayerBox.setText(MaxPlayerText);
 
-            GuiButton button101 = findButton();
+            Widget button101 = findButton();
             if (button101 != null) {
-                button101.enabled = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
+            }
+
+            Button originalButton = null;
+            for (Widget widget : this.buttons) {
+                if (widget instanceof Button) {
+                    Button button = (Button) widget;
+                    if (button.getMessage().equals(I18n.format("lanServer.start"))) {
+                        originalButton = button;
+                        break;
+                    }
+                }
+            }
+
+            if (originalButton != null) {
+                // 记录原按钮的参数
+                int width = originalButton.getWidth();
+                int height = originalButton.getHeight();
+                int x = originalButton.x;
+                int y = originalButton.y;
+
+                // 删除原按钮
+                this.buttons.remove(originalButton);
+                this.children.remove(originalButton);
+
+                // 添加新按钮
+                Button finalOriginalButton = originalButton;
+                Button newButton = new Button(x, y, width, height, I18n.format("lanServer.start"), button -> {
+                    ShareToLan.NewShareToLAN();
+                    finalOriginalButton.onPress();
+                });
+
+                this.addButton(newButton);
             }
         }
 
         @Override
-        public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-            super.drawScreen(mouseX, mouseY, partialTicks);
+        public void render(int mouseX, int mouseY, float partialTicks) {
+            super.render(mouseX, mouseY, partialTicks);
 
-            PortTextBox.drawTextBox();
-            MaxPlayerBox.drawTextBox();
+            PortTextBox.render(mouseX,mouseY,partialTicks);
+            MaxPlayerBox.render(mouseX,mouseY,partialTicks);
 
-            drawString(fontRenderer, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
+            drawString(Minecraft.getInstance().fontRenderer, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
             drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
             drawString(fontRenderer, I18n.format("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
             drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
-
         }
 
         @Override
-        protected void actionPerformed(@Nonnull GuiButton button) throws IOException{
-            super.actionPerformed(button);
-            if (button.id == 102) {
-                mc.displayGuiScreen(new GuiIngameMenu());
-            }
-            GuiButton button101 = findButton();
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            PortTextBox.keyPressed(keyCode, scanCode, modifiers);
+            MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
+
+            Widget button101 = findButton();
             if (button101 != null) {
-                button101.enabled = checkPortAndEnableButton(PortTextBox.getText());
-            }
-        }
-
-        @Override
-        protected void keyTyped(char typedChar, int keyCode) {
-            PortTextBox.textboxKeyTyped(typedChar, keyCode);
-            MaxPlayerBox.textboxKeyTyped(typedChar, keyCode);
-
-            String previousText = PortTextBox.getText();
-            String previousMaxPlayerText = MaxPlayerBox.getText();
-
-            if (Character.isDigit(typedChar) || keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
-                if (Character.isDigit(typedChar)) {
-                    String newPortText = PortTextBox.getText();
-                    String newMaxPlayerText = MaxPlayerBox.getText();
-                    try {
-                        int newPort = Integer.parseInt(newPortText);
-                        int newMaxPlayer = Integer.parseInt(newMaxPlayerText);
-
-                        if (!(newPort >= 100 && newPort <= 65535)) {
-                            PortTextBox.setText(previousText);
-                        }
-
-                        if (!(newMaxPlayer >= 2 && newMaxPlayer <= 500000)) {
-                            MaxPlayerBox.setText(previousMaxPlayerText);
-                        }
-                    } catch (NumberFormatException e) {
-                        PortTextBox.setText(previousText);
-                        MaxPlayerBox.setText(previousMaxPlayerText);
-                    }
-                } else if (keyCode == Keyboard.KEY_ESCAPE) {
-                    mc.displayGuiScreen(null);
-                    if (mc.currentScreen == null) mc.setIngameFocus();
-                }
-            }
-
-            GuiButton button101 = findButton();
-            if (button101 != null) {
-                button101.enabled = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
             }
 
             MaxPlayerText = MaxPlayerBox.getText();
             PortText = PortTextBox.getText();
+
+            return super.keyPressed(keyCode, scanCode, modifiers);
         }
 
         @Override
-        protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException{
+        public boolean charTyped(char typedChar, int keyCode) {
+            PortTextBox.charTyped(typedChar, keyCode);
+            MaxPlayerBox.charTyped(typedChar, keyCode);
+
+            String previousText = PortTextBox.getText();
+            String previousMaxPlayerText = MaxPlayerBox.getText();
+
+            if (Character.isDigit(typedChar)) {
+                String newPortText = PortTextBox.getText();
+                String newMaxPlayerText = MaxPlayerBox.getText();
+                try {
+                    int newPort = Integer.parseInt(newPortText);
+                    int newMaxPlayer = Integer.parseInt(newMaxPlayerText);
+
+                    if (!(newPort >= 100 && newPort <= 65535)) {
+                        PortTextBox.setText(previousText);
+                    }
+
+                    if (!(newMaxPlayer >= 2 && newMaxPlayer <= 500000)) {
+                        MaxPlayerBox.setText(previousMaxPlayerText);
+                    }
+                } catch (NumberFormatException e) {
+                    PortTextBox.setText(previousText);
+                    MaxPlayerBox.setText(previousMaxPlayerText);
+                }
+            }
+
+            Widget button101 = findButton();
+            if (button101 != null) {
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
+            }
+
+            MaxPlayerText = MaxPlayerBox.getText();
+            PortText = PortTextBox.getText();
+
+            return super.charTyped(typedChar, keyCode);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
             PortTextBox.mouseClicked(mouseX, mouseY, mouseButton);
             PortText = PortTextBox.getText();
 
             MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
             MaxPlayerText = MaxPlayerBox.getText();
 
-            super.mouseClicked(mouseX, mouseY, mouseButton);
+            return super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
-        private GuiButton findButton() {
-            for (GuiButton button : buttonList) {
-                if (button.id == 101) {
+        private Widget findButton() {
+            for (Widget button : buttons) {
+                if (button.getMessage().equals(I18n.format("lanServer.start"))) {
                     return button;
                 }
             }

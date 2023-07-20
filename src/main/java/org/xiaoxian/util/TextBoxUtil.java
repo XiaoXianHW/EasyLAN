@@ -2,25 +2,26 @@ package org.xiaoxian.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiTextField;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import com.mojang.blaze3d.platform.GlStateManager;
 
 import java.awt.*;
 import java.lang.reflect.Field;
 
-import static org.xiaoxian.EasyLan.devMode;
+import static org.xiaoxian.EasyLAN.devMode;
+import static org.xiaoxian.util.DrawUtil.drawLine;
 
-public class TextBoxUtil extends GuiTextField {
+public class TextBoxUtil extends TextFieldWidget {
 
     String fieldName = devMode ? "lineScrollOffset" : "field_146225_q";
     private Field lineScrollOffsetField;
     private long lastUpdateTick = 20;
 
-    public TextBoxUtil(int componentId, FontRenderer fontRendererInstance, int x, int y, int width, int height) {
-        super(componentId, fontRendererInstance, x, y, width, height);
+    public TextBoxUtil(FontRenderer fontRenderer, int x, int y, int width, int height, String msg) {
+        super(fontRenderer, x, y, width, height, msg);
 
         try {
-            lineScrollOffsetField = GuiTextField.class.getDeclaredField(fieldName);
+            lineScrollOffsetField = TextFieldWidget.class.getDeclaredField(fieldName);
             lineScrollOffsetField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -28,13 +29,13 @@ public class TextBoxUtil extends GuiTextField {
     }
 
     @Override
-    public void drawTextBox() {
-        if (this.getVisible()) {
-            drawRect(x, y, x + width + 4, y + height, new Color(128, 128, 128, 30).getRGB());
-            GL11.glLineWidth(2f);
-            drawHorizontalLine(x, x + width + 3, y + height - 1, new Color(135,206,250).getRGB());
-            GL11.glLineWidth(1f);
-            int textColor = this.getEnableBackgroundDrawing() ? 14737632 : 7368816;
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        if (this.visible) {
+            fill(x, y, x + width + 4, y + height, new Color(128, 128, 128, 30).getRGB());
+            GlStateManager.lineWidth(2f);
+            drawLine(x, x + width + 3, y + height - 1, new Color(135,206,250).getRGB());
+            GlStateManager.lineWidth(1f);
+            int textColor = this.isFocused() ? 14737632 : 7368816;
 
             int lineScrollOffset = 0;
             try {
@@ -44,14 +45,15 @@ public class TextBoxUtil extends GuiTextField {
             }
             String textToDraw = getText().substring(Math.max(0, lineScrollOffset));
 
-            if (isFocused()) {
+            if (this.isFocused()) {
                 long currentTick = System.currentTimeMillis();
                 if (currentTick - lastUpdateTick > 10) {
                     textToDraw += "_";
                     lastUpdateTick = currentTick;
                 }
             }
-            drawString(Minecraft.getMinecraft().fontRenderer, textToDraw, x + 4, y + (height - 8) / 2, textColor);
+
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(textToDraw, x + 4, y + (height - 8) / 2, textColor);
         }
     }
 }

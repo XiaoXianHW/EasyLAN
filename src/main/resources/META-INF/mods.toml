@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+issueTrackerURL="https://github.com/XiaoXianHW/EasyLAN/issues"
+
+[[mods]]
+modId="easylan"
+version="v1"
+displayName="EasyLAN"
+displayURL="https://github.com/XiaoXianHW/EasyLAN"
+authors="XiaoXian"
+description='''A Custom LAN Server Mod!:DDD'''

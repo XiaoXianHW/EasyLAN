@@ -1,46 +1,39 @@
 package org.xiaoxian.lan;
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.CommandServerKick;
-import net.minecraft.command.ICommandManager;
-import net.minecraft.command.server.*;
+import net.minecraft.command.impl.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
-import static org.xiaoxian.EasyLan.*;
+import static org.xiaoxian.EasyLAN.*;
 
 public class ServerStarting {
 
-    @Mod.EventHandler
+    @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
-        MinecraftServer minecraftServer = FMLCommonHandler.instance().getMinecraftServerInstance();
-        ICommandManager commandManager = minecraftServer.getCommandManager();
-        if (commandManager instanceof CommandHandler) {
-            if (whiteList) {
-                ((CommandHandler) commandManager).registerCommand(new CommandWhitelist());
-            }
+        MinecraftServer minecraftServer = event.getServer();
 
-            if (BanCommand) {
-                ((CommandHandler) commandManager).registerCommand(new CommandBanPlayer());
-                ((CommandHandler) commandManager).registerCommand(new CommandBanIp());
-                ((CommandHandler) commandManager).registerCommand(new CommandListBans());
-                ((CommandHandler) commandManager).registerCommand(new CommandPardonIp());
-                ((CommandHandler) commandManager).registerCommand(new CommandPardonPlayer());
-                ((CommandHandler) commandManager).registerCommand(new CommandServerKick());
-            }
+        if (whiteList) {
+            WhitelistCommand.register(event.getCommandDispatcher());
+        }
 
-            if (OpCommand) {
-                ((CommandHandler) commandManager).registerCommand(new CommandOp());
-                ((CommandHandler) commandManager).registerCommand(new CommandDeOp());
-            }
+        if (BanCommands) {
+            BanCommand.register(event.getCommandDispatcher());
+            BanIpCommand.register(event.getCommandDispatcher());
+            BanListCommand.register(event.getCommandDispatcher());
+            PardonCommand.register(event.getCommandDispatcher());
+            PardonIpCommand.register(event.getCommandDispatcher());
+        }
 
-            if (SaveCommand) {
-                ((CommandHandler) commandManager).registerCommand(new CommandSaveAll());
-                ((CommandHandler) commandManager).registerCommand(new CommandSaveOff());
-                ((CommandHandler) commandManager).registerCommand(new CommandSaveOn());
-            }
+        if (OpCommands) {
+            OpCommand.register(event.getCommandDispatcher());
+            DeOpCommand.register(event.getCommandDispatcher());
+        }
+
+        if (SaveCommands) {
+            SaveAllCommand.register(event.getCommandDispatcher());
+            SaveOnCommand.register(event.getCommandDispatcher());
+            SaveOffCommand.register(event.getCommandDispatcher());
         }
 
         minecraftServer.setAllowPvp(allowPVP);
@@ -49,6 +42,5 @@ public class ServerStarting {
         minecraftServer.setCanSpawnNPCs(spawnNPCs);
         minecraftServer.setAllowFlight(allowFlight);
         minecraftServer.setMOTD(motd);
-
     }
 }
