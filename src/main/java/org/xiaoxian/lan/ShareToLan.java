@@ -47,6 +47,7 @@ public class ShareToLan {
                 String fieldName = devMode ? "maxPlayers" : "field_72405_c";
                 Minecraft mc = Minecraft.getMinecraft();
                 IntegratedServer server = mc.getIntegratedServer();
+                assert server != null;
                 NetworkSystem networkSystem = server.getNetworkSystem();
 
                 /* 判断是否自定义端口号 */

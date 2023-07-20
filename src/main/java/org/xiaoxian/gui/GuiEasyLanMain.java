@@ -11,8 +11,6 @@ import org.xiaoxian.util.TextBoxUtil;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.xiaoxian.EasyLan.*;
 
@@ -21,7 +19,6 @@ public class GuiEasyLanMain extends GuiScreen {
     private String MotdText = motd;
 
     private final GuiScreen parentScreen;
-    private final List<GuiButton> buttonList = new ArrayList<>();
 
     public GuiEasyLanMain(GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -87,10 +84,6 @@ public class GuiEasyLanMain extends GuiScreen {
         // MOTD
         drawString(fontRendererObj, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
         MotdTextBox.drawTextBox();
-
-        for (GuiButton button : buttonList) {
-            button.drawButton(mc, mouseX, mouseY);
-        }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -180,11 +173,6 @@ public class GuiEasyLanMain extends GuiScreen {
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException{
         MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
         MotdText = MotdTextBox.getText();
-        for (GuiButton button : buttonList) {
-            if (button.mousePressed(mc, mouseX, mouseY)) {
-                actionPerformed(button);
-            }
-        }
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 }
