@@ -14,11 +14,11 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     }
 
     @Override
-    public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
-        super.drawButton(mc, mouseX, mouseY);
+    public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+        super.drawButton(mc, mouseX, mouseY, partialTicks);
 
         Color color = this.isChecked ? Color.WHITE: Color.GRAY;
-        DrawUtil.drawRect(this.xPosition + 2, this.yPosition + 2, this.width - 4, this.height - 4, color);
+        DrawUtil.drawRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4, color);
     }
 
     public boolean isChecked() {
@@ -28,5 +28,4 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     public void toggleChecked() {
         this.isChecked = !this.isChecked;
     }
-
 }

@@ -26,14 +26,4 @@ public class HookConfigFactory implements IModGuiFactory {
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
     }
-
-    @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return GuiEasyLanMain.class;
-    }
-
-    @Override
-    public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
-        return null;
-    }
 }

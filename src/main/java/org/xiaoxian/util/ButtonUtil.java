@@ -17,12 +17,12 @@ public class ButtonUtil extends GuiButton {
     }
 
     @Override
-    public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY) {
+    public void drawButton(@Nonnull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             int i = this.getHoverState(this.hovered);
 
-            FontRenderer fontrenderer = mc.fontRendererObj;
+            FontRenderer fontrenderer = mc.fontRenderer;
             GlStateManager.enableBlend();
             Color color;
             if (i == 2) {
@@ -30,7 +30,7 @@ public class ButtonUtil extends GuiButton {
             } else {
                 color = new Color(64, 64, 64, 128); // 深灰色，半透明
             }
-            DrawUtil.drawRect(this.xPosition, this.yPosition, this.width, this.height, color);
+            DrawUtil.drawRect(this.x, this.y, this.width, this.height, color);
             GlStateManager.disableBlend();
 
             int j = 14737632;
@@ -41,7 +41,7 @@ public class ButtonUtil extends GuiButton {
             } else if (this.hovered) {
                 j = 16777120;
             }
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
+            this.drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, j);
         }
     }
 }

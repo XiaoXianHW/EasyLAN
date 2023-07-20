@@ -50,7 +50,7 @@ public class GuiEasyLanMain extends GuiScreen {
         buttonList.add(new CheckBoxButtonUtil(31, this.width / 2 + 145, 80, LanOutput, 20, 20));
 
         // Motd
-        MotdTextBox = new TextBoxUtil(100, fontRendererObj, this.width / 2 - 70, 185, 230, 20);
+        MotdTextBox = new TextBoxUtil(100, fontRenderer, this.width / 2 - 70, 185, 230, 20);
         MotdTextBox.setMaxStringLength(100);
         MotdTextBox.setText(MotdText);
     }
@@ -59,30 +59,30 @@ public class GuiEasyLanMain extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         // 标题
-        drawCenteredString(fontRendererObj, I18n.format("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
+        drawCenteredString(fontRenderer, I18n.format("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
         // 基础设置
-        drawString(fontRendererObj, I18n.format("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
+        drawString(fontRenderer, I18n.format("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
 
         // 指令支持
-        drawString(fontRendererObj, I18n.format("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
+        drawString(fontRenderer, I18n.format("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
 
         // 其他设置
-        drawString(fontRendererObj, I18n.format("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        drawString(fontRendererObj, I18n.format("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
+        drawString(fontRenderer, I18n.format("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
 
         // MOTD
-        drawString(fontRendererObj, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
+        drawString(fontRenderer, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
         MotdTextBox.drawTextBox();
 
         super.drawScreen(mouseX, mouseY, partialTicks);

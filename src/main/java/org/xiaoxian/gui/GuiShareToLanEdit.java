@@ -39,11 +39,11 @@ public class GuiShareToLanEdit {
         public void initGui() {
             super.initGui();
 
-            PortTextBox = new TextBoxUtil(4, fontRendererObj, this.width / 2 - 155, this.height - 70, 145, 20);
+            PortTextBox = new TextBoxUtil(4, fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20);
             PortTextBox.setMaxStringLength(5);
             PortTextBox.setText(PortText);
 
-            MaxPlayerBox = new TextBoxUtil(5, fontRendererObj, this.width / 2 + 5, this.height - 70, 145, 20);
+            MaxPlayerBox = new TextBoxUtil(5, fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20);
             MaxPlayerBox.setMaxStringLength(6);
             MaxPlayerBox.setText(MaxPlayerText);
 
@@ -60,11 +60,11 @@ public class GuiShareToLanEdit {
             PortTextBox.drawTextBox();
             MaxPlayerBox.drawTextBox();
 
-            drawString(fontRendererObj, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            drawString(fontRendererObj, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            drawString(fontRenderer, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
+            drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
-            drawString(fontRendererObj, I18n.format("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            drawString(fontRendererObj, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            drawString(fontRenderer, I18n.format("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
+            drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
 
         }
 

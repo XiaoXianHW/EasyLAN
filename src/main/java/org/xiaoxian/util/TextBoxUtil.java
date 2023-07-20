@@ -30,9 +30,9 @@ public class TextBoxUtil extends GuiTextField {
     @Override
     public void drawTextBox() {
         if (this.getVisible()) {
-            drawRect(xPosition, yPosition, xPosition + width + 4, yPosition + height, new Color(128, 128, 128, 30).getRGB());
+            drawRect(x, y, x + width + 4, y + height, new Color(128, 128, 128, 30).getRGB());
             GL11.glLineWidth(2f);
-            drawHorizontalLine(xPosition, xPosition + width + 3, yPosition + height - 1, new Color(135,206,250).getRGB());
+            drawHorizontalLine(x, x + width + 3, y + height - 1, new Color(135,206,250).getRGB());
             GL11.glLineWidth(1f);
             int textColor = this.getEnableBackgroundDrawing() ? 14737632 : 7368816;
 
@@ -51,7 +51,7 @@ public class TextBoxUtil extends GuiTextField {
                     lastUpdateTick = currentTick;
                 }
             }
-            drawString(Minecraft.getMinecraft().fontRendererObj, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
+            drawString(Minecraft.getMinecraft().fontRenderer, textToDraw, x + 4, y + (height - 8) / 2, textColor);
         }
     }
 }
