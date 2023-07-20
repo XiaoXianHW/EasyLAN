@@ -108,7 +108,7 @@ public class ShareToLan {
                         HttpApi.set("gameType", String.valueOf(server.getGameType()));
                         HttpApi.set("maxPlayer", String.valueOf(server.getMaxPlayers()));
                         HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
-                        playerList = server.getPlayerList().getPlayerList();
+                        playerList = server.getPlayerList().getPlayers();
                         List<String> playerIDs = new ArrayList<>();
                         for (EntityPlayerMP player : playerList) {
                             playerIDs.add(player.getName());
@@ -129,7 +129,7 @@ public class ShareToLan {
                     HttpApi.set("difficulty", String.valueOf(server.getDifficulty()));
                     HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
 
-                    playerList = server.getPlayerList().getPlayerList();
+                    playerList = server.getPlayerList().getPlayers();
                     List<String> playerIDs = new ArrayList<>();
                     for (EntityPlayerMP player : playerList) {
                         playerIDs.add(player.getName());

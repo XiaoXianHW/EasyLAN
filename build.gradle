@@ -10,8 +10,8 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0"
-group= "org.xiaoxian.easylan" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "EasyLan"
+group= "org.xiaoxian.easylan"
+archivesBaseName = "EasyLAN"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -19,16 +19,15 @@ targetCompatibility = 1.8
 compileJava.options.encoding = 'UTF-8'
 
 minecraft {
-    version = "1.10.2-12.18.3.2511"
+    version = "1.11.2-13.20.1.2588"
     runDir = "run"
-    mappings = "snapshot_20161111"
+    mappings = "snapshot_20161220"
 }
 
 dependencies {
 }
 
-processResources
-{
+processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
 

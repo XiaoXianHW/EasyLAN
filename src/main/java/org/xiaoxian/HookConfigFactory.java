@@ -13,13 +13,23 @@ public class HookConfigFactory implements IModGuiFactory {
     }
 
     @Override
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return GuiEasyLanMain.class;
+    public boolean hasConfigGui() {
+        return true;
+    }
+
+    @Override
+    public GuiScreen createConfigGui(GuiScreen parentScreen) {
+        return new GuiEasyLanMain(parentScreen);
     }
 
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
+    }
+
+    @Override
+    public Class<? extends GuiScreen> mainConfigGuiClass() {
+        return GuiEasyLanMain.class;
     }
 
     @Override
