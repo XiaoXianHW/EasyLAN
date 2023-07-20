@@ -1,5 +1,8 @@
 package org.xiaoxian.util;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+
+import javax.annotation.Nonnull;
 import java.awt.*;
 
 public class CheckBoxButtonUtil extends ButtonUtil {
@@ -11,8 +14,8 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         Color color = this.isChecked ? Color.WHITE: Color.GRAY;
         DrawUtil.drawRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4, color);

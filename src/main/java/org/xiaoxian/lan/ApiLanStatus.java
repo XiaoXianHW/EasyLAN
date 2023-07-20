@@ -65,6 +65,7 @@ public class ApiLanStatus {
             sb.append(" }");
 
             String response = sb.toString();
+            t.getResponseHeaders().set("Content-Type", "application/json");
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
@@ -94,7 +95,7 @@ public class ApiLanStatus {
             sb.append(" ]");
 
             String response = sb.toString();
-
+            t.getResponseHeaders().set("Content-Type", "application/json");
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());

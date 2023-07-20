@@ -11,6 +11,6 @@ public class ChatUtil {
 
     public static void sendMsg(String msg) {
         msg = pattern.matcher(msg).replaceAll("\u00a7$1");
-        mc.ingameGUI.getChatGUI().printChatMessage(new StringTextComponent(msg));
+        mc.gui.getChat().addMessage(new StringTextComponent(msg));
     }
 }

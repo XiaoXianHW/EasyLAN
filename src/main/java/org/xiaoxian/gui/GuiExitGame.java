@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
@@ -32,7 +33,7 @@ public class GuiExitGame {
             for (Widget widget : this.buttons) {
                 if (widget instanceof Button) {
                     Button button = (Button) widget;
-                    if (button.getMessage().equals(I18n.format("menu.returnToMenu"))) {
+                    if (button.getMessage().getString().equals(I18n.get("menu.returnToMenu"))) {
                         originalButton = button;
                         break;
                     }
@@ -52,7 +53,7 @@ public class GuiExitGame {
 
                 // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, I18n.format("menu.returnToMenu"), button -> {
+                Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.get("menu.returnToMenu")), button -> {
                     ShareToLan.StopHttpAPIServer();
                     finalOriginalButton.onPress();
                 });

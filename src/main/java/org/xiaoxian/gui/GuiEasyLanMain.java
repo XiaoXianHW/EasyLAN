@@ -1,5 +1,6 @@
 package org.xiaoxian.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -11,6 +12,7 @@ import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
+import javax.annotation.Nonnull;
 import java.awt.*;
 
 import static org.xiaoxian.EasyLAN.*;
@@ -18,7 +20,7 @@ import static org.xiaoxian.EasyLAN.*;
 public class GuiEasyLanMain extends Screen {
     private TextFieldWidget MotdTextBox;
     private String MotdText = motd;
-    FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+    FontRenderer fontRenderer = Minecraft.getInstance().font;
     private final Screen parentScreen;
 
     public GuiEasyLanMain(Screen parentScreen) {
@@ -31,19 +33,19 @@ public class GuiEasyLanMain extends Screen {
         buttons.clear();
 
         // 设置
-        addButton(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.format("easylan.back")) {
+        addButton(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back")) {
             public void onClick(double mouseX, double mouseY) {
-                Minecraft.getInstance().displayGuiScreen(parentScreen);
+                Minecraft.getInstance().setScreen(parentScreen);
             }
         });
-        addButton(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.format("easylan.load")) {
+        addButton(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load")) {
             public void onClick(double mouseX, double mouseY) {
                 ConfigUtil.load();
                 MotdText = motd;
                 init();
             }
         });
-        addButton(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.format("easylan.save")) {
+        addButton(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save")) {
             public void onClick(double mouseX, double mouseY) {
                 SaveConfig();
             }
@@ -62,19 +64,13 @@ public class GuiEasyLanMain extends Screen {
                 onlineMode = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 105, spawnAnimals, 20, 20) {
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 112, spawnAnimals, 20, 20) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 spawnAnimals = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 130, spawnNPCs, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
-                spawnNPCs = this.isChecked();
-            }
-        });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95,155 , allowFlight ,20 ,20 ) {
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95,144 , allowFlight ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 allowFlight = this.isChecked();
@@ -123,61 +119,61 @@ public class GuiEasyLanMain extends Screen {
 
         // Motd
         MotdTextBox = new TextBoxUtil(fontRenderer,this.width / 2 - 70, 185, 230, 20,"");
-        MotdTextBox.setMaxStringLength(100);
-        MotdTextBox.setText(MotdText);
+        MotdTextBox.setMaxLength(100);
+        MotdTextBox.setValue(MotdText);
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
         // 标题
-        drawCenteredString(fontRenderer, I18n.format("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
+        drawCenteredString(matrixStack, fontRenderer, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
         // 基础设置
-        drawString(fontRenderer, I18n.format("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        drawString(fontRenderer, I18n.format("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFF);
 
         // 指令支持
-        drawString(fontRenderer, I18n.format("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        drawString(fontRenderer, I18n.format("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
 
         // 其他设置
-        drawString(fontRenderer, I18n.format("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        drawString(fontRenderer, I18n.format("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        drawString(fontRenderer, I18n.format("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
 
         // MOTD
-        drawString(fontRenderer, I18n.format("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        MotdTextBox.render(mouseX,mouseY,partialTicks);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
+        MotdTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         MotdTextBox.keyPressed(keyCode, scanCode, modifiers);
-        MotdText = MotdTextBox.getText();
+        MotdText = MotdTextBox.getValue();
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean charTyped(char typedChar, int keyCode) {
         MotdTextBox.charTyped(typedChar, keyCode);
-        MotdText = MotdTextBox.getText();
+        MotdText = MotdTextBox.getValue();
         return super.charTyped(typedChar, keyCode);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-        MotdText = MotdTextBox.getText();
+        MotdText = MotdTextBox.getValue();
         return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
@@ -185,7 +181,6 @@ public class GuiEasyLanMain extends Screen {
         ConfigUtil.set("pvp", String.valueOf(allowPVP));
         ConfigUtil.set("online-mode", String.valueOf(onlineMode));
         ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
-        ConfigUtil.set("spawn-NPCs", String.valueOf(spawnNPCs));
         ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
         ConfigUtil.set("whiteList", String.valueOf(whiteList));
         ConfigUtil.set("BanCommands", String.valueOf(BanCommands));
@@ -193,7 +188,7 @@ public class GuiEasyLanMain extends Screen {
         ConfigUtil.set("SaveCommands", String.valueOf(SaveCommands));
         ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
         ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
-        motd = MotdTextBox.getText();
+        motd = MotdTextBox.getValue();
         ConfigUtil.set("Motd", motd);
         ConfigUtil.save();
     }

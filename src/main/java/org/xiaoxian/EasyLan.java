@@ -22,7 +22,6 @@ public class EasyLAN {
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;
     public static boolean spawnAnimals = true;
-    public static boolean spawnNPCs = true;
     public static boolean allowFlight = true;
     public static boolean whiteList = false;
     public static boolean BanCommands = false;
