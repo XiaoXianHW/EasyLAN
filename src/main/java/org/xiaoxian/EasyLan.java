@@ -21,12 +21,12 @@ import org.xiaoxian.util.ConfigUtil;
 public class EasyLan {
 
     public static final String MOD_ID = "easylan";
-    public static final String MOD_NAME = "EasyLan";
+    public static final String MOD_NAME = "EasyLAN";
     public static final String VERSION = "v1";
 
     @Mod.Instance(MOD_ID)
     public static EasyLan INSTANCE;
-    public static boolean devMode = true;
+    public static boolean devMode = false;
 
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;

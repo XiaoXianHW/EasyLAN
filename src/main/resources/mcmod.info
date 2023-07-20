@@ -1,11 +1,11 @@
 [
 {
   "modid": "easylan",
-  "name": "EasyLan",
+  "name": "EasyLAN",
   "description": "",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "https://docs.axtn.net/docs/EasyLan/main",
+  "url": "https://github.com/XiaoXianHW/EasyLAN",
   "updateUrl": "",
   "authorList": ["XiaoXian"],
   "credits": "",
