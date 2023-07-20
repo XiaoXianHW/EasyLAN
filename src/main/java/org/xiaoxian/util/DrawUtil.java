@@ -17,7 +17,6 @@ public class DrawUtil {
         float alpha = color.getAlpha() / 255.0F;
 
         RenderSystem.enableBlend();
-        RenderSystem.disableTexture();
         RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
         RenderSystem.setShaderColor(red, green, blue, alpha);
 
@@ -32,21 +31,17 @@ public class DrawUtil {
         tesselator.end();
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 
     public static void drawLine(int startX, int endX, int y, int color) {
         RenderSystem.setShaderColor(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F);
         RenderSystem.lineWidth(2f);
-        RenderSystem.disableTexture();
 
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
         builder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
         builder.vertex(startX, y, 0.0D).color(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F).endVertex();
         builder.vertex(endX, y, 0.0D).color(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F).endVertex();
         Tesselator.getInstance().end();
-
-        RenderSystem.enableTexture();
     }
 }

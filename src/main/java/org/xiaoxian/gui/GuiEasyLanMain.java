@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
@@ -24,7 +24,7 @@ public class GuiEasyLanMain extends Screen {
     private final Screen parentScreen;
 
     public GuiEasyLanMain(Screen parentScreen) {
-        super(new TranslatableComponent("easylan.setting"));
+        super(Component.translatable("easylan.setting"));
         this.parentScreen = parentScreen;
     }
 
@@ -33,19 +33,19 @@ public class GuiEasyLanMain extends Screen {
         renderables.clear();
 
         // 设置
-        addRenderableWidget(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back")) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back"))) {
             public void onClick(double mouseX, double mouseY) {
                 Minecraft.getInstance().setScreen(parentScreen);
             }
         });
-        addRenderableWidget(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load")) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load"))) {
             public void onClick(double mouseX, double mouseY) {
                 ConfigUtil.load();
                 MotdText = motd;
                 init();
             }
         });
-        addRenderableWidget(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save")) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save"))) {
             public void onClick(double mouseX, double mouseY) {
                 SaveConfig();
             }

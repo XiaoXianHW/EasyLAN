@@ -5,12 +5,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.event.ScreenOpenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.TextBoxUtil;
@@ -30,10 +30,10 @@ public class GuiShareToLanEdit {
     public static String MaxPlayerWarningText = "";
 
     @SubscribeEvent
-    public void onGuiOpenEvent(ScreenOpenEvent event) {
+    public void onGuiOpenEvent(ScreenEvent.Opening event) {
         Screen guiScreen = event.getScreen();
         if (guiScreen instanceof ShareToLanScreen) {
-            event.setScreen(new GuiShareToLanModified(event.getScreen()));
+            event.setNewScreen(new GuiShareToLanModified(event.getScreen()));
         }
     }
 
@@ -62,7 +62,7 @@ public class GuiShareToLanEdit {
             }
 
             Button originalButton = null;
-            for (Widget widget : this.renderables) {
+            for (Renderable widget : this.renderables) {
                 if (widget instanceof Button button) {
                     if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                         originalButton = button;
@@ -72,25 +72,37 @@ public class GuiShareToLanEdit {
             }
 
             if (originalButton != null) {
-                // 记录原按钮的参数
                 int width = originalButton.getWidth();
                 int height = originalButton.getHeight();
-                int x = originalButton.x;
-                int y = originalButton.y;
+                int x = originalButton.getX();
+                int y = originalButton.getY();
 
-                // 删除原按钮
                 this.renderables.remove(originalButton);
                 this.removeWidget(originalButton);
 
-                // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, Component.nullToEmpty(I18n.get("lanServer.start")), button -> {
+                Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
                     ShareToLan.NewShareToLAN();
                     finalOriginalButton.onPress();
-                });
+                }).bounds(x, y, width, height).build();
 
                 this.addRenderableWidget(newButton);
             }
+
+            EditBox targetEditBox = null;
+            for (Renderable widget : this.renderables) {
+                if (widget instanceof EditBox editBox) {
+                    if (editBox.getMessage().equals(Component.translatable("lanServer.port"))) {
+                        targetEditBox = editBox;
+                    }
+                }
+            }
+
+            if (targetEditBox != null) {
+                this.removeWidget(targetEditBox);
+            }
+
+
         }
 
         @Override
@@ -105,6 +117,9 @@ public class GuiShareToLanEdit {
 
             drawString(matrixStack, fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
             drawString(matrixStack, fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+
+            // 来自开发者: 实在想不出好点子去掉drawString，重置GUI又太麻烦，直接眼不见心不烦¯\_(ツ)_/¯
+            fill(matrixStack, this.width / 2 - 32, 140, this.width / 2 + 32, 150, 0xFF000000);
         }
 
         @Override
@@ -173,8 +188,8 @@ public class GuiShareToLanEdit {
             return super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
-        private Widget findButton() {
-            for (Widget widget : this.renderables) {
+        private Renderable findButton() {
+            for (Renderable widget : this.renderables) {
                 if (widget instanceof Button button) {
                     if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                         return button;
