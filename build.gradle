@@ -14,7 +14,7 @@ apply plugin: 'forge'
 
 version = "1.0"
 group= "org.xiaoxian.easylan" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "EasyLan"
+archivesBaseName = "EasyLAN"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
