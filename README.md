@@ -1,4 +1,4 @@
-# EasyLan
+# EasyLAN
 ###  A Minecraft Forge Mod for Custom LAN Servers
 
 ## What function?
