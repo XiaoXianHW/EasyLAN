@@ -1,12 +1,12 @@
 package org.xiaoxian.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.xiaoxian.util.ButtonUtil;
 import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
@@ -18,59 +18,59 @@ import java.awt.*;
 import static org.xiaoxian.EasyLAN.*;
 
 public class GuiEasyLanMain extends Screen {
-    private TextFieldWidget MotdTextBox;
+    private EditBox MotdTextBox;
     private String MotdText = motd;
-    FontRenderer fontRenderer = Minecraft.getInstance().font;
+    Font fontRenderer = Minecraft.getInstance().font;
     private final Screen parentScreen;
 
     public GuiEasyLanMain(Screen parentScreen) {
-        super(new TranslationTextComponent("easylan.setting"));
+        super(new TranslatableComponent("easylan.setting"));
         this.parentScreen = parentScreen;
     }
 
     @Override
     public void init() {
-        buttons.clear();
+        renderables.clear();
 
         // 设置
-        addButton(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back")) {
+        addRenderableWidget(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back")) {
             public void onClick(double mouseX, double mouseY) {
                 Minecraft.getInstance().setScreen(parentScreen);
             }
         });
-        addButton(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load")) {
+        addRenderableWidget(new ButtonUtil(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load")) {
             public void onClick(double mouseX, double mouseY) {
                 ConfigUtil.load();
                 MotdText = motd;
                 init();
             }
         });
-        addButton(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save")) {
+        addRenderableWidget(new ButtonUtil(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save")) {
             public void onClick(double mouseX, double mouseY) {
                 SaveConfig();
             }
         });
 
         // 基础设置
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 55, allowPVP, 20, 20) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 55, allowPVP, 20, 20) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 allowPVP = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 80, onlineMode, 20, 20) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 80, onlineMode, 20, 20) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 onlineMode = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 112, spawnAnimals, 20, 20) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 112, spawnAnimals, 20, 20) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 spawnAnimals = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95,144 , allowFlight ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95,144 , allowFlight ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 allowFlight = this.isChecked();
@@ -78,25 +78,25 @@ public class GuiEasyLanMain extends Screen {
         });
 
         // 命令支持
-        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,55 ,whiteList ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +25 ,55 ,whiteList ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 whiteList = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,80 ,BanCommands ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +25 ,80 ,BanCommands ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 BanCommands = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,105 ,OpCommands ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +25 ,105 ,OpCommands ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 OpCommands = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width /2 +25 ,130 ,SaveCommands ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +25 ,130 ,SaveCommands ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 SaveCommands = this.isChecked();
@@ -104,13 +104,13 @@ public class GuiEasyLanMain extends Screen {
         });
 
         // 其他设置
-        addButton(new CheckBoxButtonUtil(this.width /2 +145 ,55 ,HttpAPI ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +145 ,55 ,HttpAPI ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 HttpAPI = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width /2 +145 ,80 ,LanOutput ,20 ,20 ) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width /2 +145 ,80 ,LanOutput ,20 ,20 ) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
                 LanOutput = this.isChecked();
@@ -124,7 +124,7 @@ public class GuiEasyLanMain extends Screen {
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         // 标题
         drawCenteredString(matrixStack, fontRenderer, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());

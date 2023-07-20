@@ -1,10 +1,10 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nonnull;
 import java.awt.Color;
@@ -12,11 +12,11 @@ import java.awt.Color;
 public class ButtonUtil extends Button {
 
     public ButtonUtil(int x, int y, int width, int height, String buttonText) {
-        super(x, y, width, height, ITextComponent.nullToEmpty(buttonText), button -> {});
+        super(x, y, width, height, Component.nullToEmpty(buttonText), button -> {});
     }
 
     @Override
-    public void renderButton(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 

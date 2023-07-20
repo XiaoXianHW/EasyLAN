@@ -3,12 +3,12 @@ package org.xiaoxian.lan;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.NetworkSystem;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.server.management.PlayerList;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerConnectionListener;
+import net.minecraft.server.players.PlayerList;
+import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.util.ChatUtil;
 
@@ -33,7 +33,7 @@ import static org.xiaoxian.lan.ApiLanStatus.server2;
 
 public class ShareToLan {
     static ApiLanStatus HttpApi = new ApiLanStatus();
-    public static List<ServerPlayerEntity> playerList;
+    public static List<ServerPlayer> playerList;
 
     public static void NewShareToLAN() {
         /* 变量区~ */
@@ -41,7 +41,7 @@ public class ShareToLan {
         Minecraft mc = Minecraft.getInstance();
         IntegratedServer server = mc.getSingleplayerServer();
         assert server != null;
-        NetworkSystem networkSystem = server.getConnection();
+        ServerConnectionListener networkSystem = server.getConnection();
 
         /* 判断是否自定义端口号 */
         if (!(GuiShareToLanEdit.PortTextBox.getValue().isEmpty())) {
@@ -60,7 +60,7 @@ public class ShareToLan {
         if (!(GuiShareToLanEdit.MaxPlayerBox.getValue().isEmpty())) {
             try {
                 PlayerList playerList = new FMLServerStartingEvent(server).getServer().getPlayerList();
-                Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.PlayerList");
+                Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.players.PlayerList");
                 Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
                 maxplayerField.setAccessible(true);
                 maxplayerField.set(playerList, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getValue()));
@@ -103,7 +103,7 @@ public class ShareToLan {
                 HttpApi.set("onlinePlayer", String.valueOf(server.getPlayerCount()));
                 playerList = server.getPlayerList().getPlayers();
                 List<String> playerIDs = new ArrayList<>();
-                for (ServerPlayerEntity player : playerList) {
+                for (ServerPlayer player : playerList) {
                     playerIDs.add(String.valueOf(player.getName()));
                 }
                 ApiLanStatus.playerIDs = playerIDs;
@@ -124,7 +124,7 @@ public class ShareToLan {
 
             playerList = server.getPlayerList().getPlayers();
             List<String> playerIDs = new ArrayList<>();
-            for (ServerPlayerEntity player : playerList) {
+            for (ServerPlayer player : playerList) {
                 playerIDs.add(player.getName().getString());
             }
             ApiLanStatus.playerIDs = playerIDs;

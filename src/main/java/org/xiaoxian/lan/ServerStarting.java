@@ -1,10 +1,10 @@
 package org.xiaoxian.lan;
 
-import net.minecraft.command.impl.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.GameRules;
+import net.minecraft.server.commands.*;
+import net.minecraft.world.level.GameRules;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
 
 import static org.xiaoxian.EasyLAN.*;
 
@@ -19,16 +19,16 @@ public class ServerStarting {
         }
 
         if (BanCommands) {
-            BanCommand.register(event.getServer().getCommands().getDispatcher());
-            BanIpCommand.register(event.getServer().getCommands().getDispatcher());
-            BanListCommand.register(event.getServer().getCommands().getDispatcher());
+            BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
+            BanIpCommands.register(event.getServer().getCommands().getDispatcher());
+            BanListCommands.register(event.getServer().getCommands().getDispatcher());
             PardonCommand.register(event.getServer().getCommands().getDispatcher());
             PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
         }
 
         if (OpCommands) {
             OpCommand.register(event.getServer().getCommands().getDispatcher());
-            DeOpCommand.register(event.getServer().getCommands().getDispatcher());
+            DeOpCommands.register(event.getServer().getCommands().getDispatcher());
         }
 
         if (SaveCommands) {

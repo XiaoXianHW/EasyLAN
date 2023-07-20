@@ -1,11 +1,11 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.gui.screen.IngameMenuScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
@@ -14,12 +14,12 @@ public class GuiExitGame {
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
         Screen guiScreen = event.getGui();
-        if (guiScreen instanceof IngameMenuScreen) {
-            event.setGui(new GuiExitGame.GuiInGameMenuModified());
+        if (guiScreen instanceof PauseScreen) {
+            event.setGui(new GuiInGameMenuModified());
         }
     }
 
-    public static class GuiInGameMenuModified extends IngameMenuScreen {
+    public static class GuiInGameMenuModified extends PauseScreen {
 
         public GuiInGameMenuModified() {
             super(true);
@@ -30,9 +30,8 @@ public class GuiExitGame {
             super.init();
 
             Button originalButton = null;
-            for (Widget widget : this.buttons) {
-                if (widget instanceof Button) {
-                    Button button = (Button) widget;
+            for (Widget widget : this.renderables) {
+                if (widget instanceof Button button) {
                     if (button.getMessage().getString().equals(I18n.get("menu.returnToMenu"))) {
                         originalButton = button;
                         break;
@@ -48,17 +47,17 @@ public class GuiExitGame {
                 int y = originalButton.y;
 
                 // 删除原按钮
-                this.buttons.remove(originalButton);
-                this.children.remove(originalButton);
+                this.renderables.remove(originalButton);
+                this.removeWidget(originalButton);
 
                 // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.get("menu.returnToMenu")), button -> {
+                Button newButton = new Button(x, y, width, height, Component.nullToEmpty(I18n.get("menu.returnToMenu")), button -> {
                     ShareToLan.StopHttpAPIServer();
                     finalOriginalButton.onPress();
                 });
 
-                this.addButton(newButton);
+                this.addRenderableWidget(newButton);
             }
         }
     }

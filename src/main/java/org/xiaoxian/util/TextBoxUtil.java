@@ -1,30 +1,30 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 import java.lang.reflect.Field;
 
 import static org.xiaoxian.EasyLAN.devMode;
 import static org.xiaoxian.util.DrawUtil.drawLine;
 
-public class TextBoxUtil extends TextFieldWidget {
+public class TextBoxUtil extends EditBox {
 
-    String fieldName = devMode ? "displayPos" : "field_146225_q";
+    String fieldName = devMode ? "displayPos" : "f_94100_";
     private Field lineScrollOffsetField;
     private long lastUpdateTick = 20;
 
-    public TextBoxUtil(FontRenderer fontRenderer, int x, int y, int width, int height, String msg) {
-        super(fontRenderer, x, y, width, height, ITextComponent.nullToEmpty(msg));
+    public TextBoxUtil(Font font, int x, int y, int width, int height, String msg) {
+        super(font, x, y, width, height, Component.nullToEmpty(msg));
 
         try {
-            lineScrollOffsetField = TextFieldWidget.class.getDeclaredField(fieldName);
+            lineScrollOffsetField = EditBox.class.getDeclaredField(fieldName);
             lineScrollOffsetField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -32,7 +32,7 @@ public class TextBoxUtil extends TextFieldWidget {
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             fill(matrixStack, x, y, x + width + 4, y + height, new Color(128, 128, 128, 30).getRGB());
             RenderSystem.lineWidth(2f);

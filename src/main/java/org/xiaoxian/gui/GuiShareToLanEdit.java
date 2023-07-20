@@ -1,15 +1,15 @@
 package org.xiaoxian.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ShareToLanScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
@@ -21,11 +21,11 @@ import java.net.ServerSocket;
 
 public class GuiShareToLanEdit {
 
-    public static TextFieldWidget PortTextBox;
+    public static EditBox PortTextBox;
     public static String PortText = "";
     public static String PortWarningText = "";
 
-    public static TextFieldWidget MaxPlayerBox;
+    public static EditBox MaxPlayerBox;
     public static String MaxPlayerText = "";
     public static String MaxPlayerWarningText = "";
 
@@ -33,12 +33,12 @@ public class GuiShareToLanEdit {
     public void onGuiOpenEvent(GuiOpenEvent event) {
         Screen guiScreen = event.getGui();
         if (guiScreen instanceof ShareToLanScreen) {
-            event.setGui(new GuiShareToLanEdit.GuiShareToLanModified(event.getGui()));
+            event.setGui(new GuiShareToLanModified(event.getGui()));
         }
     }
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
-        FontRenderer fontRenderer = Minecraft.getInstance().font;
+        Font fontRenderer = Minecraft.getInstance().font;
 
         public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
@@ -56,15 +56,14 @@ public class GuiShareToLanEdit {
             MaxPlayerBox.setMaxLength(6);
             MaxPlayerBox.setValue(MaxPlayerText);
 
-            Widget button101 = findButton();
+            Button button101 = (Button) findButton();
             if (button101 != null) {
                 button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
             }
 
             Button originalButton = null;
-            for (Widget widget : this.buttons) {
-                if (widget instanceof Button) {
-                    Button button = (Button) widget;
+            for (Widget widget : this.renderables) {
+                if (widget instanceof Button button) {
                     if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                         originalButton = button;
                         break;
@@ -80,22 +79,22 @@ public class GuiShareToLanEdit {
                 int y = originalButton.y;
 
                 // 删除原按钮
-                this.buttons.remove(originalButton);
-                this.children.remove(originalButton);
+                this.renderables.remove(originalButton);
+                this.removeWidget(originalButton);
 
                 // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.get("lanServer.start")), button -> {
+                Button newButton = new Button(x, y, width, height, Component.nullToEmpty(I18n.get("lanServer.start")), button -> {
                     ShareToLan.NewShareToLAN();
                     finalOriginalButton.onPress();
                 });
 
-                this.addButton(newButton);
+                this.addRenderableWidget(newButton);
             }
         }
 
         @Override
-        public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
             super.render(matrixStack, mouseX, mouseY, partialTicks);
 
             PortTextBox.render(matrixStack, mouseX,mouseY,partialTicks);
@@ -113,7 +112,7 @@ public class GuiShareToLanEdit {
             PortTextBox.keyPressed(keyCode, scanCode, modifiers);
             MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
 
-            Widget button101 = findButton();
+            Button button101 = (Button) findButton();
             if (button101 != null) {
                 button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
             }
@@ -152,7 +151,7 @@ public class GuiShareToLanEdit {
                 }
             }
 
-            Widget button101 = findButton();
+            Button button101 = (Button) findButton();
             if (button101 != null) {
                 button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
             }
@@ -175,9 +174,11 @@ public class GuiShareToLanEdit {
         }
 
         private Widget findButton() {
-            for (Widget button : buttons) {
-                if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
-                    return button;
+            for (Widget widget : this.renderables) {
+                if (widget instanceof Button button) {
+                    if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
+                        return button;
+                    }
                 }
             }
             return null;
