@@ -18,7 +18,7 @@
   "easylan.text.ban": "Banned",
   "easylan.text.op": "Operator",
   "easylan.text.save": "SaveAll",
-  "easylan.text.motd": "Motd（Server Info）",
+  "easylan.text.motd": "Motd (Server Info)",
   "easylan.text.httpApi": "HttpAPI Info",
   "easylan.text.lanInfo": "LAN output",
   "easylan.text.port": "Port",

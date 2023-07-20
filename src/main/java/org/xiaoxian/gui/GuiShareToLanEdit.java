@@ -1,8 +1,8 @@
 package org.xiaoxian.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -106,20 +106,20 @@ public class GuiShareToLanEdit {
         }
 
         @Override
-        public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
             super.render(matrixStack, mouseX, mouseY, partialTicks);
 
             PortTextBox.render(matrixStack, mouseX,mouseY,partialTicks);
             MaxPlayerBox.render(matrixStack, mouseX,mouseY,partialTicks);
 
-            drawString(matrixStack, Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            drawString(matrixStack, fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
+            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
-            drawString(matrixStack, fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            drawString(matrixStack, fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
+            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
 
-            // 来自开发者: 实在想不出好点子去掉drawString，重置GUI又太麻烦，直接眼不见心不烦¯\_(ツ)_/¯
-            fill(matrixStack, this.width / 2 - 32, 140, this.width / 2 + 32, 150, 0xFF000000);
+            // 来自开发者: 懒得管了
+            //matrixStack.fill(this.width / 2 - 32, 140, this.width / 2 + 32, 150, 0xFF000000);
         }
 
         @Override

@@ -1,6 +1,6 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -14,7 +14,7 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         Color color = this.isChecked ? Color.WHITE: Color.GRAY;

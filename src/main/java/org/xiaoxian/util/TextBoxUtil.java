@@ -1,9 +1,9 @@
 package org.xiaoxian.util;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
@@ -32,9 +32,9 @@ public class TextBoxUtil extends EditBox {
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderWidget(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            fill(matrixStack, getX(), getY(), getX() + width + 4, getY() + height, new Color(128, 128, 128, 30).getRGB());
+            matrixStack.fill(getX(), getY(), getX() + width + 4, getY() + height, new Color(128, 128, 128, 30).getRGB());
             RenderSystem.lineWidth(2f);
             drawLine(getX(), getX() + width + 3, getY() + height - 1, new Color(135,206,250).getRGB());
             RenderSystem.lineWidth(1f);
@@ -56,7 +56,25 @@ public class TextBoxUtil extends EditBox {
                 }
             }
 
-            Minecraft.getInstance().font.drawShadow(matrixStack, textToDraw, getX() + 4, getY() + (float)(height - 8) / 2, textColor);
+            matrixStack.drawString(Minecraft.getInstance().font, textToDraw, getX() + 4, getY() + (height - 8) / 2, textColor);
         }
     }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        if (!this.visible) {
+            return false;
+        } else {
+            boolean flag = mouseX >= this.getX() && mouseX < this.getX() + this.width && mouseY >= this.getY() && mouseY < this.getY() + this.height;
+            this.setFocused(flag);
+
+            if (this.isFocused() && flag && mouseButton == 0) {
+                this.clicked(mouseX, mouseY);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
 }
