@@ -1,9 +1,9 @@
 package org.xiaoxian;
 
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
 import org.xiaoxian.gui.GuiExitGame;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.gui.GuiWorldSelectionEdit;
@@ -41,7 +41,7 @@ public class EasyLAN {
     }
 
     @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         new ServerStarting().onServerStarting(event);
     }

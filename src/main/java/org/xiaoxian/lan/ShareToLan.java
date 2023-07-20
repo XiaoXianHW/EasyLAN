@@ -8,7 +8,7 @@ import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.players.PlayerList;
-import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.util.ChatUtil;
 
@@ -59,7 +59,7 @@ public class ShareToLan {
         /* 判断是否自定义最大玩家数 */
         if (!(GuiShareToLanEdit.MaxPlayerBox.getValue().isEmpty())) {
             try {
-                PlayerList playerList = new FMLServerStartingEvent(server).getServer().getPlayerList();
+                PlayerList playerList = new ServerStartingEvent(server).getServer().getPlayerList();
                 Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.players.PlayerList");
                 Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
                 maxplayerField.setAccessible(true);

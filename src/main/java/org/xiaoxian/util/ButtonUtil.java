@@ -22,7 +22,7 @@ public class ButtonUtil extends Button {
 
             RenderSystem.enableBlend();
             Color color;
-            if (isHovered()) {
+            if (isHovered) {
                 color = new Color(128, 128, 128, 128); // 灰色，半透明
             } else {
                 color = new Color(64, 64, 64, 128); // 深灰色，半透明

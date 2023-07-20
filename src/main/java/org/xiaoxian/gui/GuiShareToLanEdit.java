@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.TextBoxUtil;
@@ -30,10 +30,10 @@ public class GuiShareToLanEdit {
     public static String MaxPlayerWarningText = "";
 
     @SubscribeEvent
-    public void onGuiOpenEvent(GuiOpenEvent event) {
-        Screen guiScreen = event.getGui();
+    public void onGuiOpenEvent(ScreenOpenEvent event) {
+        Screen guiScreen = event.getScreen();
         if (guiScreen instanceof ShareToLanScreen) {
-            event.setGui(new GuiShareToLanModified(event.getGui()));
+            event.setScreen(new GuiShareToLanModified(event.getScreen()));
         }
     }
 

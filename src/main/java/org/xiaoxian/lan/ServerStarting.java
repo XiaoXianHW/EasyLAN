@@ -3,15 +3,15 @@ package org.xiaoxian.lan;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.*;
 import net.minecraft.world.level.GameRules;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
 
 import static org.xiaoxian.EasyLAN.*;
 
 public class ServerStarting {
 
     @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+    public void onServerStarting(ServerStartingEvent event) {
         MinecraftServer minecraftServer = event.getServer();
 
         if (whiteList) {

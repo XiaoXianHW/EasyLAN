@@ -6,16 +6,16 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 
 public class GuiExitGame {
     @SubscribeEvent
-    public void onGuiOpenEvent(GuiOpenEvent event) {
-        Screen guiScreen = event.getGui();
+    public void onGuiOpenEvent(ScreenOpenEvent event) {
+        Screen guiScreen = event.getScreen();
         if (guiScreen instanceof PauseScreen) {
-            event.setGui(new GuiInGameMenuModified());
+            event.setScreen(new GuiInGameMenuModified());
         }
     }
 
