@@ -27,5 +27,6 @@
 #### ***Other***
 
 - **HttpAPI Info（Api Support | Docs: [https://docs.axtn.net/docs/EasyLan/HttpAPI](https://docs.axtn.net/docs/EasyLan/HttpAPI)）**
+  (HttpAPI There may be a compatibility problem that may cause a crash when exiting the game. For details, please refer to https://github.com/XiaoXianHW/EasyLAN/issues/2)
 - **LAN output（Game Chat Output LAN Server Info）**
 
