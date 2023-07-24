@@ -39,5 +39,5 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: EasyLAN-v1-1.20.1
-        path: build
+        name: EasyLAN-v1-1.20.1.jar
+        path: build/libs/easylan-1.0.jar
