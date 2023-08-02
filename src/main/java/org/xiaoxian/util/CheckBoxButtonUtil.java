@@ -9,7 +9,7 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     private boolean isChecked;
 
     public CheckBoxButtonUtil(int x, int y, boolean isChecked, int width, int height) {
-        super(ButtonUtil.builder(x, y, width, height, ""));
+        super(x, y, width, height, "");
         this.isChecked = isChecked;
     }
 
@@ -18,7 +18,7 @@ public class CheckBoxButtonUtil extends ButtonUtil {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         Color color = this.isChecked ? Color.WHITE: Color.GRAY;
-        DrawUtil.drawRect(this.getX() + 2, this.getY() + 2, this.width - 4, this.height - 4, color);
+        DrawUtil.drawRect(this.x + 2, this.y + 2, this.width - 4, this.height - 4, color);
     }
 
     public boolean isChecked() {

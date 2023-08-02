@@ -11,30 +11,26 @@ import java.awt.Color;
 
 public class ButtonUtil extends Button {
 
-    public ButtonUtil(Button.Builder builder) {
-        super(builder);
-    }
-
-    public static Button.Builder builder(int x, int y, int width, int height, String buttonText) {
-        return Button.builder(Component.nullToEmpty(buttonText), button -> {}).bounds(x, y, width, height);
+    public ButtonUtil(int x, int y, int width, int height, String buttonText) {
+        super(x, y, width, height, Component.nullToEmpty(buttonText), button -> {});
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+            this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
             RenderSystem.enableBlend();
             Color color;
             if (isHovered) {
-                color = new Color(128, 128, 128, 128);
+                color = new Color(128, 128, 128, 128); // 灰色，半透明
             } else {
-                color = new Color(64, 64, 64, 128);
+                color = new Color(64, 64, 64, 128); // 深灰色，半透明
             }
-            fill(matrixStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color.getRGB());
+            fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, color.getRGB());
             RenderSystem.disableBlend();
 
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor());
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
         }
     }
 }

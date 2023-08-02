@@ -1,7 +1,7 @@
 package org.xiaoxian.gui;
 
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -30,7 +30,7 @@ public class GuiExitGame {
             super.init();
 
             Button originalButton = null;
-            for (Renderable widget : this.renderables) {
+            for (Widget widget : this.renderables) {
                 if (widget instanceof Button button) {
                     if (button.getMessage().getString().equals(I18n.get("menu.returnToMenu"))) {
                         originalButton = button;
@@ -40,19 +40,22 @@ public class GuiExitGame {
             }
 
             if (originalButton != null) {
+                // 记录原按钮的参数
                 int width = originalButton.getWidth();
                 int height = originalButton.getHeight();
-                int x = originalButton.getX();
-                int y = originalButton.getY();
+                int x = originalButton.x;
+                int y = originalButton.y;
 
+                // 删除原按钮
                 this.renderables.remove(originalButton);
                 this.removeWidget(originalButton);
 
+                // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = Button.builder(Component.translatable(I18n.get("menu.returnToMenu")), button -> {
+                Button newButton = new Button(x, y, width, height, Component.nullToEmpty(I18n.get("menu.returnToMenu")), button -> {
                     ShareToLan.StopHttpAPIServer();
                     finalOriginalButton.onPress();
-                }).bounds(x, y, width, height).build();
+                });
 
                 this.addRenderableWidget(newButton);
             }

@@ -1,7 +1,7 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[43,)"
 issueTrackerURL="https://github.com/XiaoXianHW/EasyLAN/issues"
-license="GNU General Public License v3"
+license="All rights reserved"
 
 [[mods]]
 modId="easylan"

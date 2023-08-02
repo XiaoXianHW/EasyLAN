@@ -5,8 +5,6 @@ import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import net.minecraft.server.players.PlayerList;
@@ -52,9 +50,7 @@ public class ShareToLan {
                 assert networkSystem != null;
                 networkSystem.startTcpServerListener(InetAddress.getByName("0.0.0.0"), Integer.parseInt(GuiShareToLanEdit.PortTextBox.getValue()));
                 if (!LanOutput) {
-                    ChatUtil.sendComponentMsg(Component.translatable("\u00a7e[\u00a76EasyLan\u00a7e] \u00a7a" + I18n.get("easylan.chat.CtPort"))
-                            .append(" ")
-                            .append(ComponentUtils.copyOnClickText(GuiShareToLanEdit.PortTextBox.getValue())));
+                    ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortTextBox.getValue() + "&f]");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -192,27 +188,24 @@ public class ShareToLan {
                     e.printStackTrace();
                 }
 
-                ChatUtil.sendMsg("&e[&6EasyLAN&e] &aSuccessfully");
+                ChatUtil.sendMsg("&e[&6EasyLan&e] &aSuccessfully");
                 ChatUtil.sendMsg("&4---------------------");
-                ChatUtil.sendComponentMsg(Component.translatable("\u00a7e" + I18n.get("easylan.local") + "IPv4: \u00a7a").append(ComponentUtils.copyOnClickText(LocalIPv4)));
-                ChatUtil.sendComponentMsg(Component.translatable("\u00a7e" + I18n.get("easylan.public") + "IPv4: \u00a7a").append(ComponentUtils.copyOnClickText(PublicIPv4)));
+                ChatUtil.sendMsg("&e" + I18n.get("easylan.local") + "IPv4: &a" + LocalIPv4);
+                ChatUtil.sendMsg("&e" + I18n.get("easylan.public") + "IPv4: &a" + PublicIPv4);
                 ChatUtil.sendMsg("&e" + I18n.get("easylan.chat.isPublic") + ": &a" + isPublic);
-
                 ChatUtil.sendMsg(" ");
-                ChatUtil.sendComponentMsg(Component.translatable("\u00a7e" + I18n.get("easylan.text.port") + ": \u00a7a").append(ComponentUtils.copyOnClickText(Objects.requireNonNull(getLanPort()))));
+                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.port") + ": &a" + getLanPort());
                 if (!(GuiShareToLanEdit.PortTextBox.getValue().isEmpty())) {
-                    ChatUtil.sendComponentMsg(Component.translatable("\u00a7e" + I18n.get("easylan.text.CtPort") + ": \u00a7a").append(ComponentUtils.copyOnClickText(GuiShareToLanEdit.PortTextBox.getValue())));
+                    ChatUtil.sendMsg("&e" + I18n.get("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortTextBox.getValue());
                 }
-
                 ChatUtil.sendMsg(" ");
                 ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + server.getMaxPlayers());
                 ChatUtil.sendMsg("&e" + I18n.get("easylan.text.onlineMode") + ": &a" + onlineMode);
-
                 ChatUtil.sendMsg(" ");
                 if (HttpAPI) {
                     ChatUtil.sendMsg("&eHttp-Api:&a true");
-                    ChatUtil.sendComponentMsg(Component.translatable("\u00a7eApi-Status:\u00a7a ").append(ComponentUtils.copyOnClickText("localhost:28960/status")));
-                    ChatUtil.sendComponentMsg(Component.translatable("\u00a7eApi-PlayerList:\u00a7a ").append(ComponentUtils.copyOnClickText("localhost:28960/playerlist")));
+                    ChatUtil.sendMsg("&eApi-Status:&a localhost:28960/status");
+                    ChatUtil.sendMsg("&eApi-PlayerList:&a localhost:28960/playerlist");
                 }
                 ChatUtil.sendMsg("&4---------------------");
             });
