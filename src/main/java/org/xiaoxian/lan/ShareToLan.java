@@ -40,7 +40,7 @@ public class ShareToLan {
 
     public static void NewShareToLAN() {
         /* 变量区~ */
-        String fieldName = devMode ? "maxPlayers" : "field_72405_c";
+        String fieldName = devMode ? "maxPlayers" : "f_11193_";
         Minecraft mc = Minecraft.getInstance();
         IntegratedServer server = mc.getSingleplayerServer();
         assert server != null;
