@@ -1,10 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -15,16 +16,16 @@ version = '1.0'
 group = 'org.xiaoxian.easylan'
 archivesBaseName = 'EasyLAN'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'snapshot', version: '20201028-1.16.3'
     runs {
         client {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -37,7 +38,7 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -50,7 +51,7 @@ minecraft {
         data {
             workingDirectory project.file('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
@@ -67,7 +68,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.1.37'
 }
 
 jar {
@@ -75,7 +76,7 @@ jar {
         attributes([
             "Specification-Title": "examplemod",
             "Specification-Vendor": "examplemodsareus",
-            "Specification-Version": "1", // We are version 1 of ourselves
+            "Specification-Version": "1",
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"examplemodsareus",
@@ -84,7 +85,7 @@ jar {
     }
 }
 
-jar.finalizedBy('reobfJar')
+jar.finalizedBy('reobfJar') 
 
 publishing {
     publications {

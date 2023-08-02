@@ -37,19 +37,19 @@ public class ShareToLan {
 
     public static void NewShareToLAN() {
         /* 变量区~ */
-        String fieldName = devMode ? "maxPlayers" : "field_149200_f";
+        String fieldName = devMode ? "maxPlayers" : "field_72405_c";
         Minecraft mc = Minecraft.getInstance();
-        IntegratedServer server = mc.getSingleplayerServer();
+        IntegratedServer server = mc.getIntegratedServer();
         assert server != null;
-        NetworkSystem networkSystem = server.getConnection();
+        NetworkSystem networkSystem = server.getNetworkSystem();
 
         /* 判断是否自定义端口号 */
-        if (!(GuiShareToLanEdit.PortTextBox.getValue().isEmpty())) {
+        if (!(GuiShareToLanEdit.PortTextBox.getText().isEmpty())) {
             try {
                 assert networkSystem != null;
-                networkSystem.startTcpServerListener(InetAddress.getByName("0.0.0.0"), Integer.parseInt(GuiShareToLanEdit.PortTextBox.getValue()));
+                networkSystem.addEndpoint(InetAddress.getByName("0.0.0.0"), Integer.parseInt(GuiShareToLanEdit.PortTextBox.getText()));
                 if (!LanOutput) {
-                    ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortTextBox.getValue() + "&f]");
+                    ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortTextBox.getText() + "&f]");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -57,15 +57,15 @@ public class ShareToLan {
         }
 
         /* 判断是否自定义最大玩家数 */
-        if (!(GuiShareToLanEdit.MaxPlayerBox.getValue().isEmpty())) {
+        if (!(GuiShareToLanEdit.MaxPlayerBox.getText().isEmpty())) {
             try {
                 PlayerList playerList = new FMLServerStartingEvent(server).getServer().getPlayerList();
                 Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.PlayerList");
                 Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
                 maxplayerField.setAccessible(true);
-                maxplayerField.set(playerList, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getValue()));
+                maxplayerField.set(playerList, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
                 if (!LanOutput) {
-                    ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.get("easylan.chat.CtPlayer") + " &f[&e" + GuiShareToLanEdit.MaxPlayerBox.getValue() + "&f]");
+                    ChatUtil.sendMsg("&e[&6EasyLan&e] &a" + I18n.format("easylan.chat.CtPlayer") + " &f[&e" + GuiShareToLanEdit.MaxPlayerBox.getText() + "&f]");
                 }
             } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -84,23 +84,23 @@ public class ShareToLan {
                 }
 
                 System.out.println("Starting Thread!");
-                if (GuiShareToLanEdit.PortTextBox.getValue().isEmpty()) {
+                if (GuiShareToLanEdit.PortTextBox.getText().isEmpty()) {
                     HttpApi.set("port", getLanPort());
                 } else {
-                    HttpApi.set("port", GuiShareToLanEdit.PortTextBox.getValue());
+                    HttpApi.set("port", GuiShareToLanEdit.PortTextBox.getText());
                 }
 
-                HttpApi.set("version", server.getServerVersion());
-                HttpApi.set("owner", server.getSingleplayerName());
-                HttpApi.set("motd", server.getMotd());
+                HttpApi.set("version", server.getMinecraftVersion());
+                HttpApi.set("owner", server.getServerOwner());
+                HttpApi.set("motd", server.getMOTD());
                 HttpApi.set("pvp", String.valueOf(allowPVP));
                 HttpApi.set("onlineMode", String.valueOf(onlineMode));
                 HttpApi.set("spawnAnimals", String.valueOf(spawnAnimals));
                 HttpApi.set("allowFlight", String.valueOf(allowFlight));
-                HttpApi.set("difficulty", String.valueOf(server.getWorldData().getDifficulty()));
-                HttpApi.set("gameType", String.valueOf(server.getDefaultGameType()));
+                HttpApi.set("difficulty", String.valueOf(server.func_241755_D_().getDifficulty()));
+                HttpApi.set("gameType", String.valueOf(server.getGameType()));
                 HttpApi.set("maxPlayer", String.valueOf(server.getMaxPlayers()));
-                HttpApi.set("onlinePlayer", String.valueOf(server.getPlayerCount()));
+                HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
                 playerList = server.getPlayerList().getPlayers();
                 List<String> playerIDs = new ArrayList<>();
                 for (ServerPlayerEntity player : playerList) {
@@ -119,8 +119,8 @@ public class ShareToLan {
         /* 定时异步处理API */
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.scheduleAtFixedRate(() -> {
-            HttpApi.set("difficulty", String.valueOf(server.getWorldData().getDifficulty()));
-            HttpApi.set("onlinePlayer", String.valueOf(server.getPlayerCount()));
+            HttpApi.set("difficulty", String.valueOf(server.func_241755_D_().getDifficulty()));
+            HttpApi.set("onlinePlayer", String.valueOf(server.getCurrentPlayerCount()));
 
             playerList = server.getPlayerList().getPlayers();
             List<String> playerIDs = new ArrayList<>();
@@ -189,17 +189,17 @@ public class ShareToLan {
 
                 ChatUtil.sendMsg("&e[&6EasyLan&e] &aSuccessfully");
                 ChatUtil.sendMsg("&4---------------------");
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.local") + "IPv4: &a" + LocalIPv4);
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.public") + "IPv4: &a" + PublicIPv4);
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.chat.isPublic") + ": &a" + isPublic);
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.local") + "IPv4: &a" + LocalIPv4);
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.public") + "IPv4: &a" + PublicIPv4);
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.chat.isPublic") + ": &a" + isPublic);
                 ChatUtil.sendMsg(" ");
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.port") + ": &a" + getLanPort());
-                if (!(GuiShareToLanEdit.PortTextBox.getValue().isEmpty())) {
-                    ChatUtil.sendMsg("&e" + I18n.get("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortTextBox.getValue());
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.text.port") + ": &a" + getLanPort());
+                if (!(GuiShareToLanEdit.PortTextBox.getText().isEmpty())) {
+                    ChatUtil.sendMsg("&e" + I18n.format("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortTextBox.getText());
                 }
                 ChatUtil.sendMsg(" ");
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + server.getMaxPlayers());
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.onlineMode") + ": &a" + onlineMode);
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.text.maxplayer") + ": &a" + server.getMaxPlayers());
+                ChatUtil.sendMsg("&e" + I18n.format("easylan.text.onlineMode") + ": &a" + onlineMode);
                 ChatUtil.sendMsg(" ");
                 if (HttpAPI) {
                     ChatUtil.sendMsg("&eHttp-Api:&a true");

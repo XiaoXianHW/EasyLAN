@@ -33,7 +33,7 @@ public class GuiExitGame {
             for (Widget widget : this.buttons) {
                 if (widget instanceof Button) {
                     Button button = (Button) widget;
-                    if (button.getMessage().getString().equals(I18n.get("menu.returnToMenu"))) {
+                    if (button.getMessage().getString().equals(I18n.format("menu.returnToMenu"))) {
                         originalButton = button;
                         break;
                     }
@@ -43,7 +43,7 @@ public class GuiExitGame {
             if (originalButton != null) {
                 // 记录原按钮的参数
                 int width = originalButton.getWidth();
-                int height = originalButton.getHeight();
+                int height = originalButton.getHeightRealms();
                 int x = originalButton.x;
                 int y = originalButton.y;
 
@@ -53,7 +53,7 @@ public class GuiExitGame {
 
                 // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.get("menu.returnToMenu")), button -> {
+                Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.format("menu.returnToMenu")), button -> {
                     ShareToLan.StopHttpAPIServer();
                     finalOriginalButton.onPress();
                 });

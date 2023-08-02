@@ -21,7 +21,7 @@ public class TextBoxUtil extends TextFieldWidget {
     private long lastUpdateTick = 20;
 
     public TextBoxUtil(FontRenderer fontRenderer, int x, int y, int width, int height, String msg) {
-        super(fontRenderer, x, y, width, height, ITextComponent.nullToEmpty(msg));
+        super(fontRenderer, x, y, width, height, ITextComponent.getTextComponentOrEmpty(msg));
 
         try {
             lineScrollOffsetField = TextFieldWidget.class.getDeclaredField(fieldName);
@@ -46,7 +46,7 @@ public class TextBoxUtil extends TextFieldWidget {
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            String textToDraw = getValue().substring(Math.max(0, lineScrollOffset));
+            String textToDraw = getText().substring(Math.max(0, lineScrollOffset));
 
             if (this.isFocused()) {
                 long currentTick = System.currentTimeMillis();
@@ -56,7 +56,7 @@ public class TextBoxUtil extends TextFieldWidget {
                 }
             }
 
-            Minecraft.getInstance().font.drawShadow(matrixStack, textToDraw, x + 4, y + (float)(height - 8) / 2, textColor);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(matrixStack, textToDraw, x + 4, y + (float)(height - 8) / 2, textColor);
         }
     }
 }

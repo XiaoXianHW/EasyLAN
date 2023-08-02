@@ -12,7 +12,7 @@ import java.awt.Color;
 public class ButtonUtil extends Button {
 
     public ButtonUtil(int x, int y, int width, int height, String buttonText) {
-        super(x, y, width, height, ITextComponent.nullToEmpty(buttonText), button -> {});
+        super(x, y, width, height, ITextComponent.getTextComponentOrEmpty(buttonText), button -> {});
     }
 
     @Override
@@ -30,7 +30,7 @@ public class ButtonUtil extends Button {
             fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, color.getRGB());
             RenderSystem.disableBlend();
 
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
+            drawCenteredString(matrixStack, Minecraft.getInstance().fontRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
         }
     }
 }

@@ -21,14 +21,14 @@ public class DrawUtil {
         GL11.glColor4f(red, green, blue, alpha);
 
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
         bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        bufferBuilder.vertex((double)x + width, y, 0.0D).endVertex();
-        bufferBuilder.vertex(x, y, 0.0D).endVertex();
-        bufferBuilder.vertex(x, (double)y + height, 0.0D).endVertex();
-        bufferBuilder.vertex((double)x + width, (double)y + height, 0.0D).endVertex();
-        tessellator.end();
+        bufferBuilder.pos((double)x + width, y, 0.0D).endVertex();
+        bufferBuilder.pos(x, y, 0.0D).endVertex();
+        bufferBuilder.pos(x, (double)y + height, 0.0D).endVertex();
+        bufferBuilder.pos((double)x + width, (double)y + height, 0.0D).endVertex();
+        tessellator.draw();
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.enableTexture();

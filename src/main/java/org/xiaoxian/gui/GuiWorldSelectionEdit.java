@@ -25,9 +25,9 @@ public class GuiWorldSelectionEdit {
 
         @Override
         protected void init() {
-            this.addButton(new Button(5, 5, 100, 20, new StringTextComponent(I18n.get("easylan.setting")), (button) -> {
+            this.addButton(new Button(5, 5, 100, 20, new StringTextComponent(I18n.format("easylan.setting")), (button) -> {
                 assert GuiWorldSelectionModified.this.minecraft != null;
-                GuiWorldSelectionModified.this.minecraft.setScreen(new GuiEasyLanMain(this));
+                GuiWorldSelectionModified.this.minecraft.displayGuiScreen(new GuiEasyLanMain(this));
             }));
             super.init();
         }
