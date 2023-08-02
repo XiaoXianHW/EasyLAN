@@ -1,46 +1,46 @@
 package org.xiaoxian.lan;
 
+import net.minecraft.command.impl.*;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.commands.*;
-import net.minecraft.world.level.GameRules;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 import static org.xiaoxian.EasyLAN.*;
 
 public class ServerStarting {
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(FMLServerStartingEvent event) {
         MinecraftServer minecraftServer = event.getServer();
 
         if (whiteList) {
-            WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
+            WhitelistCommand.register(event.getCommandDispatcher());
         }
 
         if (BanCommands) {
-            BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
-            BanIpCommands.register(event.getServer().getCommands().getDispatcher());
-            BanListCommands.register(event.getServer().getCommands().getDispatcher());
-            PardonCommand.register(event.getServer().getCommands().getDispatcher());
-            PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
+            BanCommand.register(event.getCommandDispatcher());
+            BanIpCommand.register(event.getCommandDispatcher());
+            BanListCommand.register(event.getCommandDispatcher());
+            PardonCommand.register(event.getCommandDispatcher());
+            PardonIpCommand.register(event.getCommandDispatcher());
         }
 
         if (OpCommands) {
-            OpCommand.register(event.getServer().getCommands().getDispatcher());
-            DeOpCommands.register(event.getServer().getCommands().getDispatcher());
+            OpCommand.register(event.getCommandDispatcher());
+            DeOpCommand.register(event.getCommandDispatcher());
         }
 
         if (SaveCommands) {
-            SaveAllCommand.register(event.getServer().getCommands().getDispatcher());
-            SaveOnCommand.register(event.getServer().getCommands().getDispatcher());
-            SaveOffCommand.register(event.getServer().getCommands().getDispatcher());
+            SaveAllCommand.register(event.getCommandDispatcher());
+            SaveOnCommand.register(event.getCommandDispatcher());
+            SaveOffCommand.register(event.getCommandDispatcher());
         }
 
-        minecraftServer.setPvpAllowed(allowPVP);
-        minecraftServer.setUsesAuthentication(onlineMode);
-        minecraftServer.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, minecraftServer);
-        minecraftServer.setFlightAllowed(allowFlight);
-        minecraftServer.setMotd(motd);
+        minecraftServer.setAllowPvp(allowPVP);
+        minecraftServer.setOnlineMode(onlineMode);
+        minecraftServer.setCanSpawnAnimals(spawnAnimals);
+        minecraftServer.setCanSpawnNPCs(spawnNPCs);
+        minecraftServer.setAllowFlight(allowFlight);
+        minecraftServer.setMOTD(motd);
     }
 }

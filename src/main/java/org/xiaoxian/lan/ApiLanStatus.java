@@ -3,7 +3,7 @@ package org.xiaoxian.lan;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -65,7 +65,6 @@ public class ApiLanStatus {
             sb.append(" }");
 
             String response = sb.toString();
-            t.getResponseHeaders().set("Content-Type", "application/json");
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
@@ -77,7 +76,7 @@ public class ApiLanStatus {
         @Override
         public void handle(HttpExchange t) throws IOException {
             playerIDs.clear();
-            for (ServerPlayer player : playerList) {
+            for (ServerPlayerEntity player : playerList) {
                 playerIDs.add(player.getDisplayName().getString());
             }
 
@@ -95,7 +94,7 @@ public class ApiLanStatus {
             sb.append(" ]");
 
             String response = sb.toString();
-            t.getResponseHeaders().set("Content-Type", "application/json");
+
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());

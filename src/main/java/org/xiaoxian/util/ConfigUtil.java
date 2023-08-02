@@ -17,6 +17,7 @@ public class ConfigUtil {
                 allowPVP = Boolean.parseBoolean(ConfigUtil.get("pvp"));
                 onlineMode = Boolean.parseBoolean(ConfigUtil.get("online-mode"));
                 spawnAnimals = Boolean.parseBoolean(ConfigUtil.get("spawn-Animals"));
+                spawnNPCs = Boolean.parseBoolean(ConfigUtil.get("spawn-NPCs"));
                 allowFlight = Boolean.parseBoolean(ConfigUtil.get("allow-Flight"));
                 whiteList = Boolean.parseBoolean(ConfigUtil.get("whiteList"));
                 BanCommands = Boolean.parseBoolean(ConfigUtil.get("BanCommands"));
@@ -56,6 +57,7 @@ public class ConfigUtil {
         properties.setProperty("pvp", "true");
         properties.setProperty("online-mode", "true");
         properties.setProperty("spawn-Animals", "true");
+        properties.setProperty("spawn-NPCs", "true");
         properties.setProperty("allow-Flight", "true");
         properties.setProperty("whiteList", "false");
         properties.setProperty("BanCommands", "false");

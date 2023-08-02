@@ -1,10 +1,9 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.BufferBuilder;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -16,32 +15,34 @@ public class DrawUtil {
         float blue = color.getBlue() / 255.0F;
         float alpha = color.getAlpha() / 255.0F;
 
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        RenderSystem.setShaderColor(red, green, blue, alpha);
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture();
+        GlStateManager.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        GlStateManager.color4f(red, green, blue, alpha);
 
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        bufferBuilder.vertex((double)x + width, y, 0.0D).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.vertex(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.vertex(x, (double)y + height, 0.0D).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.vertex((double)x + width, (double)y + height, 0.0D).color(red, green, blue, alpha).endVertex();
-        tesselator.end();
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        bufferBuilder.pos((double)x + width, y, 0.0D).endVertex();
+        bufferBuilder.pos(x, y, 0.0D).endVertex();
+        bufferBuilder.pos(x, (double)y + height, 0.0D).endVertex();
+        bufferBuilder.pos((double)x + width, (double)y + height, 0.0D).endVertex();
+        tessellator.draw();
 
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.disableBlend();
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableTexture();
+        GlStateManager.disableBlend();
     }
 
     public static void drawLine(int startX, int endX, int y, int color) {
-        RenderSystem.setShaderColor(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F);
-        RenderSystem.lineWidth(2f);
-
-        BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        builder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-        builder.vertex(startX, y, 0.0D).color(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F).endVertex();
-        builder.vertex(endX, y, 0.0D).color(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F).endVertex();
-        Tesselator.getInstance().end();
+        GlStateManager.color4f(((color >> 16) & 0xFF) / 255.0F, ((color >> 8) & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, ((color >> 24) & 0xFF) / 255.0F);
+        GlStateManager.lineWidth(2f);
+        GlStateManager.disableTexture();
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex2i(startX, y);
+        GL11.glVertex2i(endX, y);
+        GL11.glEnd();
+        GlStateManager.enableTexture();
     }
 }

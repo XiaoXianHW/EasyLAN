@@ -1,40 +1,33 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.widget.button.Button;
+import com.mojang.blaze3d.platform.GlStateManager;
 
-import javax.annotation.Nonnull;
 import java.awt.Color;
 
 public class ButtonUtil extends Button {
 
-    public ButtonUtil(Builder builder) {
-        super(builder);
-    }
-
-    public static Builder builder(int x, int y, int width, int height, String buttonText) {
-        return Button.builder(Component.nullToEmpty(buttonText), button -> {}).bounds(x, y, width, height);
+    public ButtonUtil(int x, int y, int width, int height, String buttonText) {
+        super(x, y, width, height, buttonText, button -> {});
     }
 
     @Override
-    public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+            this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
-            RenderSystem.enableBlend();
+            GlStateManager.enableBlend();
             Color color;
-            if (isHovered) {
-                color = new Color(128, 128, 128, 128);
+            if (isHovered()) {
+                color = new Color(128, 128, 128, 128); // 灰色，半透明
             } else {
-                color = new Color(64, 64, 64, 128);
+                color = new Color(64, 64, 64, 128); // 深灰色，半透明
             }
-            matrixStack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color.getRGB());
-            RenderSystem.disableBlend();
+            fill(this.x, this.y, this.x + this.width, this.y + this.height, color.getRGB());
+            GlStateManager.disableBlend();
 
-            matrixStack.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor());
+            this.drawCenteredString(Minecraft.getInstance().fontRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
         }
     }
 }

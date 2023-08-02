@@ -1,9 +1,9 @@
 package org.xiaoxian;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import org.xiaoxian.gui.GuiExitGame;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.gui.GuiWorldSelectionEdit;
@@ -22,6 +22,7 @@ public class EasyLAN {
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;
     public static boolean spawnAnimals = true;
+    public static boolean spawnNPCs = true;
     public static boolean allowFlight = true;
     public static boolean whiteList = false;
     public static boolean BanCommands = false;
@@ -41,7 +42,7 @@ public class EasyLAN {
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void onServerStarting(FMLServerStartingEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         new ServerStarting().onServerStarting(event);
     }

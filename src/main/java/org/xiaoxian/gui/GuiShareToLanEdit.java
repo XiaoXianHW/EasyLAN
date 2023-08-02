@@ -1,44 +1,41 @@
 package org.xiaoxian.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.ShareToLanScreen;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ShareToLanScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 
 public class GuiShareToLanEdit {
 
-    public static EditBox PortTextBox;
+    public static TextFieldWidget PortTextBox;
     public static String PortText = "";
     public static String PortWarningText = "";
 
-    public static EditBox MaxPlayerBox;
+    public static TextFieldWidget MaxPlayerBox;
     public static String MaxPlayerText = "";
     public static String MaxPlayerWarningText = "";
 
     @SubscribeEvent
-    public void onGuiOpenEvent(ScreenEvent.Opening event) {
-        Screen guiScreen = event.getScreen();
+    public void onGuiOpenEvent(GuiOpenEvent event) {
+        Screen guiScreen = event.getGui();
         if (guiScreen instanceof ShareToLanScreen) {
-            event.setNewScreen(new GuiShareToLanModified(event.getScreen()));
+            event.setGui(new GuiShareToLanEdit.GuiShareToLanModified(event.getGui()));
         }
     }
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
-        Font fontRenderer = Minecraft.getInstance().font;
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
 
         public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
@@ -49,22 +46,23 @@ public class GuiShareToLanEdit {
             super.init();
 
             PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
-            PortTextBox.setMaxLength(5);
-            PortTextBox.setValue(PortText);
+            PortTextBox.setMaxStringLength(5);
+            PortTextBox.setText(PortText);
 
             MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
-            MaxPlayerBox.setMaxLength(6);
-            MaxPlayerBox.setValue(MaxPlayerText);
+            MaxPlayerBox.setMaxStringLength(6);
+            MaxPlayerBox.setText(MaxPlayerText);
 
-            Button button101 = (Button) findButton();
+            Widget button101 = findButton();
             if (button101 != null) {
-                button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
             }
 
             Button originalButton = null;
-            for (Renderable widget : this.renderables) {
-                if (widget instanceof Button button) {
-                    if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
+            for (Widget widget : this.buttons) {
+                if (widget instanceof Button) {
+                    Button button = (Button) widget;
+                    if (button.getMessage().equals(I18n.format("lanServer.start"))) {
                         originalButton = button;
                         break;
                     }
@@ -72,54 +70,39 @@ public class GuiShareToLanEdit {
             }
 
             if (originalButton != null) {
+                // 记录原按钮的参数
                 int width = originalButton.getWidth();
                 int height = originalButton.getHeight();
-                int x = originalButton.getX();
-                int y = originalButton.getY();
+                int x = originalButton.x;
+                int y = originalButton.y;
 
-                this.renderables.remove(originalButton);
-                this.removeWidget(originalButton);
+                // 删除原按钮
+                this.buttons.remove(originalButton);
+                this.children.remove(originalButton);
 
+                // 添加新按钮
                 Button finalOriginalButton = originalButton;
-                Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
+                Button newButton = new Button(x, y, width, height, I18n.format("lanServer.start"), button -> {
                     ShareToLan.NewShareToLAN();
                     finalOriginalButton.onPress();
-                }).bounds(x, y, width, height).build();
+                });
 
-                this.addRenderableWidget(newButton);
+                this.addButton(newButton);
             }
-
-            EditBox targetEditBox = null;
-            for (Renderable widget : this.renderables) {
-                if (widget instanceof EditBox editBox) {
-                    if (editBox.getMessage().equals(Component.translatable("lanServer.port"))) {
-                        targetEditBox = editBox;
-                    }
-                }
-            }
-
-            if (targetEditBox != null) {
-                this.removeWidget(targetEditBox);
-            }
-
-
         }
 
         @Override
-        public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-            super.render(matrixStack, mouseX, mouseY, partialTicks);
+        public void render(int mouseX, int mouseY, float partialTicks) {
+            super.render(mouseX, mouseY, partialTicks);
 
-            PortTextBox.render(matrixStack, mouseX,mouseY,partialTicks);
-            MaxPlayerBox.render(matrixStack, mouseX,mouseY,partialTicks);
+            PortTextBox.render(mouseX,mouseY,partialTicks);
+            MaxPlayerBox.render(mouseX,mouseY,partialTicks);
 
-            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            drawString(Minecraft.getInstance().fontRenderer, I18n.format("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
+            drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
-            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
-
-            // 来自开发者: 懒得管了
-            //matrixStack.fill(this.width / 2 - 32, 140, this.width / 2 + 32, 150, 0xFF000000);
+            drawString(fontRenderer, I18n.format("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
+            drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
         }
 
         @Override
@@ -127,13 +110,13 @@ public class GuiShareToLanEdit {
             PortTextBox.keyPressed(keyCode, scanCode, modifiers);
             MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
 
-            Button button101 = (Button) findButton();
+            Widget button101 = findButton();
             if (button101 != null) {
-                button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
             }
 
-            MaxPlayerText = MaxPlayerBox.getValue();
-            PortText = PortTextBox.getValue();
+            MaxPlayerText = MaxPlayerBox.getText();
+            PortText = PortTextBox.getText();
 
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
@@ -143,36 +126,36 @@ public class GuiShareToLanEdit {
             PortTextBox.charTyped(typedChar, keyCode);
             MaxPlayerBox.charTyped(typedChar, keyCode);
 
-            String previousText = PortTextBox.getValue();
-            String previousMaxPlayerText = MaxPlayerBox.getValue();
+            String previousText = PortTextBox.getText();
+            String previousMaxPlayerText = MaxPlayerBox.getText();
 
             if (Character.isDigit(typedChar)) {
-                String newPortText = PortTextBox.getValue();
-                String newMaxPlayerText = MaxPlayerBox.getValue();
+                String newPortText = PortTextBox.getText();
+                String newMaxPlayerText = MaxPlayerBox.getText();
                 try {
                     int newPort = Integer.parseInt(newPortText);
                     int newMaxPlayer = Integer.parseInt(newMaxPlayerText);
 
                     if (!(newPort >= 100 && newPort <= 65535)) {
-                        PortTextBox.setValue(previousText);
+                        PortTextBox.setText(previousText);
                     }
 
                     if (!(newMaxPlayer >= 2 && newMaxPlayer <= 500000)) {
-                        MaxPlayerBox.setValue(previousMaxPlayerText);
+                        MaxPlayerBox.setText(previousMaxPlayerText);
                     }
                 } catch (NumberFormatException e) {
-                    PortTextBox.setValue(previousText);
-                    MaxPlayerBox.setValue(previousMaxPlayerText);
+                    PortTextBox.setText(previousText);
+                    MaxPlayerBox.setText(previousMaxPlayerText);
                 }
             }
 
-            Button button101 = (Button) findButton();
+            Widget button101 = findButton();
             if (button101 != null) {
-                button101.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
+                button101.active = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
             }
 
-            MaxPlayerText = MaxPlayerBox.getValue();
-            PortText = PortTextBox.getValue();
+            MaxPlayerText = MaxPlayerBox.getText();
+            PortText = PortTextBox.getText();
 
             return super.charTyped(typedChar, keyCode);
         }
@@ -180,20 +163,18 @@ public class GuiShareToLanEdit {
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
             PortTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-            PortText = PortTextBox.getValue();
+            PortText = PortTextBox.getText();
 
             MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
-            MaxPlayerText = MaxPlayerBox.getValue();
+            MaxPlayerText = MaxPlayerBox.getText();
 
             return super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
-        private Renderable findButton() {
-            for (Renderable widget : this.renderables) {
-                if (widget instanceof Button button) {
-                    if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
-                        return button;
-                    }
+        private Widget findButton() {
+            for (Widget button : buttons) {
+                if (button.getMessage().equals(I18n.format("lanServer.start"))) {
+                    return button;
                 }
             }
             return null;
@@ -207,15 +188,15 @@ public class GuiShareToLanEdit {
                 try {
                     int port = Integer.parseInt(portText);
                     boolean isPortAvailable = port >= 100 && port <= 65535 && isPortAvailable(port);
-                    PortWarningText = isPortAvailable ? "" : I18n.get("easylan.text.port.used");
+                    PortWarningText = isPortAvailable ? "" : I18n.format("easylan.text.port.used");
 
                     if (!(port >= 100 && port <= 65535)) {
-                        PortWarningText = I18n.get("easylan.text.port.invalid");
+                        PortWarningText = I18n.format("easylan.text.port.invalid");
                     }
 
                     return isPortAvailable;
                 } catch (NumberFormatException e) {
-                    PortWarningText = I18n.get("easylan.text.port.invalid");
+                    PortWarningText = I18n.format("easylan.text.port.invalid");
                     return false;
                 }
             }
@@ -229,13 +210,13 @@ public class GuiShareToLanEdit {
                 try {
                     int maxPlayer = Integer.parseInt(maxPlayerText);
                     if (!(maxPlayer >= 2 && maxPlayer <= 500000)) {
-                        MaxPlayerWarningText = I18n.get("easylan.text.maxplayer.invalid");
+                        MaxPlayerWarningText = I18n.format("easylan.text.maxplayer.invalid");
                         return false;
                     }
                     MaxPlayerWarningText = "";
                     return true;
                 } catch (NumberFormatException e) {
-                    MaxPlayerWarningText = I18n.get("easylan.text.maxplayer.invalid");
+                    MaxPlayerWarningText = I18n.format("easylan.text.maxplayer.invalid");
                     return false;
                 }
             }
