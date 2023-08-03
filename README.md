@@ -1,5 +1,6 @@
 # EasyLAN
 **A Minecraft Forge Mod for Custom LAN Servers Related settings for customizing the LAN server (built-in server)**
+[中文文档](https://github.com/XiaoXianHW/EasyLAN/README_CN.md)
 
 - [CurseForge](https://www.curseforge.com/minecraft/mc-mods/easylan)
 - [Modrinth](https://modrinth.com/mod/easylan)
@@ -49,11 +50,10 @@
 ## Translation Contribution
 
 This MOD supports multiple languages;<br>
-To contribute translations, please refer to and upload your language files to `src/main/resources/assets/easylan/lang`
+To contribute translations, please refer to and upload your language files to `src/main/resources/assets/easylan/lang`<br>
 Contributed translations will be added in the **next Minecraft version** (or full version if it's a major refactoring update)
 
 - 1.7.2 - 1.12.2 (xx_XX.lang; **eg: zh_CN.lang**)
-
 - 1.14.4 - 1.20.1 (xx_xx.json; **eg: zh_cn.json**)
 
 <br>
