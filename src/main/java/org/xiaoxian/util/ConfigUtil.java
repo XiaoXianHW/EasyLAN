@@ -25,6 +25,8 @@ public class ConfigUtil {
                 SaveCommand = Boolean.parseBoolean(ConfigUtil.get("SaveCommand"));
                 HttpAPI = Boolean.parseBoolean(ConfigUtil.get("Http-Api"));
                 LanOutput = Boolean.parseBoolean(ConfigUtil.get("Lan-output"));
+                CustomPort = ConfigUtil.get("Port");
+                CustomMaxPlayer = ConfigUtil.get("MaxPlayer");
                 motd = ConfigUtil.get("Motd");
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -64,5 +66,7 @@ public class ConfigUtil {
         properties.setProperty("OpCommand", "false");
         properties.setProperty("SaveCommand", "false");
         properties.setProperty("Motd", "This is a Default EasyLAN Motd!");
+        properties.setProperty("Port", "25565");
+        properties.setProperty("MaxPlayer", "20");
     }
 }

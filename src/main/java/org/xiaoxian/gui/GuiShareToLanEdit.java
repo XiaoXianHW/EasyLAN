@@ -5,6 +5,7 @@ import net.minecraft.client.gui.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import org.lwjgl.input.Keyboard;
+import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class GuiShareToLanEdit {
             if (button101 != null) {
                 button101.enabled = checkPortAndEnableButton(PortTextBox.getText()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
             }
+
         }
 
         @Override
@@ -73,6 +75,11 @@ public class GuiShareToLanEdit {
             super.actionPerformed(button);
             if (button.id == 102) {
                 mc.displayGuiScreen(new GuiIngameMenu());
+            }
+            if (button.id == 101) {
+                ConfigUtil.set("Port", PortText);
+                ConfigUtil.set("MaxPlayer", MaxPlayerText);
+                ConfigUtil.save();
             }
             GuiButton button101 = findButton();
             if (button101 != null) {
