@@ -22,7 +22,7 @@ public class EasyLan {
 
     public static final String MOD_ID = "easylan";
     public static final String MOD_NAME = "EasyLAN";
-    public static final String VERSION = "v1";
+    public static final String VERSION = "v1.2";
 
     @Mod.Instance(MOD_ID)
     public static EasyLan INSTANCE;
@@ -39,6 +39,8 @@ public class EasyLan {
     public static boolean SaveCommand = false;
     public static boolean HttpAPI = true;
     public static boolean LanOutput = true;
+    public static String CustomPort = "25565";
+    public static String CustomMaxPlayer = "20";
     public static String motd = "This is a Default EasyLAN Motd!";
 
     @Mod.EventHandler
@@ -49,6 +51,9 @@ public class EasyLan {
         MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
         MinecraftForge.EVENT_BUS.register(new ServerStarting());
         MinecraftForge.EVENT_BUS.register(new ShareToLan());
+
+        GuiShareToLanEdit.PortText = CustomPort;
+        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
     }
 
     @Mod.EventHandler
