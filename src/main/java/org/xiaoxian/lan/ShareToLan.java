@@ -148,10 +148,10 @@ public class ShareToLan {
                             e.printStackTrace();
                         }
                         String isPublic;
-                        String PublicIPv4 = "null";
-                        String LocalIPv4 = "null";
+                        String PublicIPv4 = "Unknown";
+                        String LocalIPv4 = "Unknown";
                         try {
-                            URL url = new URL("https://api.axtn.net/api/myipcheck.php");
+                            URL url = new URL("https://api.axtn.net/api/myipcheck");
                             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                             connection.setRequestMethod("GET");
                             connection.connect();
@@ -175,7 +175,7 @@ public class ShareToLan {
                             PublicIPv4 = jsonObject.get("ip").getAsString();
 
                         } catch (Exception e) {
-                            isPublic = "No";
+                            isPublic = "Unknown";
                         }
 
                         try {
@@ -223,10 +223,13 @@ public class ShareToLan {
         if (event.getGui() instanceof GuiIngameMenu) {
             if (event.getButton().id == 1) {
                 if (HttpAPI) {
-                     if (!(server2 == null)) {
-                         HttpApi.stop();
-                         System.out.println("HttpApi Stopped!");
-                     }
+                    ExecutorService executor = Executors.newSingleThreadExecutor();
+                    executor.submit(() -> {
+                        if (!(server2 == null)) {
+                            HttpApi.stop();
+                            System.out.println("HttpApi Stopped!");
+                        }
+                    });
                 }
             }
         }
