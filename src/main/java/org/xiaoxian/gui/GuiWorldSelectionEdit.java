@@ -2,6 +2,7 @@ package org.xiaoxian.gui;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -20,7 +21,7 @@ public class GuiWorldSelectionEdit {
     public static class GuiWorldSelectionModified extends SelectWorldScreen {
 
         public GuiWorldSelectionModified(Screen parentScreen) {
-            super(parentScreen);
+            super(new TitleScreen());
         }
 
         @Override
