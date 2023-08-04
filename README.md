@@ -40,10 +40,13 @@
 
 <br>
 
+**You can also configure this plugin through `.minecraft\config\easylan.cfg` (similar to server.properties)**
+
 ## Support Version
 
 - 1.7.2 - 1.20.1 [Forge]<br>
   **Unsupport 1.13.2**
+- Please delete the `.minecraft\config\easylan.cfg` file when updating from an old version of EasyLAN to a new version, otherwise the game may crash (see the update log for details)
 
 <br>
 
