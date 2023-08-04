@@ -29,6 +29,8 @@ public class EasyLAN {
     public static boolean SaveCommands = false;
     public static boolean HttpAPI = true;
     public static boolean LanOutput = true;
+    public static String CustomPort = "25565";
+    public static String CustomMaxPlayer = "20";
     public static String motd = "This is a Default EasyLAN Motd!";
 
     public EasyLAN() {
@@ -38,6 +40,9 @@ public class EasyLAN {
         MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
         MinecraftForge.EVENT_BUS.register(new ServerStarting());
         MinecraftForge.EVENT_BUS.register(new GuiExitGame());
+
+        GuiShareToLanEdit.PortText = CustomPort;
+        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
     }
 
     @SubscribeEvent
