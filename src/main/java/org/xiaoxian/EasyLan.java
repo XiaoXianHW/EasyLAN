@@ -17,7 +17,7 @@ public class EasyLAN {
 
     // 如果处于IDEA等开发环境，请修改此值为true，否则可能无法正常运行
     // If you are in a development environment such as IDEA, please modify this boolean to true, otherwise it may not work properly
-    public static boolean devMode = true;
+    public static boolean devMode = false;
 
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;
@@ -29,6 +29,8 @@ public class EasyLAN {
     public static boolean SaveCommands = false;
     public static boolean HttpAPI = true;
     public static boolean LanOutput = true;
+    public static String CustomPort = "25565";
+    public static String CustomMaxPlayer = "20";
     public static String motd = "This is a Default EasyLAN Motd!";
 
     public EasyLAN() {
@@ -38,6 +40,9 @@ public class EasyLAN {
         MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
         MinecraftForge.EVENT_BUS.register(new ServerStarting());
         MinecraftForge.EVENT_BUS.register(new GuiExitGame());
+
+        GuiShareToLanEdit.PortText = CustomPort;
+        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
     }
 
     @SubscribeEvent
