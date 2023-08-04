@@ -9,7 +9,7 @@ name: Build
 
 on:
   push:
-    branches: [ "v1.0" ]
+    branches: [ "1.14.2" ]
 
 permissions:
   contents: read
@@ -39,5 +39,5 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: EasyLAN-v1-1.14.2
-        path: build/libs/easylan-1.0.jar
+        name: EasyLAN-v1.2-1.14.2.jar
+        path: build/libs

@@ -11,6 +11,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
+import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
 import java.io.IOException;
@@ -85,6 +86,9 @@ public class GuiShareToLanEdit {
                 Button newButton = new Button(x, y, width, height, I18n.format("lanServer.start"), button -> {
                     ShareToLan.NewShareToLAN();
                     finalOriginalButton.onPress();
+                    ConfigUtil.set("Port", PortText);
+                    ConfigUtil.set("MaxPlayer", MaxPlayerText);
+                    ConfigUtil.save();
                 });
 
                 this.addButton(newButton);
