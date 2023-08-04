@@ -1,6 +1,7 @@
 package org.xiaoxian.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.text.ITextComponent;
 
 import java.util.regex.Pattern;
 
@@ -10,6 +11,6 @@ public class ChatUtil {
 
     public static void sendMsg(String msg) {
         msg = pattern.matcher(msg).replaceAll("\u00a7$1");
-        mc.ingameGUI.getChatGUI().addToSentMessages(msg);
+        mc.ingameGUI.getChatGUI().printChatMessage(ITextComponent.getTextComponentOrEmpty(msg));
     }
 }
