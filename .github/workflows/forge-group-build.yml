@@ -1,0 +1,39 @@
+name: Forge Group Build
+
+on:
+  push:
+    branches:
+      - forge-1.14.2-1.15.2
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: "1.14.2"
+            java-version: "8"
+          - version: "1.14.4"
+            java-version: "8"
+          - version: "1.15.2"
+            java-version: "8"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java-version }}
+          cache: gradle
+
+      - name: Build ${{ matrix.version }}
+        working-directory: versions/${{ matrix.version }}/project
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
