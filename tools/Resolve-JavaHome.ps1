@@ -7,7 +7,18 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $javaRoot = if ($env:EASYLAN_JAVA_ROOT) { $env:EASYLAN_JAVA_ROOT } else { 'F:\Java' }
-$gradleUserHome = if ($env:EASYLAN_GRADLE_USER_HOME) { $env:EASYLAN_GRADLE_USER_HOME } else { 'H:\gradle' }
+$configuredGradleHome = if ($env:EASYLAN_GRADLE_USER_HOME) { $env:EASYLAN_GRADLE_USER_HOME } else { 'H:\gradle' }
+$nestedGradleHome = Join-Path $configuredGradleHome '.gradle'
+
+$gradleUserHome = if (
+    -not $env:EASYLAN_GRADLE_USER_HOME -and
+    (Test-Path (Join-Path $nestedGradleHome 'wrapper\dists')) -and
+    -not (Test-Path (Join-Path $configuredGradleHome 'wrapper\dists'))
+) {
+    $nestedGradleHome
+} else {
+    $configuredGradleHome
+}
 
 $javaHome = switch -Regex ($Version) {
     '^1\.(14\.2|14\.4|15\.2)$' { Join-Path $javaRoot 'jdk8'; break }
