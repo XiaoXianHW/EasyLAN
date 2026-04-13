@@ -6,8 +6,19 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$javaRoot = 'F:\Java'
-$gradleUserHome = 'H:\gradle'
+$javaRoot = if ($env:EASYLAN_JAVA_ROOT) { $env:EASYLAN_JAVA_ROOT } else { 'F:\Java' }
+$configuredGradleHome = if ($env:EASYLAN_GRADLE_USER_HOME) { $env:EASYLAN_GRADLE_USER_HOME } else { 'H:\gradle' }
+$nestedGradleHome = Join-Path $configuredGradleHome '.gradle'
+
+$gradleUserHome = if (
+    -not $env:EASYLAN_GRADLE_USER_HOME -and
+    (Test-Path (Join-Path $nestedGradleHome 'wrapper\dists')) -and
+    -not (Test-Path (Join-Path $configuredGradleHome 'wrapper\dists'))
+) {
+    $nestedGradleHome
+} else {
+    $configuredGradleHome
+}
 
 $javaHome = switch -Regex ($Version) {
     '^1\.16\.(4|5)$' { Join-Path $javaRoot 'jdk8'; break }
@@ -21,7 +32,7 @@ if (-not (Test-Path $javaHome)) {
 }
 
 if (-not (Test-Path $gradleUserHome)) {
-    throw ("Missing Gradle user home: {0}" -f $gradleUserHome)
+    New-Item -ItemType Directory -Force -Path $gradleUserHome | Out-Null
 }
 
 [PSCustomObject]@{
