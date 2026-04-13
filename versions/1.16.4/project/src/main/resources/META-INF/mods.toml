@@ -1,0 +1,12 @@
+modLoader="javafml"
+loaderVersion="[35,)"
+issueTrackerURL="https://github.com/XiaoXianHW/EasyLAN/issues"
+license="GNU General Public License v3"
+
+[[mods]]
+modId="easylan"
+version="v1.2"
+displayName="EasyLAN"
+displayURL="https://github.com/XiaoXianHW/EasyLAN"
+authors="XiaoXian"
+description='''A Custom LAN Server Mod!:DDD'''
