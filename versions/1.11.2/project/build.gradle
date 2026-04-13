@@ -1,0 +1,75 @@
+buildscript {
+    repositories {
+        maven { url = "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.5"
+group= "org.xiaoxian.easylan"
+archivesBaseName = "EasyLAN"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
+def existingSourceDirs = { Object... paths ->
+    paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/java'),
+                    new File(repoRoot, 'shared/forge-group/src/main/java'),
+                    file('../overrides/src/main/java'),
+                    file('src/main/java')
+            )
+        }
+        resources {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/resources'),
+                    new File(repoRoot, 'shared/forge-group/src/main/resources'),
+                    file('../overrides/src/main/resources'),
+                    file('src/main/resources')
+            )
+        }
+    }
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+minecraft {
+    version = "1.11.2-13.20.1.2588"
+    runDir = "run"
+    mappings = "snapshot_20161220"
+}
+
+dependencies {
+    compile('org.nanohttpd:nanohttpd:2.3.1')
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+}
+
+jar {
+    from {
+        configurations.compile.findAll { it.name.contains('nanohttpd') }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    eachFile { file ->
+        if (file.name == 'LICENSE.txt') {
+            file.exclude()
+        }
+    }
+}

@@ -7,14 +7,21 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $javaRoot = if ($env:EASYLAN_JAVA_ROOT) { $env:EASYLAN_JAVA_ROOT } else { 'F:\Java' }
-$gradleUserHome = if ($env:EASYLAN_GRADLE_USER_HOME) { $env:EASYLAN_GRADLE_USER_HOME } else { 'H:\gradle' }
+$configuredGradleHome = if ($env:EASYLAN_GRADLE_USER_HOME) { $env:EASYLAN_GRADLE_USER_HOME } else { 'H:\gradle' }
+$nestedGradleHome = Join-Path $configuredGradleHome '.gradle'
+
+$gradleUserHome = if (
+    -not $env:EASYLAN_GRADLE_USER_HOME -and
+    (Test-Path (Join-Path $nestedGradleHome 'wrapper\dists')) -and
+    -not (Test-Path (Join-Path $configuredGradleHome 'wrapper\dists'))
+) {
+    $nestedGradleHome
+} else {
+    $configuredGradleHome
+}
 
 $javaHome = switch -Regex ($Version) {
-    '^1\.12\.2$' { Join-Path $javaRoot 'jdk8'; break }
-    '^1\.(14\.2|14\.4|15\.2)$' { Join-Path $javaRoot 'jdk8'; break }
-    '^1\.16\.(4|5)$' { Join-Path $javaRoot 'jdk8'; break }
-    '^1\.(17\.1|18\.2|19\.2|19\.4|20\.1)$' { Join-Path $javaRoot 'zulu17'; break }
-    '^1\.(20\.6|21\.1)$' { Join-Path $javaRoot 'zulu21'; break }
+    '^1\.(7\.2|7\.10|8|8\.9|9\.4|10\.2|11\.2)$' { Join-Path $javaRoot 'jdk8'; break }
     default { Join-Path $javaRoot 'jdk8' }
 }
 

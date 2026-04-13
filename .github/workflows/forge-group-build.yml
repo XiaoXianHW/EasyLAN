@@ -3,7 +3,7 @@ name: Forge Group Build
 on:
   push:
     branches:
-      - forge-1.12.2
+      - forge-1.7.2-1.11.2
   pull_request:
   workflow_dispatch:
 
@@ -14,7 +14,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - version: "1.12.2"
+          - version: "1.7.2"
+            java-version: "8"
+          - version: "1.7.10"
+            java-version: "8"
+          - version: "1.8"
+            java-version: "8"
+          - version: "1.8.9"
+            java-version: "8"
+          - version: "1.9.4"
+            java-version: "8"
+          - version: "1.10.2"
+            java-version: "8"
+          - version: "1.11.2"
             java-version: "8"
 
     steps:
