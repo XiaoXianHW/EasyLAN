@@ -20,7 +20,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint" }) {
+        for (String methodName : new String[] { "bind", "method_14354", "a", "startTcpServerListener", "addEndpoint" }) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
