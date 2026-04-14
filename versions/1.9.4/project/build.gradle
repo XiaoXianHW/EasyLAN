@@ -54,8 +54,13 @@ minecraft {
     mappings = "snapshot_20160518"
 }
 
+configurations {
+    shade
+}
+
 dependencies {
     compile('org.nanohttpd:nanohttpd:2.3.1')
+    shade('org.nanohttpd:nanohttpd:2.3.1')
 }
 
 processResources
@@ -71,7 +76,7 @@ processResources
 
 jar {
     from {
-        configurations.compile.findAll { it.name.contains('nanohttpd') }.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.shade.collect { it.isDirectory() ? it : zipTree(it) }
     }
     eachFile { file ->
         if (file.name == 'LICENSE.txt') {

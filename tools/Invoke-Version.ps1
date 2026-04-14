@@ -8,7 +8,8 @@ param(
     [Alias('ExtraArgs')]
     [string[]]$GradleArgs,
 
-    [switch]$SkipServerCacheCheck
+    [switch]$SkipServerCacheCheck,
+    [switch]$SkipAssetCacheCheck
 )
 
 Set-StrictMode -Version Latest
@@ -52,6 +53,14 @@ try {
         $cacheResult = & (Join-Path $PSScriptRoot 'Ensure-MinecraftServerCache.ps1') -Version $Version -GradleUserHome $javaInfo.GradleUserHome
         if ($cacheResult -and $cacheResult.Status -ne 'Skipped') {
             Write-Host ("[EasyLAN] Server cache " + $cacheResult.Status + " -> " + $cacheResult.Path) -ForegroundColor DarkCyan
+        }
+    }
+
+    $assetTasks = @('runClient', 'debugClient', 'runServer', 'debugServer', 'setupDevWorkspace', 'setupDecompWorkspace')
+    if (-not $SkipAssetCacheCheck -and $assetTasks -contains $Task) {
+        $assetResult = & (Join-Path $PSScriptRoot 'Ensure-MinecraftAssetsCache.ps1') -Version $Version -GradleUserHome $javaInfo.GradleUserHome
+        if ($assetResult -and $assetResult.Status -ne 'Skipped') {
+            Write-Host ("[EasyLAN] Asset cache " + $assetResult.Status + " -> reused " + $assetResult.Reused + ", copied " + $assetResult.Copied + ", downloaded " + $assetResult.Downloaded) -ForegroundColor DarkCyan
         }
     }
 

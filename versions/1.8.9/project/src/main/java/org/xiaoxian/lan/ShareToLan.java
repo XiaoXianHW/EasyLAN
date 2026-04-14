@@ -174,7 +174,17 @@ public class ShareToLan {
         try {
             ServerConfigurationManager configManager = MinecraftServer.getServer().getConfigurationManager();
             Class<?> minecraftServerPlayerClass = Class.forName("net.minecraft.server.management.ServerConfigurationManager");
-            Field maxplayerField = minecraftServerPlayerClass.getDeclaredField(fieldName);
+            Field maxplayerField = null;
+            for (String candidate : new String[] { fieldName, "maxPlayers", "field_72405_c" }) {
+                try {
+                    maxplayerField = minecraftServerPlayerClass.getDeclaredField(candidate);
+                    break;
+                } catch (NoSuchFieldException ignored) {
+                }
+            }
+            if (maxplayerField == null) {
+                throw new NoSuchFieldException(fieldName);
+            }
             maxplayerField.setAccessible(true);
             maxplayerField.set(configManager, Integer.parseInt(GuiShareToLanEdit.MaxPlayerBox.getText()));
             if (!LanOutput) {

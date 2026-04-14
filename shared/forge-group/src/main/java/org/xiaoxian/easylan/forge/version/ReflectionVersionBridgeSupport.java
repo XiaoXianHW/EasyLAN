@@ -1,6 +1,7 @@
 package org.xiaoxian.easylan.forge.version;
 
 import org.xiaoxian.EasyLAN;
+import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
+    private static final EasyLanRuntimeState LEGACY_RUNTIME_STATE = new EasyLanRuntimeState();
+
     protected abstract String[] maxPlayerFieldNames();
 
     @Override
@@ -24,7 +27,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
                     continue;
                 }
                 method.invoke(connection, InetAddress.getByName("0.0.0.0"), port);
-                EasyLAN.getRuntimeState().setLanPort(String.valueOf(port));
+                runtimeState().setLanPort(String.valueOf(port));
                 return;
             } catch (IOException ex) {
                 lastError = ex;
@@ -63,22 +66,35 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public String resolveLanPort(Object server) {
-        String runtimePort = EasyLAN.getRuntimeState().getLanPort();
+        String runtimePort = runtimeState().getLanPort();
         if (runtimePort != null && !runtimePort.isEmpty()) {
             return runtimePort;
         }
 
         String reflectedPort = invokePortGetter(server, "getPort", "getServerPort");
         if (reflectedPort != null) {
-            EasyLAN.getRuntimeState().setLanPort(reflectedPort);
+            runtimeState().setLanPort(reflectedPort);
             return reflectedPort;
         }
 
         String logPort = readLanPortFromLog();
         if (logPort != null) {
-            EasyLAN.getRuntimeState().setLanPort(logPort);
+            runtimeState().setLanPort(logPort);
         }
         return logPort;
+    }
+
+    private EasyLanRuntimeState runtimeState() {
+        try {
+            Method method = EasyLAN.class.getDeclaredMethod("getRuntimeState");
+            method.setAccessible(true);
+            Object state = method.invoke(null);
+            if (state instanceof EasyLanRuntimeState) {
+                return (EasyLanRuntimeState) state;
+            }
+        } catch (ReflectiveOperationException ignored) {
+        }
+        return LEGACY_RUNTIME_STATE;
     }
 
     private String invokePortGetter(Object target, String... methodNames) {

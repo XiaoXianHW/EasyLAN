@@ -8,23 +8,14 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.lang.reflect.Field;
 
-import static org.xiaoxian.EasyLAN.devMode;
-
 public class TextBoxUtil extends GuiTextField {
-
-    String fieldName = devMode ? "lineScrollOffset" : "field_146225_q";
+    private static final String[] LINE_SCROLL_OFFSET_FIELD_NAMES = { "lineScrollOffset", "field_146225_q" };
     private Field lineScrollOffsetField;
     private long lastUpdateTick = 20;
 
     public TextBoxUtil(int componentId, FontRenderer fontRendererInstance, int x, int y, int width, int height) {
         super(fontRendererInstance, x, y, width, height);
-
-        try {
-            lineScrollOffsetField = GuiTextField.class.getDeclaredField(fieldName);
-            lineScrollOffsetField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            System.out.println("[EasyLan | TextBoxUtil] Error: " + e.getMessage());
-        }
+        lineScrollOffsetField = resolveLineScrollOffsetField();
     }
 
     @Override
@@ -36,13 +27,12 @@ public class TextBoxUtil extends GuiTextField {
             GL11.glLineWidth(1f);
             int textColor = this.getEnableBackgroundDrawing() ? 14737632 : 7368816;
 
-            int lineScrollOffset = 0;
-            try {
-                lineScrollOffset = (int) lineScrollOffsetField.get(this);
-            } catch (IllegalAccessException e) {
-                System.out.println("[EasyLan | drawTextBox] Error: " + e.getMessage());
+            String text = getText();
+            int lineScrollOffset = Math.max(0, getLineScrollOffset());
+            if (lineScrollOffset > text.length()) {
+                lineScrollOffset = text.length();
             }
-            String textToDraw = getText().substring(Math.max(0, lineScrollOffset));
+            String textToDraw = text.substring(lineScrollOffset);
 
             if (isFocused()) {
                 long currentTick = System.currentTimeMillis();
@@ -52,6 +42,32 @@ public class TextBoxUtil extends GuiTextField {
                 }
             }
             drawString(Minecraft.getMinecraft().fontRenderer, textToDraw, xPosition + 4, yPosition + (height - 8) / 2, textColor);
+        }
+    }
+
+    private Field resolveLineScrollOffsetField() {
+        for (String fieldName : LINE_SCROLL_OFFSET_FIELD_NAMES) {
+            try {
+                Field field = GuiTextField.class.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException ignored) {
+            }
+        }
+        System.out.println("[EasyLan | TextBoxUtil] Error: missing line scroll offset field");
+        return null;
+    }
+
+    private int getLineScrollOffset() {
+        if (lineScrollOffsetField == null) {
+            return 0;
+        }
+
+        try {
+            return (int) lineScrollOffsetField.get(this);
+        } catch (IllegalAccessException e) {
+            System.out.println("[EasyLan | drawTextBox] Error: " + e.getMessage());
+            return 0;
         }
     }
 }
