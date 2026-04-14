@@ -16,6 +16,7 @@ public class EasyLanConfig {
     private static final String KEY_PVP = "pvp";
     private static final String KEY_ONLINE_MODE = "online-mode";
     private static final String KEY_SPAWN_ANIMALS = "spawn-Animals";
+    private static final String KEY_SPAWN_NPCS = "spawn-NPCs";
     private static final String KEY_ALLOW_FLIGHT = "allow-Flight";
     private static final String KEY_WHITE_LIST = "whiteList";
     private static final String KEY_BAN_COMMANDS = "BanCommands";
@@ -106,6 +107,7 @@ public class EasyLanConfig {
         ruleProfile.setAllowPvp(Boolean.parseBoolean(propertyOrDefault(KEY_PVP, "true")));
         ruleProfile.setOnlineMode(Boolean.parseBoolean(propertyOrDefault(KEY_ONLINE_MODE, "true")));
         ruleProfile.setSpawnAnimals(Boolean.parseBoolean(propertyOrDefault(KEY_SPAWN_ANIMALS, "true")));
+        ruleProfile.setSpawnNpcs(Boolean.parseBoolean(propertyOrDefault(KEY_SPAWN_NPCS, propertyOrDefault(KEY_SPAWN_ANIMALS, "true"))));
         ruleProfile.setAllowFlight(Boolean.parseBoolean(propertyOrDefault(KEY_ALLOW_FLIGHT, "true")));
         ruleProfile.setWhiteList(Boolean.parseBoolean(propertyOrDefault(KEY_WHITE_LIST, "false")));
         ruleProfile.setBanCommands(Boolean.parseBoolean(propertyOrDefault(KEY_BAN_COMMANDS, "false")));
@@ -122,6 +124,7 @@ public class EasyLanConfig {
         properties.setProperty(KEY_PVP, String.valueOf(ruleProfile.isAllowPvp()));
         properties.setProperty(KEY_ONLINE_MODE, String.valueOf(ruleProfile.isOnlineMode()));
         properties.setProperty(KEY_SPAWN_ANIMALS, String.valueOf(ruleProfile.isSpawnAnimals()));
+        properties.setProperty(KEY_SPAWN_NPCS, String.valueOf(ruleProfile.isSpawnNpcs()));
         properties.setProperty(KEY_ALLOW_FLIGHT, String.valueOf(ruleProfile.isAllowFlight()));
         properties.setProperty(KEY_WHITE_LIST, String.valueOf(ruleProfile.isWhiteList()));
         properties.setProperty(KEY_BAN_COMMANDS, String.valueOf(ruleProfile.isBanCommands()));
@@ -140,6 +143,7 @@ public class EasyLanConfig {
         properties.putIfAbsent(KEY_PVP, "true");
         properties.putIfAbsent(KEY_ONLINE_MODE, "true");
         properties.putIfAbsent(KEY_SPAWN_ANIMALS, "true");
+        properties.putIfAbsent(KEY_SPAWN_NPCS, properties.getProperty(KEY_SPAWN_ANIMALS, "true"));
         properties.putIfAbsent(KEY_ALLOW_FLIGHT, "true");
         properties.putIfAbsent(KEY_WHITE_LIST, "false");
         properties.putIfAbsent(KEY_BAN_COMMANDS, "false");

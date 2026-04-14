@@ -96,7 +96,7 @@ public class GuiShareToLanEdit {
 
             EditBox targetEditBox = null;
             for (Renderable widget : this.renderables) {
-                if (widget instanceof EditBox editBox && editBox.getMessage().equals(Component.translatable("lanServer.port"))) {
+                if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
                     targetEditBox = editBox;
                 }
             }
@@ -108,7 +108,13 @@ public class GuiShareToLanEdit {
 
         @Override
         public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-            super.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.renderBackground(matrixStack);
+            drawCenteredString(matrixStack, fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
+            drawCenteredString(matrixStack, fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
+
+            for (Renderable widget : this.renderables) {
+                widget.render(matrixStack, mouseX, mouseY, partialTicks);
+            }
 
             PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
             MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -118,8 +124,6 @@ public class GuiShareToLanEdit {
 
             drawString(matrixStack, fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
             drawString(matrixStack, fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
-
-            fill(matrixStack, this.width / 2 - 32, 140, this.width / 2 + 32, 150, 0xFF000000);
         }
 
         @Override

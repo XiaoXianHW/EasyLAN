@@ -89,7 +89,7 @@ public class GuiShareToLanEdit {
 
             EditBox targetEditBox = null;
             for (Renderable widget : this.renderables) {
-                if (widget instanceof EditBox editBox && editBox.getMessage().equals(Component.translatable("lanServer.port"))) {
+                if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
                     targetEditBox = editBox;
                 }
             }
@@ -101,7 +101,13 @@ public class GuiShareToLanEdit {
 
         @Override
         public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-            super.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
+            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
+            matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
+
+            for (Renderable widget : this.renderables) {
+                widget.render(matrixStack, mouseX, mouseY, partialTicks);
+            }
 
             PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
             MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);

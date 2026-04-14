@@ -20,6 +20,7 @@ import static org.xiaoxian.EasyLAN.*;
 public class GuiEasyLanMain extends Screen {
     private EditBox MotdTextBox;
     private String MotdText = motd;
+    private boolean mobSpawningEnabled = spawnAnimals && spawnNPCs;
     Font fontRenderer = Minecraft.getInstance().font;
     private final Screen parentScreen;
 
@@ -31,6 +32,7 @@ public class GuiEasyLanMain extends Screen {
     @Override
     public void init() {
         renderables.clear();
+        mobSpawningEnabled = spawnAnimals && spawnNPCs;
 
         // 设置
         addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back"))) {
@@ -64,10 +66,12 @@ public class GuiEasyLanMain extends Screen {
                 onlineMode = this.isChecked();
             }
         });
-        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 112, spawnAnimals, 20, 20) {
+        addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 118, mobSpawningEnabled, 20, 20) {
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
-                spawnAnimals = this.isChecked();
+                mobSpawningEnabled = this.isChecked();
+                spawnAnimals = mobSpawningEnabled;
+                spawnNPCs = mobSpawningEnabled;
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95,144 , allowFlight ,20 ,20 ) {
@@ -134,6 +138,7 @@ public class GuiEasyLanMain extends Screen {
         drawString(matrixStack, fontRenderer, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
         drawString(matrixStack, fontRenderer, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
         drawString(matrixStack, fontRenderer, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+        drawString(matrixStack, fontRenderer, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFF);
         drawString(matrixStack, fontRenderer, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFF);
 
         // 指令支持
@@ -177,9 +182,12 @@ public class GuiEasyLanMain extends Screen {
     }
 
     public void SaveConfig() {
+        spawnAnimals = mobSpawningEnabled;
+        spawnNPCs = mobSpawningEnabled;
         ConfigUtil.set("pvp", String.valueOf(allowPVP));
         ConfigUtil.set("online-mode", String.valueOf(onlineMode));
-        ConfigUtil.set("spawn-Animals", String.valueOf(spawnAnimals));
+        ConfigUtil.set("spawn-Animals", String.valueOf(mobSpawningEnabled));
+        ConfigUtil.set("spawn-NPCs", String.valueOf(mobSpawningEnabled));
         ConfigUtil.set("allow-Flight", String.valueOf(allowFlight));
         ConfigUtil.set("whiteList", String.valueOf(whiteList));
         ConfigUtil.set("BanCommands", String.valueOf(BanCommands));

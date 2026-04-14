@@ -21,6 +21,7 @@ public class EasyLAN {
     public static boolean allowPVP = true;
     public static boolean onlineMode = true;
     public static boolean spawnAnimals = true;
+    public static boolean spawnNPCs = true;
     public static boolean allowFlight = true;
     public static boolean whiteList = false;
     public static boolean BanCommands = false;
@@ -56,6 +57,7 @@ public class EasyLAN {
         allowPVP = rules.isAllowPvp();
         onlineMode = rules.isOnlineMode();
         spawnAnimals = rules.isSpawnAnimals();
+        spawnNPCs = rules.isSpawnNpcs();
         allowFlight = rules.isAllowFlight();
         whiteList = rules.isWhiteList();
         BanCommands = rules.isBanCommands();
@@ -73,6 +75,7 @@ public class EasyLAN {
         rules.setAllowPvp(allowPVP);
         rules.setOnlineMode(onlineMode);
         rules.setSpawnAnimals(spawnAnimals);
+        rules.setSpawnNpcs(spawnNPCs);
         rules.setAllowFlight(allowFlight);
         rules.setWhiteList(whiteList);
         rules.setBanCommands(BanCommands);
