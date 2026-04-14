@@ -1,7 +1,7 @@
 package org.xiaoxian.lan;
 
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 public class ServerStopping {
 

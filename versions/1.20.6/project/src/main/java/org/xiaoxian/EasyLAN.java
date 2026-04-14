@@ -1,7 +1,7 @@
 package org.xiaoxian;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
@@ -35,10 +35,10 @@ public class EasyLAN {
 
     public EasyLAN() {
         ConfigUtil.load();
-        MinecraftForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
-        MinecraftForge.EVENT_BUS.register(new ServerStarting());
-        MinecraftForge.EVENT_BUS.register(new ServerStopping());
+        NeoForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
+        NeoForge.EVENT_BUS.register(new GuiShareToLanEdit());
+        NeoForge.EVENT_BUS.register(new ServerStarting());
+        NeoForge.EVENT_BUS.register(new ServerStopping());
 
         GuiShareToLanEdit.PortText = CustomPort;
         GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;

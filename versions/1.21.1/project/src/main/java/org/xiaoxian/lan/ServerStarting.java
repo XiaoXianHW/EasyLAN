@@ -3,8 +3,8 @@ package org.xiaoxian.lan;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.*;
 import net.minecraft.world.level.GameRules;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import static org.xiaoxian.EasyLAN.*;
 
