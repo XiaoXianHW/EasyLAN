@@ -25,6 +25,7 @@ sourceSets {
             srcDirs = existingSourceDirs(
                     new File(repoRoot, 'shared/core/src/main/java'),
                     new File(repoRoot, 'shared/neoforge-group/src/main/java'),
+                    new File(repoRoot, 'shared/neoforge-modern/src/main/java'),
                     file('../overrides/src/main/java'),
                     file('src/main/java')
             )
@@ -33,6 +34,7 @@ sourceSets {
             srcDirs = existingSourceDirs(
                     new File(repoRoot, 'shared/core/src/main/resources'),
                     new File(repoRoot, 'shared/neoforge-group/src/main/resources'),
+                    new File(repoRoot, 'shared/neoforge-modern/src/main/resources'),
                     file('../overrides/src/main/resources'),
                     file('src/main/resources'),
                     file('src/generated/resources')
