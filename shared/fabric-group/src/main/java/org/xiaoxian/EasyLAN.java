@@ -1,9 +1,12 @@
-﻿package org.xiaoxian;
+package org.xiaoxian;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
+import org.xiaoxian.lan.ServerStarting;
+import org.xiaoxian.lan.ServerStopping;
 import org.xiaoxian.util.ConfigUtil;
 
 public class EasyLAN implements ModInitializer {
@@ -30,6 +33,8 @@ public class EasyLAN implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfigUtil.load();
+        ServerLifecycleEvents.SERVER_STARTING.register(ServerStarting::onServerStarting);
+        ServerLifecycleEvents.SERVER_STOPPING.register(ServerStopping::onServerStopping);
     }
 
     public static EasyLanConfig getConfig() {

@@ -1,5 +1,6 @@
 package org.xiaoxian.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,6 +12,7 @@ import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
+import javax.annotation.Nonnull;
 import java.awt.Color;
 
 import static org.xiaoxian.EasyLAN.BanCommands;
@@ -29,6 +31,7 @@ import static org.xiaoxian.EasyLAN.whiteList;
 public class GuiEasyLanMain extends Screen {
     private EditBox motdTextBox;
     private String motdText = motd;
+    private boolean mobSpawningEnabled = spawnAnimals && spawnNPCs;
     private final Font font = Minecraft.getInstance().font;
     private final Screen parentScreen;
 
@@ -41,6 +44,7 @@ public class GuiEasyLanMain extends Screen {
     public void init() {
         this.buttons.clear();
         this.children.clear();
+        mobSpawningEnabled = spawnAnimals && spawnNPCs;
 
         addButton(new ButtonUtil(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back")) {
             @Override
@@ -76,21 +80,16 @@ public class GuiEasyLanMain extends Screen {
                 onlineMode = this.isChecked();
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 105, spawnAnimals, 20, 20) {
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 118, mobSpawningEnabled, 20, 20) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
-                spawnAnimals = this.isChecked();
+                mobSpawningEnabled = this.isChecked();
+                spawnAnimals = mobSpawningEnabled;
+                spawnNPCs = mobSpawningEnabled;
             }
         });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 130, spawnNPCs, 20, 20) {
-            @Override
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
-                spawnNPCs = this.isChecked();
-            }
-        });
-        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 155, allowFlight, 20, 20) {
+        addButton(new CheckBoxButtonUtil(this.width / 2 - 95, 144, allowFlight, 20, 20) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 this.toggleChecked();
@@ -148,31 +147,31 @@ public class GuiEasyLanMain extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
-        drawCenteredString(font, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
+        drawCenteredString(matrixStack, font, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
-        drawString(font, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        drawString(font, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 135, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 160, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFF);
 
-        drawString(font, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        drawString(font, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
 
-        drawString(font, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        drawString(font, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        drawString(font, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
+        drawString(matrixStack, font, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
 
-        drawString(font, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        motdTextBox.render(mouseX, mouseY, partialTicks);
+        drawString(matrixStack, font, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
+        motdTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -197,6 +196,8 @@ public class GuiEasyLanMain extends Screen {
     }
 
     private void saveConfig() {
+        spawnAnimals = mobSpawningEnabled;
+        spawnNPCs = mobSpawningEnabled;
         motd = motdTextBox.getValue();
         ConfigUtil.save();
     }

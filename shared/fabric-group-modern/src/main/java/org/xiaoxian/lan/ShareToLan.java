@@ -2,8 +2,8 @@ package org.xiaoxian.lan;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.model.EasyLanStatusSnapshot;

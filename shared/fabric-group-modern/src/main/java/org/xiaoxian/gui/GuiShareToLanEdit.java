@@ -1,5 +1,6 @@
 package org.xiaoxian.gui;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -7,11 +8,13 @@ import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TextComponent;
 import org.xiaoxian.easylan.fabric.version.VersionBridgeResolver;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -71,7 +74,7 @@ public class GuiShareToLanEdit {
                 this.children.remove(originalButton);
 
                 Button finalOriginalButton = originalButton;
-                Button newButton = new Button(x, y, width, height, I18n.get("lanServer.start"), button -> {
+                Button newButton = new Button(x, y, width, height, new TextComponent(I18n.get("lanServer.start")), button -> {
                     syncTextState();
                     finalOriginalButton.onPress();
                     CustomPort = PortText;
@@ -95,25 +98,25 @@ public class GuiShareToLanEdit {
         }
 
         @Override
-        public void render(int mouseX, int mouseY, float partialTicks) {
-            this.renderBackground();
-            drawCenteredString(font, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
-            drawCenteredString(font, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
+        public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+            this.renderBackground(matrixStack);
+            drawCenteredString(matrixStack, font, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
+            drawCenteredString(matrixStack, font, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
 
             for (Object widget : this.buttons) {
                 if (widget instanceof Button) {
-                    ((Button) widget).render(mouseX, mouseY, partialTicks);
+                    ((Button) widget).render(matrixStack, mouseX, mouseY, partialTicks);
                 }
             }
 
-            PortTextBox.render(mouseX, mouseY, partialTicks);
-            MaxPlayerBox.render(mouseX, mouseY, partialTicks);
+            PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
+            MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
-            drawString(font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            drawString(font, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            drawString(matrixStack, font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
+            drawString(matrixStack, font, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
-            drawString(font, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            drawString(font, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            drawString(matrixStack, font, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
+            drawString(matrixStack, font, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
         }
 
         @Override
@@ -158,7 +161,7 @@ public class GuiShareToLanEdit {
             for (Object widget : this.buttons) {
                 if (widget instanceof Button) {
                     Button button = (Button) widget;
-                    if (button.getMessage().equals(I18n.get("lanServer.start"))) {
+                    if (button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                         return button;
                     }
                 }

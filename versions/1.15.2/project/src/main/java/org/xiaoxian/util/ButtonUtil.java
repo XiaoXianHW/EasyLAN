@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.Button;
 import java.awt.Color;
 
 public class ButtonUtil extends Button {
-
     public ButtonUtil(int x, int y, int width, int height, String buttonText) {
         super(x, y, width, height, buttonText, button -> {});
     }
