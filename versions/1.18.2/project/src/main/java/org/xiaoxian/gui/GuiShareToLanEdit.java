@@ -13,6 +13,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.validation.ValidationRules;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
@@ -89,6 +90,8 @@ public class GuiShareToLanEdit {
                 Button newButton = new Button(x, y, width, height, Component.nullToEmpty(I18n.get("lanServer.start")), button -> {
                     new ShareToLan().handleLanSetup();
                     finalOriginalButton.onPress();
+                    EasyLAN.CustomPort = PortText;
+                    EasyLAN.CustomMaxPlayer = MaxPlayerText;
                     ConfigUtil.set("Port", PortText);
                     ConfigUtil.set("MaxPlayer", MaxPlayerText);
                     ConfigUtil.save();
