@@ -1,0 +1,98 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+
+version = '1.5'
+group = 'org.xiaoxian.easylan'
+archivesBaseName = 'EasyLAN'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
+def existingSourceDirs = { Object... paths ->
+    paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/java'),
+                    new File(repoRoot, 'shared/forge-group/src/main/java'),
+                    file('../overrides/src/main/java'),
+                    file('src/main/java')
+            )
+        }
+        resources {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/resources'),
+                    new File(repoRoot, 'shared/forge-group/src/main/resources'),
+                    file('../overrides/src/main/resources'),
+                    file('src/main/resources')
+            )
+        }
+    }
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20180921-1.13'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.223'
+    compile('org.nanohttpd:nanohttpd:2.3.1')
+}
+
+configurations {
+    customJarConfiguration {
+        canBeResolved = true
+        canBeConsumed = false
+        extendsFrom compile
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    from {
+        configurations.customJarConfiguration.filter { it.name.contains('nanohttpd') }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    eachFile { file ->
+        if (file.name == 'LICENSE.txt') {
+            file.exclude()
+        }
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).all {
+    options.encoding = 'UTF-8'
+}

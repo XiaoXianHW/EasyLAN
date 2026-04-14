@@ -14,6 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - version: "1.13.2"
+            java-version: "8"
           - version: "1.14.2"
             java-version: "8"
           - version: "1.14.4"

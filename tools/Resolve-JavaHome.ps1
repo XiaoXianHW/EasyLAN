@@ -21,7 +21,7 @@ $gradleUserHome = if (
 }
 
 $javaHome = switch -Regex ($Version) {
-    '^1\.(14\.2|14\.4|15\.2)$' { Join-Path $javaRoot 'jdk8'; break }
+    '^1\.(13\.2|14\.2|14\.4|15\.2)$' { Join-Path $javaRoot 'jdk8'; break }
     '^1\.16\.(4|5)$' { Join-Path $javaRoot 'jdk8'; break }
     '^1\.(17\.1|18\.2|19\.2|19\.4|20\.1)$' { Join-Path $javaRoot 'zulu17'; break }
     '^1\.(20\.6|21\.1)$' { Join-Path $javaRoot 'zulu21'; break }
