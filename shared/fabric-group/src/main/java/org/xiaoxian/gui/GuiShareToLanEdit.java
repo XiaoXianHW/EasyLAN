@@ -6,11 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import org.xiaoxian.easylan.fabric.version.VersionBridgeResolver;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
@@ -33,7 +33,8 @@ public class GuiShareToLanEdit {
 
     public static void maybeReplace(Minecraft minecraft, Screen screen) {
         if (screen instanceof ShareToLanScreen && !(screen instanceof GuiShareToLanModified)) {
-            minecraft.setScreen(new GuiShareToLanModified(new PauseScreen(true)));
+            Screen parentScreen = VersionBridgeResolver.get().resolveShareToLanParent(screen);
+            minecraft.setScreen(new GuiShareToLanModified(parentScreen));
         }
     }
 
@@ -50,6 +51,8 @@ public class GuiShareToLanEdit {
 
             PortText = CustomPort;
             MaxPlayerText = CustomMaxPlayer;
+            PortWarningText = "";
+            MaxPlayerWarningText = "";
 
             PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
             PortTextBox.setMaxLength(5);
@@ -58,8 +61,6 @@ public class GuiShareToLanEdit {
             MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
             MaxPlayerBox.setMaxLength(6);
             MaxPlayerBox.setValue(MaxPlayerText);
-
-            refreshLanButtonState();
 
             Button originalButton = findLanButton();
             if (originalButton != null) {
@@ -80,6 +81,7 @@ public class GuiShareToLanEdit {
                     ConfigUtil.save();
                     new ShareToLan().handleLanSetup();
                 }).bounds(x, y, width, height).build();
+                newButton.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
 
                 this.addRenderableWidget(newButton);
             }
@@ -94,6 +96,8 @@ public class GuiShareToLanEdit {
             if (targetEditBox != null) {
                 this.removeWidget(targetEditBox);
             }
+
+            refreshLanButtonState();
         }
 
         @Override

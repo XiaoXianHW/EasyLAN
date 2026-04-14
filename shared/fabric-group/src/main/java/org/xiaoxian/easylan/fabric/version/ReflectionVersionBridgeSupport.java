@@ -1,5 +1,8 @@
 package org.xiaoxian.easylan.fabric.version;
 
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import org.xiaoxian.EasyLAN;
 
 import java.io.BufferedReader;
@@ -81,6 +84,16 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
         return logPort;
     }
 
+    @Override
+    public Screen resolveWorldSelectionParent(Screen screen) {
+        return resolveParentScreen(screen, new TitleScreen(), "lastScreen", "parent", "previousScreen");
+    }
+
+    @Override
+    public Screen resolveShareToLanParent(Screen screen) {
+        return resolveParentScreen(screen, new PauseScreen(true), "lastScreen", "parent", "previousScreen");
+    }
+
     private String invokePortGetter(Object target, String... methodNames) {
         for (String methodName : methodNames) {
             try {
@@ -146,6 +159,46 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             }
         }
         return null;
+    }
+
+    private Screen resolveParentScreen(Screen screen, Screen fallback, String... fieldNames) {
+        for (String fieldName : fieldNames) {
+            Screen resolved = readScreenField(screen, findField(screen.getClass(), fieldName));
+            if (resolved != null && resolved != screen) {
+                return resolved;
+            }
+        }
+
+        Class<?> current = screen.getClass();
+        while (current != null) {
+            for (Field field : current.getDeclaredFields()) {
+                if (!Screen.class.isAssignableFrom(field.getType())) {
+                    continue;
+                }
+
+                Screen resolved = readScreenField(screen, field);
+                if (resolved != null && resolved != screen) {
+                    return resolved;
+                }
+            }
+            current = current.getSuperclass();
+        }
+
+        return fallback;
+    }
+
+    private Screen readScreenField(Screen screen, Field field) {
+        if (field == null) {
+            return null;
+        }
+
+        try {
+            field.setAccessible(true);
+            Object value = field.get(screen);
+            return value instanceof Screen ? (Screen) value : null;
+        } catch (IllegalAccessException ignored) {
+            return null;
+        }
     }
 
     private String readLanPortFromLog() {

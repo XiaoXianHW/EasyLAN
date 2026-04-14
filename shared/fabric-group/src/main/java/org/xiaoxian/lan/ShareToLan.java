@@ -23,6 +23,7 @@ import static org.xiaoxian.EasyLAN.allowFlight;
 import static org.xiaoxian.EasyLAN.allowPVP;
 import static org.xiaoxian.EasyLAN.onlineMode;
 import static org.xiaoxian.EasyLAN.spawnAnimals;
+import static org.xiaoxian.EasyLAN.spawnNPCs;
 
 public class ShareToLan {
     public void handleStop() {
@@ -48,6 +49,8 @@ public class ShareToLan {
         if (!isBlank(customMaxPlayer)) {
             setMaxPlayer(server, Integer.parseInt(customMaxPlayer));
         }
+
+        ServerRuleApplier.apply(server);
 
         if (HttpAPI) {
             EasyLAN.getRuntimeState().openUpdateService();
@@ -121,6 +124,7 @@ public class ShareToLan {
             snapshot.putStatus("pvp", String.valueOf(allowPVP));
             snapshot.putStatus("onlineMode", String.valueOf(onlineMode));
             snapshot.putStatus("spawnAnimals", String.valueOf(spawnAnimals));
+            snapshot.putStatus("spawnNPCs", String.valueOf(spawnNPCs));
             snapshot.putStatus("allowFlight", String.valueOf(allowFlight));
             snapshot.putStatus("difficulty", safeValue(server.getWorldData().getDifficulty()));
             snapshot.putStatus("gameType", safeValue(server.getDefaultGameType()));

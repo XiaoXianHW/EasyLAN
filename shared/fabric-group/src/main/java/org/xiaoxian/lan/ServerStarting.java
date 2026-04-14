@@ -2,7 +2,6 @@ package org.xiaoxian.lan;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.*;
-import net.minecraft.world.level.GameRules;
 
 import static org.xiaoxian.EasyLAN.*;
 
@@ -33,10 +32,6 @@ public class ServerStarting {
             SaveOffCommand.register(dispatcher);
         }
 
-        minecraftServer.setPvpAllowed(allowPVP);
-        minecraftServer.setUsesAuthentication(onlineMode);
-        minecraftServer.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, minecraftServer);
-        minecraftServer.setFlightAllowed(allowFlight);
-        minecraftServer.setMotd(motd);
+        ServerRuleApplier.apply(minecraftServer);
     }
 }
