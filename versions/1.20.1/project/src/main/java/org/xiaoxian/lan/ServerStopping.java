@@ -1,13 +1,10 @@
 package org.xiaoxian.lan;
 
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.server.MinecraftServer;
 
 public class ServerStopping {
-
-    @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event) {
-        if (event.getServer().isSingleplayer()) {
+    public static void onServerStopping(MinecraftServer minecraftServer) {
+        if (minecraftServer.isSingleplayer()) {
             new ShareToLan().handleStop();
         }
     }

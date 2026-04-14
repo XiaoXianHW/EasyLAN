@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.model.EasyLanStatusSnapshot;
-import org.xiaoxian.easylan.forge.version.VersionBridgeResolver;
+import org.xiaoxian.easylan.fabric.version.VersionBridgeResolver;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.util.ChatUtil;
 import org.xiaoxian.util.NetworkUtil;

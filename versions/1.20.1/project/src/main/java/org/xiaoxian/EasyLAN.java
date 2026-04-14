@@ -1,18 +1,15 @@
 package org.xiaoxian;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
-import org.xiaoxian.gui.GuiShareToLanEdit;
-import org.xiaoxian.gui.GuiWorldSelectionEdit;
 import org.xiaoxian.lan.ServerStarting;
 import org.xiaoxian.lan.ServerStopping;
 import org.xiaoxian.util.ConfigUtil;
 
-@Mod(EasyLAN.MOD_ID)
-public class EasyLAN {
+public class EasyLAN implements ModInitializer {
     public static final String MOD_ID = "easylan";
 
     private static final EasyLanConfig CONFIG = EasyLanConfig.defaultConfig();
@@ -33,15 +30,11 @@ public class EasyLAN {
     public static String CustomMaxPlayer = "20";
     public static String motd = "This is a Default EasyLAN Motd!";
 
-    public EasyLAN() {
+    @Override
+    public void onInitialize() {
         ConfigUtil.load();
-        MinecraftForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
-        MinecraftForge.EVENT_BUS.register(new ServerStarting());
-        MinecraftForge.EVENT_BUS.register(new ServerStopping());
-
-        GuiShareToLanEdit.PortText = CustomPort;
-        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
+        ServerLifecycleEvents.SERVER_STARTING.register(ServerStarting::onServerStarting);
+        ServerLifecycleEvents.SERVER_STOPPING.register(ServerStopping::onServerStopping);
     }
 
     public static EasyLanConfig getConfig() {
