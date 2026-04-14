@@ -1,0 +1,78 @@
+﻿package org.xiaoxian;
+
+import net.fabricmc.api.ModInitializer;
+import org.xiaoxian.easylan.core.config.EasyLanConfig;
+import org.xiaoxian.easylan.core.model.LanRuleProfile;
+import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
+import org.xiaoxian.util.ConfigUtil;
+
+public class EasyLAN implements ModInitializer {
+    public static final String MOD_ID = "easylan";
+
+    private static final EasyLanConfig CONFIG = EasyLanConfig.defaultConfig();
+    private static final EasyLanRuntimeState RUNTIME_STATE = new EasyLanRuntimeState();
+
+    public static boolean allowPVP = true;
+    public static boolean onlineMode = true;
+    public static boolean spawnAnimals = true;
+    public static boolean spawnNPCs = true;
+    public static boolean allowFlight = true;
+    public static boolean whiteList = false;
+    public static boolean BanCommands = false;
+    public static boolean OpCommands = false;
+    public static boolean SaveCommands = false;
+    public static boolean HttpAPI = true;
+    public static boolean LanOutput = true;
+    public static String CustomPort = "25565";
+    public static String CustomMaxPlayer = "20";
+    public static String motd = "This is a Default EasyLAN Motd!";
+
+    @Override
+    public void onInitialize() {
+        ConfigUtil.load();
+    }
+
+    public static EasyLanConfig getConfig() {
+        return CONFIG;
+    }
+
+    public static EasyLanRuntimeState getRuntimeState() {
+        return RUNTIME_STATE;
+    }
+
+    public static void syncFromConfig() {
+        LanRuleProfile rules = CONFIG.getRuleProfile();
+        allowPVP = rules.isAllowPvp();
+        onlineMode = rules.isOnlineMode();
+        spawnAnimals = rules.isSpawnAnimals();
+        spawnNPCs = rules.isSpawnNpcs();
+        allowFlight = rules.isAllowFlight();
+        whiteList = rules.isWhiteList();
+        BanCommands = rules.isBanCommands();
+        OpCommands = rules.isOpCommands();
+        SaveCommands = rules.isSaveCommands();
+        HttpAPI = rules.isHttpApi();
+        LanOutput = rules.isLanOutput();
+        motd = rules.getMotd();
+        CustomPort = CONFIG.getCustomPort();
+        CustomMaxPlayer = CONFIG.getCustomMaxPlayer();
+    }
+
+    public static void syncToConfig() {
+        LanRuleProfile rules = CONFIG.getRuleProfile();
+        rules.setAllowPvp(allowPVP);
+        rules.setOnlineMode(onlineMode);
+        rules.setSpawnAnimals(spawnAnimals);
+        rules.setSpawnNpcs(spawnNPCs);
+        rules.setAllowFlight(allowFlight);
+        rules.setWhiteList(whiteList);
+        rules.setBanCommands(BanCommands);
+        rules.setOpCommands(OpCommands);
+        rules.setSaveCommands(SaveCommands);
+        rules.setHttpApi(HttpAPI);
+        rules.setLanOutput(LanOutput);
+        rules.setMotd(motd);
+        CONFIG.setCustomPort(CustomPort);
+        CONFIG.setCustomMaxPlayer(CustomMaxPlayer);
+    }
+}
