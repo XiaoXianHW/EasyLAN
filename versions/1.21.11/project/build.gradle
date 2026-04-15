@@ -1,0 +1,126 @@
+plugins {
+    id 'idea'
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
+def existingSourceDirs = { Object... paths ->
+    paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/java'),
+                    new File(repoRoot, 'shared/neoforge-group/src/main/java'),
+                    new File(repoRoot, 'shared/neoforge-modern/src/main/java'),
+                    file('../overrides/src/main/java'),
+                    file('src/main/java')
+            )
+        }
+        resources {
+            srcDirs = existingSourceDirs(
+                    new File(repoRoot, 'shared/core/src/main/resources'),
+                    new File(repoRoot, 'shared/neoforge-group/src/main/resources'),
+                    new File(repoRoot, 'shared/neoforge-modern/src/main/resources'),
+                    file('../overrides/src/main/resources'),
+                    file('src/main/resources'),
+                    file('src/generated/resources')
+            )
+        }
+    }
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+dependencies {
+    implementation ('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+configurations {
+    customJarConfiguration {
+        canBeResolved = true
+        canBeConsumed = false
+        extendsFrom implementation
+    }
+}
+
+jar {
+    from {
+        configurations.customJarConfiguration.filter {
+            it.name.contains('nanohttpd')
+        }.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    eachFile { file ->
+        if (file.name == 'LICENSE.txt') {
+            file.exclude()
+        }
+    }
+    manifest {
+        attributes([
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
