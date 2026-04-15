@@ -3,6 +3,8 @@ package org.xiaoxian.lan;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
+import java.lang.reflect.Method;
+
 import static org.xiaoxian.EasyLAN.allowFlight;
 import static org.xiaoxian.EasyLAN.allowPVP;
 import static org.xiaoxian.EasyLAN.motd;
@@ -16,8 +18,32 @@ public final class ServerRuleApplier {
     public static void apply(MinecraftServer minecraftServer) {
         minecraftServer.setPvpAllowed(allowPVP);
         minecraftServer.setUsesAuthentication(onlineMode);
-        minecraftServer.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, minecraftServer);
+        GameRules gameRules = resolveGameRules(minecraftServer);
+        if (gameRules != null) {
+            gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, minecraftServer);
+        }
         minecraftServer.setFlightAllowed(allowFlight);
         minecraftServer.setMotd(motd);
+    }
+
+    private static GameRules resolveGameRules(MinecraftServer minecraftServer) {
+        try {
+            Method worldDataMethod = minecraftServer.getClass().getMethod("getWorldData");
+            Object worldData = worldDataMethod.invoke(minecraftServer);
+            if (worldData != null) {
+                Method gameRulesMethod = worldData.getClass().getMethod("getGameRules");
+                Object gameRules = gameRulesMethod.invoke(worldData);
+                if (gameRules instanceof GameRules) {
+                    return (GameRules) gameRules;
+                }
+            }
+        } catch (ReflectiveOperationException ignored) {
+        }
+
+        try {
+            return minecraftServer.getGameRules();
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 }

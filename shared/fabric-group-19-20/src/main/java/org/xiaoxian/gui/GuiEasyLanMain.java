@@ -122,6 +122,7 @@ public class GuiEasyLanMain extends Screen {
 
     @Override
     public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         matrixStack.drawCenteredString(fontRenderer, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
