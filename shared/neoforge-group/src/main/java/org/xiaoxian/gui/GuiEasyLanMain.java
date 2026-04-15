@@ -135,27 +135,27 @@ public class GuiEasyLanMain extends Screen {
         matrixStack.drawCenteredString(fontRenderer, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
         // 基础设置
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFFFF);
 
         // 指令支持
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFFFF);
 
         // 其他设置
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFFFF);
 
         // MOTD
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFFFF);
         MotdTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 

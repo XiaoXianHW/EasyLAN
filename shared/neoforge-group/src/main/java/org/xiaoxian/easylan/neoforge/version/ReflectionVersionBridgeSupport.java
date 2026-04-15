@@ -46,19 +46,42 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return false;
         }
 
+        if (invokeIntSetter(playerList, maxPlayers, "setMaxPlayers")) {
+            return true;
+        }
+
+        if (invokeIntSetter(server, maxPlayers, "setMaxPlayers")) {
+            return true;
+        }
+
         for (String fieldName : maxPlayerFieldNames()) {
             try {
                 Field field = findField(playerList.getClass(), fieldName);
                 if (field == null) {
                     continue;
                 }
-                field.setAccessible(true);
                 field.set(playerList, maxPlayers);
                 return true;
             } catch (ReflectiveOperationException ignored) {
             }
         }
         return false;
+    }
+
+    @Override
+    public int resolveMaxPlayers(Object server) {
+        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Integer playerListValue = invokeIntGetter(playerList, "getMaxPlayers");
+        if (playerListValue != null && playerListValue > 0) {
+            return playerListValue;
+        }
+
+        Integer serverValue = invokeIntGetter(server, "getMaxPlayers");
+        if (serverValue != null && serverValue > 0) {
+            return serverValue;
+        }
+
+        return 0;
     }
 
     @Override
@@ -101,7 +124,11 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
         return null;
     }
 
-    private Object invokeNoArgs(Object target, String... methodNames) {
+    protected final Object invokeNoArgs(Object target, String... methodNames) {
+        if (target == null) {
+            return null;
+        }
+
         for (String methodName : methodNames) {
             try {
                 Method method = findMethod(target.getClass(), methodName);
@@ -115,7 +142,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
         return null;
     }
 
-    private Method findMethod(Class<?> type, String name, Class<?>... parameterTypes) {
+    protected final Method findMethod(Class<?> type, String name, Class<?>... parameterTypes) {
         Class<?> current = type;
         while (current != null) {
             try {
@@ -136,14 +163,43 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
         }
     }
 
-    private Field findField(Class<?> type, String name) {
+    protected final Field findField(Class<?> type, String name) {
         Class<?> current = type;
         while (current != null) {
             try {
-                return current.getDeclaredField(name);
+                Field field = current.getDeclaredField(name);
+                field.setAccessible(true);
+                return field;
             } catch (NoSuchFieldException ignored) {
                 current = current.getSuperclass();
             }
+        }
+        return null;
+    }
+
+    private boolean invokeIntSetter(Object target, int value, String... methodNames) {
+        if (target == null) {
+            return false;
+        }
+
+        for (String methodName : methodNames) {
+            try {
+                Method method = findMethod(target.getClass(), methodName, Integer.TYPE);
+                if (method == null) {
+                    continue;
+                }
+                method.invoke(target, value);
+                return true;
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+        return false;
+    }
+
+    private Integer invokeIntGetter(Object target, String... methodNames) {
+        Object value = invokeNoArgs(target, methodNames);
+        if (value instanceof Number number) {
+            return number.intValue();
         }
         return null;
     }

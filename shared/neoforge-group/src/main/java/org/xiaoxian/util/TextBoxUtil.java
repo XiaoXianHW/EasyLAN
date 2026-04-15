@@ -45,7 +45,7 @@ public class TextBoxUtil extends EditBox {
                 }
             }
 
-            matrixStack.drawString(Minecraft.getInstance().font, textToDraw, getX() + 4, getY() + (height - 8) / 2, this.isFocused() ? 14737632 : 7368816);
+            matrixStack.drawString(Minecraft.getInstance().font, textToDraw, getX() + 4, getY() + (height - 8) / 2, this.isFocused() ? 0xFFE0E0E0 : 0xFF707070);
         }
     }
 

@@ -7,5 +7,7 @@ public interface VersionBridge {
 
     boolean setMaxPlayers(Object server, int maxPlayers);
 
+    int resolveMaxPlayers(Object server);
+
     String resolveLanPort(Object server);
 }

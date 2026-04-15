@@ -102,8 +102,8 @@ public class GuiShareToLanEdit {
         @Override
         public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
             this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
-            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
-            matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
+            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFFFF);
+            matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFFFF);
 
             for (Renderable widget : this.renderables) {
                 widget.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -112,11 +112,11 @@ public class GuiShareToLanEdit {
             PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
             MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
-            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFFFF);
+            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFFFF5555);
 
-            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
+            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF5555);
         }
 
         @Override

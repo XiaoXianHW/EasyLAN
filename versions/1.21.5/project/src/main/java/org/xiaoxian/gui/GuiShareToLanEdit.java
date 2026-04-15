@@ -99,12 +99,12 @@ public class GuiShareToLanEdit {
         @Override
         public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
             super.render(guiGraphics, mouseX, mouseY, partialTicks);
-            guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 50, 0xFFFFFF);
-            guiGraphics.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
-            guiGraphics.drawString(this.font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            guiGraphics.drawString(this.font, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
-            guiGraphics.drawString(this.font, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            guiGraphics.drawString(this.font, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 50, 0xFFFFFFFF);
+            guiGraphics.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFFFF5555);
+            guiGraphics.drawString(this.font, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF5555);
         }
 
         private Button createCycleButton(int x, int y, int width, int height) {
