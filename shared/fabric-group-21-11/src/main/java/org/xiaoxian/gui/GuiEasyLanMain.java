@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import org.xiaoxian.util.ButtonUtil;
@@ -12,9 +13,20 @@ import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
-import java.awt.*;
+import java.awt.Color;
 
-import static org.xiaoxian.EasyLAN.*;
+import static org.xiaoxian.EasyLAN.BanCommands;
+import static org.xiaoxian.EasyLAN.HttpAPI;
+import static org.xiaoxian.EasyLAN.LanOutput;
+import static org.xiaoxian.EasyLAN.OpCommands;
+import static org.xiaoxian.EasyLAN.SaveCommands;
+import static org.xiaoxian.EasyLAN.allowFlight;
+import static org.xiaoxian.EasyLAN.allowPVP;
+import static org.xiaoxian.EasyLAN.motd;
+import static org.xiaoxian.EasyLAN.onlineMode;
+import static org.xiaoxian.EasyLAN.spawnAnimals;
+import static org.xiaoxian.EasyLAN.spawnNPCs;
+import static org.xiaoxian.EasyLAN.whiteList;
 
 public class GuiEasyLanMain extends Screen {
     private EditBox motdTextBox;
@@ -34,83 +46,96 @@ public class GuiEasyLanMain extends Screen {
         mobSpawningEnabled = spawnAnimals && spawnNPCs;
 
         addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back"))) {
-            public void onClick(double mouseX, double mouseY) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
                 Minecraft.getInstance().setScreen(parentScreen);
             }
         });
         addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load"))) {
-            public void onClick(double mouseX, double mouseY) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
                 ConfigUtil.load();
                 minecraft.setScreen(new GuiEasyLanMain(parentScreen));
             }
         });
         addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save"))) {
-            public void onClick(double mouseX, double mouseY) {
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
                 saveConfig();
             }
         });
 
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 55, allowPVP, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 allowPVP = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 80, onlineMode, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 onlineMode = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 118, mobSpawningEnabled, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 mobSpawningEnabled = this.isChecked();
                 spawnAnimals = mobSpawningEnabled;
                 spawnNPCs = mobSpawningEnabled;
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 - 95, 144, allowFlight, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 allowFlight = this.isChecked();
             }
         });
 
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 25, 55, whiteList, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 whiteList = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 25, 80, BanCommands, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 BanCommands = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 25, 105, OpCommands, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 OpCommands = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 25, 130, SaveCommands, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 SaveCommands = this.isChecked();
             }
         });
 
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 145, 55, HttpAPI, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 HttpAPI = this.isChecked();
             }
         });
         addRenderableWidget(new CheckBoxButtonUtil(this.width / 2 + 145, 80, LanOutput, 20, 20) {
-            public void onClick(double mouseX, double mouseY) {
-                this.toggleChecked();
+            @Override
+            public void onPress(InputWithModifiers inputWithModifiers) {
+                super.onPress(inputWithModifiers);
                 LanOutput = this.isChecked();
             }
         });
@@ -118,6 +143,8 @@ public class GuiEasyLanMain extends Screen {
         motdTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 70, 185, 230, 20, "");
         motdTextBox.setMaxLength(100);
         motdTextBox.setValue(motdText);
+        motdTextBox.setResponder(text -> motdText = text);
+        addRenderableWidget(motdTextBox);
     }
 
     @Override
@@ -144,34 +171,12 @@ public class GuiEasyLanMain extends Screen {
         matrixStack.drawString(fontRenderer, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
 
         matrixStack.drawString(fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        motdTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        motdTextBox.keyPressed(keyCode, scanCode, modifiers);
-        motdText = motdTextBox.getValue();
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean charTyped(char typedChar, int keyCode) {
-        motdTextBox.charTyped(typedChar, keyCode);
-        motdText = motdTextBox.getValue();
-        return super.charTyped(typedChar, keyCode);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        motdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-        motdText = motdTextBox.getValue();
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     private void saveConfig() {
         spawnAnimals = mobSpawningEnabled;
         spawnNPCs = mobSpawningEnabled;
-        motd = motdTextBox.getValue();
+        motd = motdText;
         ConfigUtil.save();
     }
 }

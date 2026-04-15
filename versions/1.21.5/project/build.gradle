@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.8.13'
+    id 'fabric-loom' version '1.11.8'
 }
 
 version = mod_version
@@ -10,6 +10,10 @@ base {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+
+loom {
+    enableModProvidedJavadoc = false
+}
 
 def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
 def existingSourceDirs = { Object... paths ->

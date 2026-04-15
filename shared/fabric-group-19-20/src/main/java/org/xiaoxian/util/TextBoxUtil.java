@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 
-import javax.annotation.Nonnull;
 import java.awt.Color;
 import java.lang.reflect.Field;
 
@@ -28,7 +27,7 @@ public class TextBoxUtil extends EditBox {
     }
 
     @Override
-    public void renderWidget(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderWidget(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             matrixStack.fill(getX(), getY(), getX() + width + 4, getY() + height, new Color(128, 128, 128, 30).getRGB());
 

@@ -1,8 +1,7 @@
 package org.xiaoxian.util;
 
 import net.minecraft.client.gui.GuiGraphics;
-
-import java.awt.*;
+import net.minecraft.client.input.InputWithModifiers;
 
 public class CheckBoxButtonUtil extends ButtonUtil {
     private boolean isChecked;
@@ -13,11 +12,14 @@ public class CheckBoxButtonUtil extends ButtonUtil {
     }
 
     @Override
-    public void renderWidget(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
+    protected void renderContents(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        int color = this.isChecked ? 0xFFFFFFFF : 0xFF7F7F7F;
+        matrixStack.fill(this.getX() + 4, this.getY() + 4, this.getX() + this.width - 4, this.getY() + this.height - 4, color);
+    }
 
-        Color color = this.isChecked ? Color.WHITE: Color.GRAY;
-        DrawUtil.drawRect(this.getX() + 2, this.getY() + 2, this.width - 4, this.height - 4, color);
+    @Override
+    public void onPress(InputWithModifiers inputWithModifiers) {
+        this.isChecked = !this.isChecked;
     }
 
     public boolean isChecked() {

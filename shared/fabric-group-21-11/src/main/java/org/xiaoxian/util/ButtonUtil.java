@@ -1,13 +1,10 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-
-import java.awt.Color;
 
 public class ButtonUtil extends Button {
 
@@ -20,17 +17,8 @@ public class ButtonUtil extends Button {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        if (this.visible) {
-            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
-
-            RenderSystem.enableBlend();
-            Color color = isHovered ? new Color(128, 128, 128, 128) : new Color(64, 64, 64, 128);
-            matrixStack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color.getRGB());
-            RenderSystem.disableBlend();
-
-            matrixStack.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, this.active ? 0xFFFFFF : 0xA0A0A0);
-        }
+    protected void renderContents(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        matrixStack.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, this.active ? 0xFFFFFF : 0xA0A0A0);
     }
 
     @Override

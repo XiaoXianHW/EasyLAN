@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
@@ -15,7 +16,6 @@ import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -69,7 +69,6 @@ public class GuiShareToLanEdit {
                 int x = originalButton.getX();
                 int y = originalButton.getY();
 
-                this.renderables.remove(originalButton);
                 this.removeWidget(originalButton);
 
                 Button finalOriginalButton = originalButton;
@@ -87,7 +86,7 @@ public class GuiShareToLanEdit {
             }
 
             EditBox targetEditBox = null;
-            for (Renderable widget : this.renderables) {
+            for (GuiEventListener widget : this.children()) {
                 if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
                     targetEditBox = editBox;
                 }
@@ -101,13 +100,15 @@ public class GuiShareToLanEdit {
         }
 
         @Override
-        public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
             this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
             matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
             matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
 
-            for (Renderable widget : this.renderables) {
-                widget.render(matrixStack, mouseX, mouseY, partialTicks);
+            for (GuiEventListener widget : this.children()) {
+                if (widget instanceof Renderable renderable) {
+                    renderable.render(matrixStack, mouseX, mouseY, partialTicks);
+                }
             }
 
             PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -159,7 +160,7 @@ public class GuiShareToLanEdit {
         }
 
         private Button findLanButton() {
-            for (Renderable widget : this.renderables) {
+            for (GuiEventListener widget : this.children()) {
                 if (widget instanceof Button button && button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                     return button;
                 }

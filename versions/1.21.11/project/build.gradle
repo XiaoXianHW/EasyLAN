@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.8.13'
+    id 'fabric-loom' version '1.11.8'
 }
 
 version = mod_version
@@ -11,6 +11,10 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
 
+loom {
+    enableModProvidedJavadoc = false
+}
+
 def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
 def existingSourceDirs = { Object... paths ->
     paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
@@ -21,7 +25,7 @@ sourceSets {
         java {
             srcDirs = existingSourceDirs(
                     new File(repoRoot, 'shared/core/src/main/java'),
-                    new File(repoRoot, 'shared/fabric-group-21/src/main/java'),
+                    new File(repoRoot, 'shared/fabric-group-21-11/src/main/java'),
                     file('../overrides/src/main/java'),
                     file('src/main/java')
             )
@@ -29,7 +33,7 @@ sourceSets {
         resources {
             srcDirs = existingSourceDirs(
                     new File(repoRoot, 'shared/core/src/main/resources'),
-                    new File(repoRoot, 'shared/fabric-group-21/src/main/resources'),
+                    new File(repoRoot, 'shared/fabric-group-21-11/src/main/resources'),
                     file('../overrides/src/main/resources'),
                     file('src/main/resources')
             )
