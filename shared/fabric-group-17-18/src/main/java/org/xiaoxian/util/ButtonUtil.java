@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
-import javax.annotation.Nonnull;
 import java.awt.Color;
 
 public class ButtonUtil extends Button {
@@ -15,7 +14,7 @@ public class ButtonUtil extends Button {
     }
 
     @Override
-    public void renderButton(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
@@ -24,7 +23,8 @@ public class ButtonUtil extends Button {
             fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, color.getRGB());
             RenderSystem.disableBlend();
 
-            drawCenteredString(matrixStack, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
+            int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
+            drawCenteredString(matrixStack, Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, textColor);
         }
     }
 }

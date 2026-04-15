@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
@@ -15,7 +14,6 @@ import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -71,7 +69,6 @@ public class GuiShareToLanEdit {
                 int x = originalButton.x;
                 int y = originalButton.y;
 
-                this.renderables.remove(originalButton);
                 this.removeWidget(originalButton);
 
                 Button finalOriginalButton = originalButton;
@@ -89,14 +86,13 @@ public class GuiShareToLanEdit {
             }
 
             List<EditBox> targetEditBoxes = new ArrayList<>();
-            for (Renderable widget : this.renderables) {
+            for (Object widget : this.children()) {
                 if (widget instanceof EditBox editBox) {
                     targetEditBoxes.add(editBox);
                 }
             }
 
             for (EditBox targetEditBox : targetEditBoxes) {
-                this.renderables.remove(targetEditBox);
                 this.removeWidget(targetEditBox);
             }
 
@@ -104,14 +100,11 @@ public class GuiShareToLanEdit {
         }
 
         @Override
-        public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
             this.renderBackground(matrixStack);
             drawCenteredString(matrixStack, fontRenderer, this.title, this.width / 2, 50, 0xFFFFFF);
             drawCenteredString(matrixStack, fontRenderer, Component.nullToEmpty(I18n.get("lanServer.otherPlayers")), this.width / 2, 82, 0xFFFFFF);
-
-            for (Renderable widget : this.renderables) {
-                widget.render(matrixStack, mouseX, mouseY, partialTicks);
-            }
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
 
             PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
             MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -162,7 +155,7 @@ public class GuiShareToLanEdit {
         }
 
         private Button findLanButton() {
-            for (Renderable widget : this.renderables) {
+            for (Object widget : this.children()) {
                 if (widget instanceof Button button && button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
                     return button;
                 }
