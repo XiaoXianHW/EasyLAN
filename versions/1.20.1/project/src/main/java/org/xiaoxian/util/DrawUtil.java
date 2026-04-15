@@ -24,10 +24,10 @@ public class DrawUtil {
         BufferBuilder bufferBuilder = tesselator.getBuilder();
 
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        bufferBuilder.vertex((double)x + width, y, 0.0D).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.vertex((double) x + width, y, 0.0D).color(red, green, blue, alpha).endVertex();
         bufferBuilder.vertex(x, y, 0.0D).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.vertex(x, (double)y + height, 0.0D).color(red, green, blue, alpha).endVertex();
-        bufferBuilder.vertex((double)x + width, (double)y + height, 0.0D).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.vertex(x, (double) y + height, 0.0D).color(red, green, blue, alpha).endVertex();
+        bufferBuilder.vertex((double) x + width, (double) y + height, 0.0D).color(red, green, blue, alpha).endVertex();
         tesselator.end();
 
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

@@ -18,6 +18,15 @@ def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
 def existingSourceDirs = { Object... paths ->
     paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
 }
+def excludedSharedJavaSuffixes = [
+        '/shared/neoforge-group/src/main/java/org/xiaoxian/gui/GuiEasyLanMain.java',
+        '/shared/neoforge-group/src/main/java/org/xiaoxian/lan/ShareToLan.java',
+        '/shared/neoforge-group/src/main/java/org/xiaoxian/util/TextBoxUtil.java',
+        '/shared/neoforge-modern/src/main/java/org/xiaoxian/gui/GuiShareToLanEdit.java',
+        '/shared/neoforge-modern/src/main/java/org/xiaoxian/lan/ServerStarting.java',
+        '/shared/neoforge-modern/src/main/java/org/xiaoxian/util/ButtonUtil.java',
+        '/shared/neoforge-modern/src/main/java/org/xiaoxian/util/CheckBoxButtonUtil.java'
+]
 
 sourceSets {
     main {
@@ -29,6 +38,10 @@ sourceSets {
                     file('../overrides/src/main/java'),
                     file('src/main/java')
             )
+            exclude { details ->
+                def normalized = details.file.absolutePath.replace('\\', '/')
+                excludedSharedJavaSuffixes.any { normalized.endsWith(it) }
+            }
         }
         resources {
             srcDirs = existingSourceDirs(
