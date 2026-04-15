@@ -19,7 +19,10 @@ public final class ServerRuleApplier {
     public static void apply(MinecraftServer server) {
         server.setPvpAllowed(allowPVP);
         server.setUsesAuthentication(onlineMode);
-        server.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, server);
+        GameRules gameRules = resolveGameRules(server);
+        if (gameRules != null) {
+            gameRules.getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, server);
+        }
         applyNpcSetting(server);
         server.setFlightAllowed(allowFlight);
         server.setMotd(motd);
@@ -35,6 +38,27 @@ public final class ServerRuleApplier {
             Method method = server.getClass().getMethod(methodName, Boolean.TYPE);
             method.invoke(server, spawnNPCs);
         } catch (ReflectiveOperationException ignored) {
+        }
+    }
+
+    private static GameRules resolveGameRules(MinecraftServer server) {
+        try {
+            Method worldDataMethod = server.getClass().getMethod("getWorldData");
+            Object worldData = worldDataMethod.invoke(server);
+            if (worldData != null) {
+                Method gameRulesMethod = worldData.getClass().getMethod("getGameRules");
+                Object gameRules = gameRulesMethod.invoke(worldData);
+                if (gameRules instanceof GameRules) {
+                    return (GameRules) gameRules;
+                }
+            }
+        } catch (ReflectiveOperationException ignored) {
+        }
+
+        try {
+            return server.getGameRules();
+        } catch (RuntimeException ignored) {
+            return null;
         }
     }
 }

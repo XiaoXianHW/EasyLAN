@@ -8,8 +8,6 @@ import net.minecraft.client.gui.components.EditBox;
 import java.awt.Color;
 import java.lang.reflect.Field;
 
-import static org.xiaoxian.util.DrawUtil.drawLine;
-
 public class TextBoxUtil extends EditBox {
     private static final String[] DISPLAY_POS_FIELDS = { "displayPos", "field_146225_q" };
 
@@ -22,14 +20,14 @@ public class TextBoxUtil extends EditBox {
         if (lineScrollOffsetField != null) {
             lineScrollOffsetField.setAccessible(true);
         }
+        setBordered(false);
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
-            fill(x, y, x + width + 4, y + height, new Color(128, 128, 128, 30).getRGB());
-            GlStateManager.lineWidth(2f);
-            drawLine(x, x + width + 3, y + height - 1, new Color(135, 206, 250).getRGB());
+            fill(x, y, x + width + 4, y + height, new Color(48, 48, 48, 170).getRGB());
+            fill(x, y + height - 1, x + width + 4, y + height, new Color(135, 206, 250, 230).getRGB());
             GlStateManager.lineWidth(1f);
             int textColor = this.isFocused() ? 14737632 : 7368816;
 
@@ -44,9 +42,8 @@ public class TextBoxUtil extends EditBox {
 
             if (this.isFocused()) {
                 long currentTick = System.currentTimeMillis();
-                if (currentTick - lastUpdateTick > 10) {
+                if ((currentTick / 300L) % 2L == 0L) {
                     textToDraw += "_";
-                    lastUpdateTick = currentTick;
                 }
             }
 
