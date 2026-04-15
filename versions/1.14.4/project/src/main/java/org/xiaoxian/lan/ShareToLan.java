@@ -2,8 +2,8 @@ package org.xiaoxian.lan;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.model.EasyLanStatusSnapshot;
@@ -13,6 +13,7 @@ import org.xiaoxian.util.ChatUtil;
 import org.xiaoxian.util.NetworkUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -126,7 +127,7 @@ public class ShareToLan {
             snapshot.putStatus("spawnAnimals", String.valueOf(spawnAnimals));
             snapshot.putStatus("spawnNPCs", String.valueOf(spawnNPCs));
             snapshot.putStatus("allowFlight", String.valueOf(allowFlight));
-            snapshot.putStatus("difficulty", safeValue(server.getDifficulty()));
+            snapshot.putStatus("difficulty", safeValue(resolveDifficulty(server)));
             snapshot.putStatus("gameType", safeValue(server.getDefaultGameType()));
             snapshot.putStatus("maxPlayer", String.valueOf(server.getMaxPlayers()));
             snapshot.putStatus("onlinePlayer", String.valueOf(server.getPlayerCount()));
@@ -181,5 +182,25 @@ public class ShareToLan {
 
     private static String safeValue(Object value) {
         return value == null ? "" : String.valueOf(value);
+    }
+
+    private static Object resolveDifficulty(IntegratedServer server) {
+        try {
+            Method method = server.getClass().getMethod("getDifficulty");
+            return method.invoke(server);
+        } catch (ReflectiveOperationException ignored) {
+        }
+
+        try {
+            Method worldDataMethod = server.getClass().getMethod("getWorldData");
+            Object worldData = worldDataMethod.invoke(server);
+            if (worldData != null) {
+                Method difficultyMethod = worldData.getClass().getMethod("getDifficulty");
+                return difficultyMethod.invoke(worldData);
+            }
+        } catch (ReflectiveOperationException ignored) {
+        }
+
+        return null;
     }
 }

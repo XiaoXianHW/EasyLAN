@@ -9,7 +9,10 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+def targetJavaVersion = java_version as int
+def toolchainJavaVersion = targetJavaVersion < 17 ? 17 : targetJavaVersion
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
 
 def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
 def existingSourceDirs = { Object... paths ->
@@ -99,4 +102,5 @@ jar {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.release = targetJavaVersion
 }

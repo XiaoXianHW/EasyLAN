@@ -22,7 +22,8 @@ public class ButtonUtil extends Button {
             fill(this.x, this.y, this.x + this.width, this.y + this.height, color.getRGB());
             GlStateManager.disableBlend();
 
-            this.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor());
+            int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
+            this.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, textColor);
         }
     }
 }

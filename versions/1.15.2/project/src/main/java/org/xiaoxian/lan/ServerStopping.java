@@ -4,7 +4,7 @@ import net.minecraft.server.MinecraftServer;
 
 public class ServerStopping {
     public static void onServerStopping(MinecraftServer server) {
-        if (server.isSinglePlayer()) {
+        if (!server.isDedicatedServer()) {
             new ShareToLan().handleStop();
         }
     }

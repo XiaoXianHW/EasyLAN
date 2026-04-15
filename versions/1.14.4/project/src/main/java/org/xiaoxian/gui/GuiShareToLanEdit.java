@@ -63,7 +63,7 @@ public class GuiShareToLanEdit {
             Button originalButton = findLanButton();
             if (originalButton != null) {
                 int width = originalButton.getWidth();
-                int height = originalButton.getHeight();
+                int height = 20;
                 int x = originalButton.x;
                 int y = originalButton.y;
 
