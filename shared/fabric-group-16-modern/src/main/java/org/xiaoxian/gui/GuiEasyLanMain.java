@@ -12,7 +12,6 @@ import org.xiaoxian.util.CheckBoxButtonUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.awt.Color;
 
 import static org.xiaoxian.EasyLAN.BanCommands;
@@ -147,7 +146,7 @@ public class GuiEasyLanMain extends Screen {
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         drawCenteredString(matrixStack, font, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
 

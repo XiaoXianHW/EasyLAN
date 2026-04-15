@@ -14,7 +14,6 @@ import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -98,7 +97,7 @@ public class GuiShareToLanEdit {
         }
 
         @Override
-        public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
             this.renderBackground(matrixStack);
             drawCenteredString(matrixStack, font, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
             drawCenteredString(matrixStack, font, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);

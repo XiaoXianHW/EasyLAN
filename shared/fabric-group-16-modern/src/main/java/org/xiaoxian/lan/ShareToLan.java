@@ -2,7 +2,7 @@ package org.xiaoxian.lan;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
@@ -13,6 +13,7 @@ import org.xiaoxian.util.ChatUtil;
 import org.xiaoxian.util.NetworkUtil;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -119,14 +120,14 @@ public class ShareToLan {
 
             snapshot.putStatus("port", safeValue(resolvedPort));
             snapshot.putStatus("version", safeValue(server.getServerVersion()));
-            snapshot.putStatus("owner", safeValue(server.getSingleplayerName()));
+            snapshot.putStatus("owner", safeValue(resolveProfileName(server)));
             snapshot.putStatus("motd", safeValue(server.getMotd()));
             snapshot.putStatus("pvp", String.valueOf(allowPVP));
             snapshot.putStatus("onlineMode", String.valueOf(onlineMode));
             snapshot.putStatus("spawnAnimals", String.valueOf(spawnAnimals));
             snapshot.putStatus("spawnNPCs", String.valueOf(spawnNPCs));
             snapshot.putStatus("allowFlight", String.valueOf(allowFlight));
-            snapshot.putStatus("difficulty", safeValue(server.getDifficulty()));
+            snapshot.putStatus("difficulty", safeValue(server.getWorldData().getDifficulty()));
             snapshot.putStatus("gameType", safeValue(server.getDefaultGameType()));
             snapshot.putStatus("maxPlayer", String.valueOf(server.getMaxPlayers()));
             snapshot.putStatus("onlinePlayer", String.valueOf(server.getPlayerCount()));
@@ -181,5 +182,39 @@ public class ShareToLan {
 
     private static String safeValue(Object value) {
         return value == null ? "" : String.valueOf(value);
+    }
+
+    private static String resolveProfileName(IntegratedServer server) {
+        try {
+            Method method = server.getClass().getMethod("getSingleplayerName");
+            Object value = method.invoke(server);
+            if (value != null) {
+                return String.valueOf(value);
+            }
+        } catch (ReflectiveOperationException ignored) {
+        }
+
+        try {
+            Method method = server.getClass().getMethod("getSingleplayerProfile");
+            Object profile = method.invoke(server);
+            if (profile == null) {
+                return "";
+            }
+
+            for (String methodName : new String[] { "getName", "name" }) {
+                try {
+                    Method profileMethod = profile.getClass().getMethod(methodName);
+                    Object value = profileMethod.invoke(profile);
+                    if (value != null) {
+                        return String.valueOf(value);
+                    }
+                } catch (ReflectiveOperationException ignored) {
+                }
+            }
+
+            return String.valueOf(profile);
+        } catch (ReflectiveOperationException ignored) {
+            return "";
+        }
     }
 }
