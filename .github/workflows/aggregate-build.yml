@@ -1,0 +1,132 @@
+name: Aggregate Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Build target group
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - forge
+          - fabric
+          - neoforge
+      branches:
+        description: Optional custom branches (comma, space, or newline separated)
+        required: false
+        type: string
+
+concurrency:
+  group: aggregate-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: windows-latest
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+      has-projects: ${{ steps.discover.outputs.has-projects }}
+      targets: ${{ steps.discover.outputs.targets }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Discover build matrix
+        id: discover
+        shell: pwsh
+        env:
+          BUILD_PROFILE: ${{ inputs.profile }}
+          CUSTOM_BRANCHES: ${{ inputs.branches }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          $matrix = & .\tools\Resolve-BuildMatrix.ps1 -Profile $env:BUILD_PROFILE -Branches $env:CUSTOM_BRANCHES
+          $parsed = ConvertFrom-Json $matrix
+          $items = @($parsed.include)
+          $hasProjects = if ($items.Count -gt 0) { 'true' } else { 'false' }
+          $targets = ($items | ForEach-Object { $_.branch } | Select-Object -Unique) -join ', '
+
+          "matrix=$matrix" >> $env:GITHUB_OUTPUT
+          "has-projects=$hasProjects" >> $env:GITHUB_OUTPUT
+          "targets=$targets" >> $env:GITHUB_OUTPUT
+
+          Write-Host "Resolved targets: $targets"
+          Write-Host "Resolved matrix: $matrix"
+
+  build:
+    needs: discover
+    if: ${{ needs.discover.outputs.has-projects == 'true' }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+
+    steps:
+      - name: Checkout ${{ matrix.branch }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          fetch-depth: 1
+
+      - name: Setup Java ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: gradle
+
+      - name: Prepare downloadServer cache
+        shell: pwsh
+        run: |
+          if (
+            (Test-Path '.\tools\Ensure-MinecraftServerCache.ps1') -and
+            @('1.16.4', '1.16.5', '1.17.1', '1.18.2') -contains '${{ matrix.version }}'
+          ) {
+            .\tools\Ensure-MinecraftServerCache.ps1 -Version '${{ matrix.version }}' -GradleUserHome "$env:USERPROFILE\.gradle"
+          }
+
+      - name: Build ${{ matrix.branch }} / ${{ matrix.version }}
+        shell: pwsh
+        working-directory: versions/${{ matrix.version }}/project
+        run: .\gradlew.bat build
+
+      - name: Upload ${{ matrix.branch }} / ${{ matrix.version }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: easylan-${{ matrix.branch }}-${{ matrix.version }}
+          path: |
+            versions/${{ matrix.version }}/project/build/libs/*.jar
+            !versions/${{ matrix.version }}/project/build/libs/*-sources.jar
+          if-no-files-found: error
+          retention-days: 14
+
+  bundle:
+    needs: build
+    if: ${{ always() && needs.build.result != 'cancelled' }}
+    runs-on: windows-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: artifacts
+
+      - name: Create bundle
+        id: bundle
+        shell: pwsh
+        run: |
+          $bundleName = "easylan-bundle-${{ github.run_number }}-$(Get-Date -Format 'yyyyMMdd-HHmmss').zip"
+          $bundlePath = Join-Path $PWD $bundleName
+          Compress-Archive -Path (Join-Path $PWD 'artifacts\*') -DestinationPath $bundlePath
+          "bundle_name=$bundleName" >> $env:GITHUB_OUTPUT
+          "bundle_path=$bundlePath" >> $env:GITHUB_OUTPUT
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle.outputs.bundle_name }}
+          path: ${{ steps.bundle.outputs.bundle_path }}
+          if-no-files-found: error
+          retention-days: 14

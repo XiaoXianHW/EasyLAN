@@ -1,0 +1,4 @@
+.tmp-*
+.gradle/
+artifacts/
+branch-sources/
