@@ -1,40 +1,51 @@
 package org.xiaoxian.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 
-import javax.annotation.Nonnull;
 import java.awt.Color;
 
 public class ButtonUtil extends Button {
+    public static class Builder {
+        private final int x;
+        private final int y;
+        private final int width;
+        private final int height;
+        private final String text;
+
+        private Builder(int x, int y, int width, int height, String text) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.text = text;
+        }
+    }
 
     public ButtonUtil(Builder builder) {
-        super(builder);
+        super(builder.x, builder.y, builder.width, builder.height, Component.nullToEmpty(builder.text), button -> {
+        }, DEFAULT_NARRATION);
     }
 
     public static Builder builder(int x, int y, int width, int height, String buttonText) {
-        return Button.builder(Component.nullToEmpty(buttonText), button -> {}).bounds(x, y, width, height);
+        return new Builder(x, y, width, height, buttonText);
     }
 
     @Override
-    public void renderWidget(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        if (this.visible) {
-            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+    public void onPress(InputWithModifiers input) {
+        handleClick();
+    }
 
-            RenderSystem.enableBlend();
-            Color color;
-            if (isHovered) {
-                color = new Color(128, 128, 128, 128);
-            } else {
-                color = new Color(64, 64, 64, 128);
-            }
-            matrixStack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color.getRGB());
-            RenderSystem.disableBlend();
+    protected void handleClick() {
+    }
 
-            matrixStack.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor());
-        }
+    @Override
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        Color color = this.isHoveredOrFocused() ? new Color(128, 128, 128, 128) : new Color(64, 64, 64, 128);
+        guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, color.getRGB());
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor());
     }
 }

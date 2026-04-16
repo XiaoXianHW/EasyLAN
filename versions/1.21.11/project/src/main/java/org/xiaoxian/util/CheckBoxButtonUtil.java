@@ -2,30 +2,28 @@ package org.xiaoxian.util;
 
 import net.minecraft.client.gui.GuiGraphics;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Color;
 
 public class CheckBoxButtonUtil extends ButtonUtil {
-    private boolean isChecked;
+    private boolean checked;
 
-    public CheckBoxButtonUtil(int x, int y, boolean isChecked, int width, int height) {
+    public CheckBoxButtonUtil(int x, int y, boolean checked, int width, int height) {
         super(ButtonUtil.builder(x, y, width, height, ""));
-        this.isChecked = isChecked;
+        this.checked = checked;
     }
 
     @Override
-    public void renderWidget(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        super.renderWidget(matrixStack, mouseX, mouseY, partialTicks);
-
-        Color color = this.isChecked ? Color.WHITE: Color.GRAY;
-        DrawUtil.drawRect(this.getX() + 2, this.getY() + 2, this.width - 4, this.height - 4, color);
+    protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.renderContents(guiGraphics, mouseX, mouseY, partialTicks);
+        int innerColor = checked ? Color.WHITE.getRGB() : new Color(110, 110, 110, 220).getRGB();
+        guiGraphics.fill(this.getX() + 3, this.getY() + 3, this.getX() + this.width - 3, this.getY() + this.height - 3, innerColor);
     }
 
     public boolean isChecked() {
-        return isChecked;
+        return checked;
     }
 
     public void toggleChecked() {
-        this.isChecked = !this.isChecked;
+        checked = !checked;
     }
 }

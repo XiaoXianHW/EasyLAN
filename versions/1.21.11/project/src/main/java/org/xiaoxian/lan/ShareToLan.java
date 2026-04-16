@@ -116,7 +116,7 @@ public class ShareToLan {
 
             snapshot.putStatus("port", safeValue(resolvedPort));
             snapshot.putStatus("version", safeValue(server.getServerVersion()));
-            snapshot.putStatus("owner", safeValue(server.getSingleplayerProfile().getName()));
+            snapshot.putStatus("owner", safeValue(server.getSingleplayerProfile() == null ? null : server.getSingleplayerProfile().name()));
             snapshot.putStatus("motd", safeValue(server.getMotd()));
             snapshot.putStatus("pvp", String.valueOf(allowPVP));
             snapshot.putStatus("onlineMode", String.valueOf(onlineMode));
@@ -124,7 +124,7 @@ public class ShareToLan {
             snapshot.putStatus("allowFlight", String.valueOf(allowFlight));
             snapshot.putStatus("difficulty", safeValue(server.getWorldData().getDifficulty()));
             snapshot.putStatus("gameType", safeValue(server.getDefaultGameType()));
-            snapshot.putStatus("maxPlayer", String.valueOf(server.getMaxPlayers()));
+            snapshot.putStatus("maxPlayer", String.valueOf(resolveMaxPlayers(server)));
             snapshot.putStatus("onlinePlayer", String.valueOf(server.getPlayerCount()));
 
             List<String> playerIds = new ArrayList<>();
@@ -169,6 +169,11 @@ public class ShareToLan {
 
     private static String getLanPort(IntegratedServer server) {
         return VersionBridgeResolver.get().resolveLanPort(server);
+    }
+
+    private static int resolveMaxPlayers(IntegratedServer server) {
+        int resolved = VersionBridgeResolver.get().resolveMaxPlayers(server);
+        return resolved > 0 ? resolved : server.getMaxPlayers();
     }
 
     private static boolean isBlank(String value) {

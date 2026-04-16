@@ -62,6 +62,42 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     }
 
     @Override
+    public int resolveMaxPlayers(Object server) {
+        Object playerList = invokeNoArgs(server, "getPlayerList");
+        if (playerList == null) {
+            return -1;
+        }
+
+        for (String fieldName : maxPlayerFieldNames()) {
+            try {
+                Field field = findField(playerList.getClass(), fieldName);
+                if (field == null) {
+                    continue;
+                }
+                field.setAccessible(true);
+                Object value = field.get(playerList);
+                if (value instanceof Number) {
+                    int resolved = ((Number) value).intValue();
+                    if (resolved > 0) {
+                        return resolved;
+                    }
+                }
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+
+        Object reflected = invokeNoArgs(playerList, "getMaxPlayers", "getMaxPlayersCount");
+        if (reflected instanceof Number) {
+            int resolved = ((Number) reflected).intValue();
+            if (resolved > 0) {
+                return resolved;
+            }
+        }
+
+        return -1;
+    }
+
+    @Override
     public String resolveLanPort(Object server) {
         String runtimePort = EasyLAN.getRuntimeState().getLanPort();
         if (runtimePort != null && !runtimePort.isEmpty()) {

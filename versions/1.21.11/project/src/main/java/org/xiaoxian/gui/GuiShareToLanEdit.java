@@ -1,35 +1,26 @@
 package org.xiaoxian.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.util.HttpUtil;
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
-import org.xiaoxian.util.TextBoxUtil;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.net.ServerSocket;
-
-import static org.xiaoxian.EasyLAN.CustomMaxPlayer;
-import static org.xiaoxian.EasyLAN.CustomPort;
 
 public class GuiShareToLanEdit {
-    public static EditBox PortTextBox;
     public static String PortText = "";
     public static String PortWarningText = "";
-
-    public static EditBox MaxPlayerBox;
     public static String MaxPlayerText = "";
     public static String MaxPlayerWarningText = "";
 
@@ -40,181 +31,188 @@ public class GuiShareToLanEdit {
         }
     }
 
-    public static class GuiShareToLanModified extends ShareToLanScreen {
-        private final Font fontRenderer = Minecraft.getInstance().font;
+    public static class GuiShareToLanModified extends Screen {
+        private final Screen lastScreen;
+        private EditBox portTextBox;
+        private EditBox maxPlayerTextBox;
+        private Button startButton;
+        private GameType gameMode = GameType.SURVIVAL;
+        private boolean commands;
+        private int publishPort;
 
-        public GuiShareToLanModified(Screen parentScreen) {
-            super(parentScreen);
+        public GuiShareToLanModified(Screen lastScreen) {
+            super(Component.translatable("lanServer.title"));
+            this.lastScreen = lastScreen;
         }
 
         @Override
-        public void init() {
-            super.init();
-
-            PortText = CustomPort;
-            MaxPlayerText = CustomMaxPlayer;
-
-            PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
-            PortTextBox.setMaxLength(5);
-            PortTextBox.setValue(PortText);
-
-            MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
-            MaxPlayerBox.setMaxLength(6);
-            MaxPlayerBox.setValue(MaxPlayerText);
-
-            refreshLanButtonState();
-
-            Button originalButton = findLanButton();
-            if (originalButton != null) {
-                int width = originalButton.getWidth();
-                int height = originalButton.getHeight();
-                int x = originalButton.getX();
-                int y = originalButton.getY();
-
-                this.renderables.remove(originalButton);
-                this.removeWidget(originalButton);
-
-                Button finalOriginalButton = originalButton;
-                Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
-                    syncTextState();
-                    finalOriginalButton.onPress();
-                    CustomPort = PortText;
-                    CustomMaxPlayer = MaxPlayerText;
-                    ConfigUtil.save();
-                    new ShareToLan().handleLanSetup();
-                }).bounds(x, y, width, height).build();
-
-                this.addRenderableWidget(newButton);
+        protected void init() {
+            IntegratedServer integratedServer = this.minecraft.getSingleplayerServer();
+            if (integratedServer != null) {
+                gameMode = integratedServer.getDefaultGameType();
+                commands = integratedServer.getWorldData().isAllowCommands();
             }
 
-            EditBox targetEditBox = null;
-            for (Renderable widget : this.renderables) {
-                if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
-                    targetEditBox = editBox;
+            publishPort = HttpUtil.getAvailablePort();
+            PortText = org.xiaoxian.EasyLAN.CustomPort;
+            MaxPlayerText = org.xiaoxian.EasyLAN.CustomMaxPlayer;
+
+            addRenderableWidget(createCycleButton(this.width / 2 - 155, 100, 150, 20));
+            addRenderableWidget(createCommandsButton(this.width / 2 + 5, 100, 150, 20));
+
+            portTextBox = new EditBox(this.font, this.width / 2 - 155, this.height - 70, 145, 20, Component.translatable("easylan.text.port"));
+            portTextBox.setMaxLength(5);
+            portTextBox.setValue(PortText);
+            portTextBox.setHint(Component.literal(String.valueOf(publishPort)));
+            portTextBox.setResponder(value -> {
+                PortText = value;
+                refreshWarnings();
+            });
+            addRenderableWidget(portTextBox);
+
+            maxPlayerTextBox = new EditBox(this.font, this.width / 2 + 5, this.height - 70, 145, 20, Component.translatable("easylan.text.maxplayer"));
+            maxPlayerTextBox.setMaxLength(6);
+            maxPlayerTextBox.setValue(MaxPlayerText);
+            maxPlayerTextBox.setResponder(value -> {
+                MaxPlayerText = value;
+                refreshWarnings();
+            });
+            addRenderableWidget(maxPlayerTextBox);
+
+            startButton = Button.builder(Component.translatable("lanServer.start"), button -> startLan())
+                    .bounds(this.width / 2 - 155, this.height - 28, 150, 20)
+                    .build();
+            addRenderableWidget(startButton);
+
+            addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, button -> onClose())
+                    .bounds(this.width / 2 + 5, this.height - 28, 150, 20)
+                    .build());
+
+            refreshWarnings();
+        }
+
+        @Override
+        public void onClose() {
+            this.minecraft.setScreen(this.lastScreen);
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+            super.render(guiGraphics, mouseX, mouseY, partialTicks);
+            guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 50, 0xFFFFFFFF);
+            guiGraphics.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFFFF5555);
+            guiGraphics.drawString(this.font, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
+            guiGraphics.drawString(this.font, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF5555);
+        }
+
+        private Button createCycleButton(int x, int y, int width, int height) {
+            return Button.builder(gameModeMessage(), button -> {
+                GameType[] values = new GameType[] {
+                        GameType.SURVIVAL,
+                        GameType.SPECTATOR,
+                        GameType.CREATIVE,
+                        GameType.ADVENTURE
+                };
+                int index = 0;
+                for (int i = 0; i < values.length; i++) {
+                    if (values[i] == gameMode) {
+                        index = i;
+                        break;
+                    }
                 }
-            }
-
-            if (targetEditBox != null) {
-                this.removeWidget(targetEditBox);
-            }
+                gameMode = values[(index + 1) % values.length];
+                button.setMessage(gameModeMessage());
+            }).bounds(x, y, width, height).build();
         }
 
-        @Override
-        public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-            this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
-            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
-            matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
-
-            for (Renderable widget : this.renderables) {
-                widget.render(matrixStack, mouseX, mouseY, partialTicks);
-            }
-
-            PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
-            MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
-
-            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
-
-            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+        private Button createCommandsButton(int x, int y, int width, int height) {
+            return Button.builder(commandsMessage(), button -> {
+                commands = !commands;
+                button.setMessage(commandsMessage());
+            }).bounds(x, y, width, height).build();
         }
 
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            PortTextBox.keyPressed(keyCode, scanCode, modifiers);
-            MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
-            refreshLanButtonState();
-            syncTextState();
-            return super.keyPressed(keyCode, scanCode, modifiers);
+        private Component gameModeMessage() {
+            return Component.literal(I18n.get("selectWorld.gameMode") + ": " + gameMode.getShortDisplayName().getString());
         }
 
-        @Override
-        public boolean charTyped(char typedChar, int keyCode) {
-            PortTextBox.charTyped(typedChar, keyCode);
-            MaxPlayerBox.charTyped(typedChar, keyCode);
-            refreshLanButtonState();
-            syncTextState();
-            return super.charTyped(typedChar, keyCode);
+        private Component commandsMessage() {
+            return Component.literal(I18n.get("selectWorld.allowCommands") + ": " + (commands ? "ON" : "OFF"));
         }
 
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-            PortTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-            MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
-            syncTextState();
-            return super.mouseClicked(mouseX, mouseY, mouseButton);
+        private void refreshWarnings() {
+            boolean portValid = validatePort(portTextBox.getValue());
+            boolean maxPlayerValid = validateMaxPlayers(maxPlayerTextBox.getValue());
+            startButton.active = portValid && maxPlayerValid;
         }
 
-        private void syncTextState() {
-            PortText = PortTextBox.getValue();
-            MaxPlayerText = MaxPlayerBox.getValue();
-        }
-
-        private void refreshLanButtonState() {
-            Button button = findLanButton();
-            if (button != null) {
-                button.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
-            }
-        }
-
-        private Button findLanButton() {
-            for (Renderable widget : this.renderables) {
-                if (widget instanceof Button button && button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
-                    return button;
-                }
-            }
-            return null;
-        }
-
-        private boolean checkPortAndEnableButton(String portText) {
-            if (portText.isEmpty()) {
-                PortWarningText = "";
+        private boolean validatePort(String value) {
+            PortWarningText = "";
+            if (value == null || value.isEmpty()) {
                 return true;
             }
 
             try {
-                int port = Integer.parseInt(portText);
-                boolean isPortAvailable = port >= 100 && port <= 65535 && isPortAvailable(port);
-                PortWarningText = isPortAvailable ? "" : I18n.get("easylan.text.port.used");
-
-                if (!(port >= 100 && port <= 65535)) {
+                int port = Integer.parseInt(value);
+                if (port < 100 || port > 65535) {
                     PortWarningText = I18n.get("easylan.text.port.invalid");
+                    return false;
                 }
-
-                return isPortAvailable;
-            } catch (NumberFormatException ex) {
+                if (!HttpUtil.isPortAvailable(port)) {
+                    PortWarningText = I18n.get("easylan.text.port.used");
+                    return false;
+                }
+                return true;
+            } catch (NumberFormatException exception) {
                 PortWarningText = I18n.get("easylan.text.port.invalid");
                 return false;
             }
         }
 
-        private boolean checkMaxPlayerAndEnableButton(String maxPlayerText) {
-            if (maxPlayerText.isEmpty()) {
-                MaxPlayerWarningText = "";
+        private boolean validateMaxPlayers(String value) {
+            MaxPlayerWarningText = "";
+            if (value == null || value.isEmpty()) {
                 return true;
             }
 
             try {
-                int maxPlayer = Integer.parseInt(maxPlayerText);
-                if (!(maxPlayer >= 2 && maxPlayer <= 500000)) {
+                int maxPlayers = Integer.parseInt(value);
+                if (maxPlayers < 2 || maxPlayers > 500000) {
                     MaxPlayerWarningText = I18n.get("easylan.text.maxplayer.invalid");
                     return false;
                 }
-                MaxPlayerWarningText = "";
                 return true;
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException exception) {
                 MaxPlayerWarningText = I18n.get("easylan.text.maxplayer.invalid");
                 return false;
             }
         }
 
-        private boolean isPortAvailable(int port) {
-            try (ServerSocket serverSocket = new ServerSocket(port)) {
-                serverSocket.setReuseAddress(true);
-                return true;
-            } catch (IOException ex) {
-                return false;
+        private void startLan() {
+            IntegratedServer integratedServer = this.minecraft.getSingleplayerServer();
+            if (integratedServer == null) {
+                return;
             }
+
+            PortText = portTextBox.getValue();
+            MaxPlayerText = maxPlayerTextBox.getValue();
+
+            this.minecraft.setScreen(null);
+            Component result;
+            if (integratedServer.publishServer(gameMode, commands, publishPort)) {
+                result = PublishCommand.getSuccessMessage(publishPort);
+                org.xiaoxian.EasyLAN.CustomPort = PortText;
+                org.xiaoxian.EasyLAN.CustomMaxPlayer = MaxPlayerText;
+                ConfigUtil.save();
+                new ShareToLan().handleLanSetup();
+            } else {
+                result = Component.translatable("commands.publish.failed");
+            }
+
+            this.minecraft.gui.getChat().addMessage(result);
+            this.minecraft.updateTitle();
         }
     }
 }
