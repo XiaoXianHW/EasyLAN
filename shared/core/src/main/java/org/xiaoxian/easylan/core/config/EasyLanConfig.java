@@ -19,12 +19,9 @@ public class EasyLanConfig {
     private static final String KEY_SPAWN_NPCS = "spawn-NPCs";
     private static final String KEY_ALLOW_FLIGHT = "allow-Flight";
     private static final String KEY_WHITE_LIST = "whiteList";
-    private static final String KEY_BAN_COMMAND = "BanCommand";
-    private static final String KEY_OP_COMMAND = "OpCommand";
-    private static final String KEY_SAVE_COMMAND = "SaveCommand";
-    private static final String LEGACY_KEY_BAN_COMMANDS = "BanCommands";
-    private static final String LEGACY_KEY_OP_COMMANDS = "OpCommands";
-    private static final String LEGACY_KEY_SAVE_COMMANDS = "SaveCommands";
+    private static final String KEY_BAN_COMMANDS = "BanCommands";
+    private static final String KEY_OP_COMMANDS = "OpCommands";
+    private static final String KEY_SAVE_COMMANDS = "SaveCommands";
     private static final String KEY_MOTD = "Motd";
     private static final String KEY_PORT = "Port";
     private static final String KEY_MAX_PLAYER = "MaxPlayer";
@@ -110,12 +107,12 @@ public class EasyLanConfig {
         ruleProfile.setAllowPvp(Boolean.parseBoolean(propertyOrDefault(KEY_PVP, "true")));
         ruleProfile.setOnlineMode(Boolean.parseBoolean(propertyOrDefault(KEY_ONLINE_MODE, "true")));
         ruleProfile.setSpawnAnimals(Boolean.parseBoolean(propertyOrDefault(KEY_SPAWN_ANIMALS, "true")));
-        ruleProfile.setSpawnNpcs(Boolean.parseBoolean(propertyOrDefault(KEY_SPAWN_NPCS, "true")));
+        ruleProfile.setSpawnNpcs(Boolean.parseBoolean(propertyOrDefault(KEY_SPAWN_NPCS, propertyOrDefault(KEY_SPAWN_ANIMALS, "true"))));
         ruleProfile.setAllowFlight(Boolean.parseBoolean(propertyOrDefault(KEY_ALLOW_FLIGHT, "true")));
         ruleProfile.setWhiteList(Boolean.parseBoolean(propertyOrDefault(KEY_WHITE_LIST, "false")));
-        ruleProfile.setBanCommands(Boolean.parseBoolean(propertyOrDefault("false", KEY_BAN_COMMAND, LEGACY_KEY_BAN_COMMANDS)));
-        ruleProfile.setOpCommands(Boolean.parseBoolean(propertyOrDefault("false", KEY_OP_COMMAND, LEGACY_KEY_OP_COMMANDS)));
-        ruleProfile.setSaveCommands(Boolean.parseBoolean(propertyOrDefault("false", KEY_SAVE_COMMAND, LEGACY_KEY_SAVE_COMMANDS)));
+        ruleProfile.setBanCommands(Boolean.parseBoolean(propertyOrDefault(KEY_BAN_COMMANDS, "false")));
+        ruleProfile.setOpCommands(Boolean.parseBoolean(propertyOrDefault(KEY_OP_COMMANDS, "false")));
+        ruleProfile.setSaveCommands(Boolean.parseBoolean(propertyOrDefault(KEY_SAVE_COMMANDS, "false")));
         ruleProfile.setHttpApi(Boolean.parseBoolean(propertyOrDefault(KEY_HTTP_API, "true")));
         ruleProfile.setLanOutput(Boolean.parseBoolean(propertyOrDefault(KEY_LAN_OUTPUT, "true")));
         ruleProfile.setMotd(propertyOrDefault(KEY_MOTD, "This is a Default EasyLAN Motd!"));
@@ -130,12 +127,9 @@ public class EasyLanConfig {
         properties.setProperty(KEY_SPAWN_NPCS, String.valueOf(ruleProfile.isSpawnNpcs()));
         properties.setProperty(KEY_ALLOW_FLIGHT, String.valueOf(ruleProfile.isAllowFlight()));
         properties.setProperty(KEY_WHITE_LIST, String.valueOf(ruleProfile.isWhiteList()));
-        properties.remove(LEGACY_KEY_BAN_COMMANDS);
-        properties.remove(LEGACY_KEY_OP_COMMANDS);
-        properties.remove(LEGACY_KEY_SAVE_COMMANDS);
-        properties.setProperty(KEY_BAN_COMMAND, String.valueOf(ruleProfile.isBanCommands()));
-        properties.setProperty(KEY_OP_COMMAND, String.valueOf(ruleProfile.isOpCommands()));
-        properties.setProperty(KEY_SAVE_COMMAND, String.valueOf(ruleProfile.isSaveCommands()));
+        properties.setProperty(KEY_BAN_COMMANDS, String.valueOf(ruleProfile.isBanCommands()));
+        properties.setProperty(KEY_OP_COMMANDS, String.valueOf(ruleProfile.isOpCommands()));
+        properties.setProperty(KEY_SAVE_COMMANDS, String.valueOf(ruleProfile.isSaveCommands()));
         properties.setProperty(KEY_HTTP_API, String.valueOf(ruleProfile.isHttpApi()));
         properties.setProperty(KEY_LAN_OUTPUT, String.valueOf(ruleProfile.isLanOutput()));
         properties.setProperty(KEY_MOTD, ruleProfile.getMotd());
@@ -149,12 +143,12 @@ public class EasyLanConfig {
         properties.putIfAbsent(KEY_PVP, "true");
         properties.putIfAbsent(KEY_ONLINE_MODE, "true");
         properties.putIfAbsent(KEY_SPAWN_ANIMALS, "true");
-        properties.putIfAbsent(KEY_SPAWN_NPCS, "true");
+        properties.putIfAbsent(KEY_SPAWN_NPCS, properties.getProperty(KEY_SPAWN_ANIMALS, "true"));
         properties.putIfAbsent(KEY_ALLOW_FLIGHT, "true");
         properties.putIfAbsent(KEY_WHITE_LIST, "false");
-        properties.putIfAbsent(KEY_BAN_COMMAND, "false");
-        properties.putIfAbsent(KEY_OP_COMMAND, "false");
-        properties.putIfAbsent(KEY_SAVE_COMMAND, "false");
+        properties.putIfAbsent(KEY_BAN_COMMANDS, "false");
+        properties.putIfAbsent(KEY_OP_COMMANDS, "false");
+        properties.putIfAbsent(KEY_SAVE_COMMANDS, "false");
         properties.putIfAbsent(KEY_MOTD, "This is a Default EasyLAN Motd!");
         properties.putIfAbsent(KEY_PORT, "25565");
         properties.putIfAbsent(KEY_MAX_PLAYER, "20");
@@ -162,15 +156,5 @@ public class EasyLanConfig {
 
     private String propertyOrDefault(String key, String fallback) {
         return properties.getProperty(key, fallback);
-    }
-
-    private String propertyOrDefault(String fallback, String... keys) {
-        for (String key : keys) {
-            String value = properties.getProperty(key);
-            if (value != null) {
-                return value;
-            }
-        }
-        return fallback;
     }
 }
