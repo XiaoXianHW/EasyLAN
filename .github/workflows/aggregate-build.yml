@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   discover:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
       has-projects: ${{ steps.discover.outputs.has-projects }}
@@ -43,7 +43,7 @@ jobs:
           CUSTOM_BRANCHES: ${{ inputs.branches }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          $matrix = & .\tools\Resolve-BuildMatrix.ps1 -Profile $env:BUILD_PROFILE -Branches $env:CUSTOM_BRANCHES
+          $matrix = & (Join-Path $PWD 'tools/Resolve-BuildMatrix.ps1') -Profile $env:BUILD_PROFILE -Branches $env:CUSTOM_BRANCHES
           $parsed = ConvertFrom-Json $matrix
           $items = @($parsed.include)
           $hasProjects = if ($items.Count -gt 0) { 'true' } else { 'false' }
@@ -59,7 +59,7 @@ jobs:
   build:
     needs: discover
     if: ${{ needs.discover.outputs.has-projects == 'true' }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
@@ -88,7 +88,7 @@ jobs:
       - name: Apply shared source from main
         shell: pwsh
         run: |
-          .\ci-main\tools\Apply-SharedSource.ps1 `
+          & (Join-Path $PWD 'ci-main/tools/Apply-SharedSource.ps1') `
             -SourceRepositoryRoot (Join-Path $PWD 'ci-main') `
             -TargetRepositoryRoot $PWD `
             -Branch '${{ matrix.branch }}'
@@ -96,17 +96,25 @@ jobs:
       - name: Prepare downloadServer cache
         shell: pwsh
         run: |
+          $gradleUserHome = if ([string]::IsNullOrWhiteSpace($env:GRADLE_USER_HOME)) {
+            Join-Path $HOME '.gradle'
+          } else {
+            $env:GRADLE_USER_HOME
+          }
+
           if (
-            (Test-Path '.\tools\Ensure-MinecraftServerCache.ps1') -and
+            (Test-Path (Join-Path $PWD 'tools/Ensure-MinecraftServerCache.ps1')) -and
             @('1.16.4', '1.16.5', '1.17.1', '1.18.2') -contains '${{ matrix.version }}'
           ) {
-            .\tools\Ensure-MinecraftServerCache.ps1 -Version '${{ matrix.version }}' -GradleUserHome "$env:USERPROFILE\.gradle"
+            & (Join-Path $PWD 'tools/Ensure-MinecraftServerCache.ps1') -Version '${{ matrix.version }}' -GradleUserHome $gradleUserHome
           }
 
       - name: Build ${{ matrix.branch }} / ${{ matrix.version }}
-        shell: pwsh
+        shell: bash
         working-directory: versions/${{ matrix.version }}/project
-        run: .\gradlew.bat build
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build
 
       - name: Upload ${{ matrix.branch }} / ${{ matrix.version }}
         uses: actions/upload-artifact@v4
@@ -121,7 +129,7 @@ jobs:
   bundle:
     needs: build
     if: ${{ always() && needs.build.result != 'cancelled' }}
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v5
@@ -134,7 +142,8 @@ jobs:
         run: |
           $bundleName = "easylan-bundle-${{ github.run_number }}-$(Get-Date -Format 'yyyyMMdd-HHmmss').zip"
           $bundlePath = Join-Path $PWD $bundleName
-          Compress-Archive -Path (Join-Path $PWD 'artifacts\*') -DestinationPath $bundlePath
+          $artifactGlob = Join-Path (Join-Path $PWD 'artifacts') '*'
+          Compress-Archive -Path $artifactGlob -DestinationPath $bundlePath
           "bundle_name=$bundleName" >> $env:GITHUB_OUTPUT
           "bundle_path=$bundlePath" >> $env:GITHUB_OUTPUT
 

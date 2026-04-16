@@ -163,7 +163,10 @@ try {
             Sort-Object Name |
             Where-Object {
                 $projectPath = Join-Path $_.FullName 'project'
-                (Test-Path (Join-Path $projectPath 'gradlew.bat')) -and
+                (
+                    (Test-Path (Join-Path $projectPath 'gradlew')) -or
+                    (Test-Path (Join-Path $projectPath 'gradlew.bat'))
+                ) -and
                 ($excludedVersions -notcontains $_.Name)
             } |
             ForEach-Object {

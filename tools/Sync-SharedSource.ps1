@@ -50,7 +50,7 @@ try {
             throw "Failed to clone branch: $branch"
         }
 
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $repoRoot 'tools/Apply-SharedSource.ps1') `
+        & (Join-Path $repoRoot 'tools/Apply-SharedSource.ps1') `
             -SourceRepositoryRoot $repoRoot `
             -TargetRepositoryRoot $branchPath `
             -Branch $branch `

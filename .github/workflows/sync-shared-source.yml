@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -52,4 +52,4 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           $profile = if ([string]::IsNullOrWhiteSpace($env:INPUT_PROFILE)) { 'all' } else { $env:INPUT_PROFILE }
-          .\tools\Sync-SharedSource.ps1 -Profile $profile -Branches $env:INPUT_BRANCHES -Push
+          & (Join-Path $PWD 'tools/Sync-SharedSource.ps1') -Profile $profile -Branches $env:INPUT_BRANCHES -Push
