@@ -36,25 +36,36 @@ jobs:
                   [string]$BuildGradlePath
               )
 
+              $buildContent = ''
+              $requestedJavaVersion = $null
+
               if (Test-Path $GradlePropertiesPath) {
                   $javaVersionLine = Get-Content $GradlePropertiesPath | Where-Object { $_ -match '^\s*java_version\s*=\s*(\d+)\s*$' } | Select-Object -First 1
                   if ($javaVersionLine -match '(\d+)') {
-                      return [int]$Matches[1]
+                      $requestedJavaVersion = [int]$Matches[1]
                   }
               }
 
               if (Test-Path $BuildGradlePath) {
                   $buildContent = Get-Content $BuildGradlePath -Raw
-                  if ($buildContent -match 'JavaLanguageVersion\.of\((\d+)\)') {
-                      return [int]$Matches[1]
+                  if (-not $requestedJavaVersion -and $buildContent -match 'JavaLanguageVersion\.of\((\d+)\)') {
+                      $requestedJavaVersion = [int]$Matches[1]
                   }
               }
 
-              switch -Regex ($Version) {
-                  '^1\.(17\.1|18\.2|19\.2|19\.4|20\.1)$' { return 17 }
-                  '^1\.(20\.6|21\.1|21\.5|21\.11)$' { return 21 }
-                  default { return 8 }
+              if (-not $requestedJavaVersion) {
+                  $requestedJavaVersion = switch -Regex ($Version) {
+                      '^1\.(17\.1|18\.2|19\.2|19\.4|20\.1)$' { 17; break }
+                      '^1\.(20\.6|21\.1|21\.5|21\.11)$' { 21; break }
+                      default { 8 }
+                  }
               }
+
+              if ($buildContent -match "id\s+['""]fabric-loom['""]") {
+                  return [Math]::Max(17, $requestedJavaVersion)
+              }
+
+              return $requestedJavaVersion
           }
 
           $matrixInclude = @(
