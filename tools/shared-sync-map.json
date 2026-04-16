@@ -1,0 +1,50 @@
+{
+  "sources": [
+    {
+      "name": "shared-core",
+      "source": "shared-source/core",
+      "targets": [
+        {
+          "branch": "forge-1.7.2-1.11.2",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "forge-1.12.2",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "forge-1.13.2-1.15.2",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "forge-1.16.4-1.18.2",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "forge-1.19.2-1.21.11",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "fabric-1.14.4-1.15.2",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "fabric-1.16.4-1.16.5",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "fabric-1.17.1-1.20.1",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "fabric-1.20.6-1.21.11",
+          "destination": "shared/core"
+        },
+        {
+          "branch": "neoforge-1.20.1-1.21.11",
+          "destination": "shared/core"
+        }
+      ]
+    }
+  ]
+}

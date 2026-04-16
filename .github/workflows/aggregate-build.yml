@@ -71,12 +71,27 @@ jobs:
           ref: ${{ matrix.branch }}
           fetch-depth: 1
 
+      - name: Checkout main shared source
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          path: ci-main
+
       - name: Setup Java ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
           cache: gradle
+
+      - name: Apply shared source from main
+        shell: pwsh
+        run: |
+          .\ci-main\tools\Apply-SharedSource.ps1 `
+            -SourceRepositoryRoot (Join-Path $PWD 'ci-main') `
+            -TargetRepositoryRoot $PWD `
+            -Branch '${{ matrix.branch }}'
 
       - name: Prepare downloadServer cache
         shell: pwsh
