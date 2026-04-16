@@ -7,6 +7,10 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
 public class ButtonUtil extends Button {
+    private static final int NORMAL_BORDER_COLOR = 0x70808080;
+    private static final int HOVER_BORDER_COLOR = 0x90A7D8FF;
+    private static final int NORMAL_BACKGROUND_COLOR = 0x7A303030;
+    private static final int HOVER_BACKGROUND_COLOR = 0x9A4A4A4A;
 
     public ButtonUtil(Builder builder) {
         super(builder.x, builder.y, builder.width, builder.height, Component.nullToEmpty(builder.buttonText), button -> {}, DEFAULT_NARRATION);
@@ -23,8 +27,8 @@ public class ButtonUtil extends Button {
         }
 
         this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
-        int backgroundColor = this.isHovered ? 0x80808080 : 0x40404080;
-        matrixStack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, backgroundColor);
+        matrixStack.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, this.isHovered ? HOVER_BORDER_COLOR : NORMAL_BORDER_COLOR);
+        matrixStack.fill(this.getX() + 1, this.getY() + 1, this.getX() + this.width - 1, this.getY() + this.height - 1, this.isHovered ? HOVER_BACKGROUND_COLOR : NORMAL_BACKGROUND_COLOR);
         matrixStack.drawCenteredString(Minecraft.getInstance().font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, this.active ? 0xFFFFFF : 0xA0A0A0);
     }
 

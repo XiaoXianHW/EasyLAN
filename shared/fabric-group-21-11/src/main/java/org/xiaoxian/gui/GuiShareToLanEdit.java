@@ -84,12 +84,12 @@ public class GuiShareToLanEdit {
                 this.removeWidget(originalButton);
 
                 Button finalOriginalButton = originalButton;
-                Button newButton = Button.builder(Component.translatable("lanServer.start"), button -> {
+                Button newButton = Button.builder(text("lanServer.start", "Start LAN World"), button -> {
                     syncTextState();
-                    finalOriginalButton.onPress(new KeyEvent(257, 0, 0));
                     CustomPort = PortText;
                     CustomMaxPlayer = MaxPlayerText;
                     ConfigUtil.save();
+                    finalOriginalButton.onPress(new KeyEvent(257, 0, 0));
                     new ShareToLan().handleLanSetup();
                 }).bounds(x, y, width, height).build();
                 newButton.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
@@ -99,7 +99,7 @@ public class GuiShareToLanEdit {
 
             EditBox targetEditBox = null;
             for (GuiEventListener widget : this.children()) {
-                if (widget instanceof EditBox editBox && editBox != PortTextBox && editBox != MaxPlayerBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
+                if (widget instanceof EditBox editBox && editBox != PortTextBox && editBox != MaxPlayerBox && editBox.getMessage().getString().equals(resolveText("lanServer.port", "Port Number"))) {
                     targetEditBox = editBox;
                 }
             }
@@ -113,9 +113,9 @@ public class GuiShareToLanEdit {
 
         @Override
         public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-            this.renderBackground(matrixStack, mouseX, mouseY, partialTicks);
-            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFF);
-            matrixStack.drawCenteredString(fontRenderer, I18n.get("lanServer.otherPlayers"), this.width / 2, 82, 0xFFFFFF);
+            this.renderTransparentBackground(matrixStack);
+            matrixStack.drawCenteredString(fontRenderer, this.title.getString(), this.width / 2, 50, 0xFFFFFFFF);
+            matrixStack.drawCenteredString(fontRenderer, resolveText("lanServer.otherPlayers", "Settings for Other Players"), this.width / 2, 82, 0xFFFFFFFF);
 
             for (GuiEventListener widget : this.children()) {
                 if (widget instanceof Renderable renderable) {
@@ -123,11 +123,11 @@ public class GuiShareToLanEdit {
                 }
             }
 
-            matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
+            matrixStack.drawString(Minecraft.getInstance().font, text("easylan.text.port", "Port"), this.width / 2 - 155, this.height - 85, 0xFFFFFFFF);
+            matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFFFF0000);
 
-            matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
-            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+            matrixStack.drawString(fontRenderer, text("easylan.text.maxplayer", "Max Player"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
+            matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF0000);
         }
 
         private void syncTextState() {
@@ -144,7 +144,7 @@ public class GuiShareToLanEdit {
 
         private Button findLanButton() {
             for (GuiEventListener widget : this.children()) {
-                if (widget instanceof Button button && button.getMessage().getString().equals(I18n.get("lanServer.start"))) {
+                if (widget instanceof Button button && button.getMessage().getString().equals(resolveText("lanServer.start", "Start LAN World"))) {
                     return button;
                 }
             }
@@ -200,6 +200,18 @@ public class GuiShareToLanEdit {
             } catch (IOException ex) {
                 return false;
             }
+        }
+
+        private static Component text(String key, String fallback) {
+            return Component.literal(resolveText(key, fallback));
+        }
+
+        private static String resolveText(String key, String fallback) {
+            String translated = I18n.get(key);
+            if (translated == null || translated.isBlank() || translated.equals(key)) {
+                translated = fallback;
+            }
+            return translated;
         }
     }
 }

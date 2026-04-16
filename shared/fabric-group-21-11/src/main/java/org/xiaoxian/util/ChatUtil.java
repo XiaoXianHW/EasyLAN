@@ -11,10 +11,18 @@ public class ChatUtil {
 
     public static void sendMsg(String msg) {
         msg = PATTERN.matcher(msg).replaceAll("\u00A7$1");
-        MC.gui.getChat().addMessage(Component.nullToEmpty(msg));
+        sendComponentMsg(Component.nullToEmpty(msg));
     }
 
     public static void sendComponentMsg(Component component) {
-        MC.gui.getChat().addMessage(component);
+        if (MC == null || component == null) {
+            return;
+        }
+
+        MC.execute(() -> {
+            if (MC.gui != null) {
+                MC.gui.getChat().addMessage(component);
+            }
+        });
     }
 }

@@ -57,10 +57,21 @@ public class GuiShareToLanEdit {
             PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
             PortTextBox.setMaxLength(5);
             PortTextBox.setValue(PortText);
+            PortTextBox.setResponder(value -> {
+                PortText = value;
+                refreshLanButtonState();
+            });
 
             MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
             MaxPlayerBox.setMaxLength(6);
             MaxPlayerBox.setValue(MaxPlayerText);
+            MaxPlayerBox.setResponder(value -> {
+                MaxPlayerText = value;
+                refreshLanButtonState();
+            });
+
+            addRenderableWidget(PortTextBox);
+            addRenderableWidget(MaxPlayerBox);
 
             Button originalButton = findLanButton();
             if (originalButton != null) {
@@ -87,7 +98,7 @@ public class GuiShareToLanEdit {
 
             EditBox targetEditBox = null;
             for (GuiEventListener widget : this.children()) {
-                if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
+                if (widget instanceof EditBox editBox && editBox != PortTextBox && editBox != MaxPlayerBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
                     targetEditBox = editBox;
                 }
             }
@@ -110,9 +121,6 @@ public class GuiShareToLanEdit {
                     renderable.render(matrixStack, mouseX, mouseY, partialTicks);
                 }
             }
-
-            PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
-            MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
 
             matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
             matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);

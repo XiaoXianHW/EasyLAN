@@ -1,5 +1,6 @@
 package org.xiaoxian.util;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.input.InputWithModifiers;
 
@@ -13,8 +14,16 @@ public class CheckBoxButtonUtil extends ButtonUtil {
 
     @Override
     protected void renderContents(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
-        int color = this.isChecked ? 0xFFFFFFFF : 0xFF7F7F7F;
-        matrixStack.fill(this.getX() + 4, this.getY() + 4, this.getX() + this.width - 4, this.getY() + this.height - 4, color);
+        super.renderContents(matrixStack, mouseX, mouseY, partialTicks);
+        int left = this.getX() + 4;
+        int top = this.getY() + 4;
+        int right = this.getX() + this.width - 4;
+        int bottom = this.getY() + this.height - 4;
+        matrixStack.fill(left, top, right, bottom, this.isChecked ? 0xFFF2F2F2 : 0xA0555555);
+
+        if (this.isChecked) {
+            matrixStack.drawCenteredString(Minecraft.getInstance().font, "x", this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, 0xFF2B2B2B);
+        }
     }
 
     @Override

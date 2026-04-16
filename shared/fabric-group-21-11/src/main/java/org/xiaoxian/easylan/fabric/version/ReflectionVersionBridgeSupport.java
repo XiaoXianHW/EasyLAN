@@ -44,7 +44,15 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public boolean setMaxPlayers(Object server, int maxPlayers) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        if (resolveCurrentMaxPlayers(server) == maxPlayers) {
+            return true;
+        }
+
+        if (tryInvokeIntSetter(server, maxPlayers, "setMaxPlayers", "method_73587")) {
+            return resolveCurrentMaxPlayers(server) == maxPlayers;
+        }
+
+        Object playerList = invokeNoArgs(server, "getPlayerList", "method_3760");
         if (playerList == null) {
             return false;
         }
@@ -57,11 +65,34 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
                 }
                 field.setAccessible(true);
                 field.set(playerList, maxPlayers);
-                return true;
+                if (resolveCurrentMaxPlayers(server, playerList) == maxPlayers) {
+                    return true;
+                }
             } catch (ReflectiveOperationException ignored) {
             }
         }
         return false;
+    }
+
+    private int resolveCurrentMaxPlayers(Object server) {
+        return resolveCurrentMaxPlayers(server, null);
+    }
+
+    private int resolveCurrentMaxPlayers(Object server, Object playerList) {
+        Integer value = invokeIntNoArgs(server, "getMaxPlayers", "method_3802");
+        if (value != null) {
+            return value;
+        }
+
+        Object resolvedPlayerList = playerList != null ? playerList : invokeNoArgs(server, "getPlayerList", "method_3760");
+        if (resolvedPlayerList != null) {
+            value = invokeIntNoArgs(resolvedPlayerList, "getMaxPlayers", "method_14592");
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return -1;
     }
 
     @Override
@@ -126,6 +157,26 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             }
         }
         return null;
+    }
+
+    private Integer invokeIntNoArgs(Object target, String... methodNames) {
+        Object value = invokeNoArgs(target, methodNames);
+        return value instanceof Number ? ((Number) value).intValue() : null;
+    }
+
+    private boolean tryInvokeIntSetter(Object target, int value, String... methodNames) {
+        for (String methodName : methodNames) {
+            try {
+                Method method = findMethod(target.getClass(), methodName, Integer.TYPE);
+                if (method == null) {
+                    continue;
+                }
+                method.invoke(target, value);
+                return true;
+            } catch (ReflectiveOperationException ignored) {
+            }
+        }
+        return false;
     }
 
     private Method findMethod(Class<?> type, String name, Class<?>... parameterTypes) {

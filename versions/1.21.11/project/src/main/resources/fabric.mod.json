@@ -17,6 +17,9 @@
       "org.xiaoxian.client.EasyLanClient"
     ]
   },
+  "mixins": [
+    "easylan.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",

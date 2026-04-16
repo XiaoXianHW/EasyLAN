@@ -45,20 +45,20 @@ public class GuiEasyLanMain extends Screen {
         clearWidgets();
         mobSpawningEnabled = spawnAnimals && spawnNPCs;
 
-        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 + 70, this.height - 25, 100, 20, I18n.get("easylan.back"))) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 + 70, this.height - 25, 100, 20, text("easylan.back", "Back"))) {
             @Override
             public void onPress(InputWithModifiers inputWithModifiers) {
                 Minecraft.getInstance().setScreen(parentScreen);
             }
         });
-        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 50, this.height - 25, 100, 20, I18n.get("easylan.load"))) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 50, this.height - 25, 100, 20, text("easylan.load", "Load Config"))) {
             @Override
             public void onPress(InputWithModifiers inputWithModifiers) {
                 ConfigUtil.load();
                 minecraft.setScreen(new GuiEasyLanMain(parentScreen));
             }
         });
-        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 170, this.height - 25, 100, 20, I18n.get("easylan.save"))) {
+        addRenderableWidget(new ButtonUtil(ButtonUtil.builder(this.width / 2 - 170, this.height - 25, 100, 20, text("easylan.save", "Save Config"))) {
             @Override
             public void onPress(InputWithModifiers inputWithModifiers) {
                 saveConfig();
@@ -151,26 +151,26 @@ public class GuiEasyLanMain extends Screen {
     public void render(GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        matrixStack.drawCenteredString(fontRenderer, I18n.get("easylan.setting"), this.width / 2, 15, Color.WHITE.getRGB());
+        matrixStack.drawCenteredString(fontRenderer, text("easylan.setting", "EasyLAN Setting"), this.width / 2, 15, Color.WHITE.getRGB());
 
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting1"), this.width / 2 - 165, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.pvp"), this.width / 2 - 165, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.onlineMode"), this.width / 2 - 165, 85, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnAnimals"), this.width / 2 - 165, 110, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.spawnNPCs"), this.width / 2 - 165, 125, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.allowFlight"), this.width / 2 - 165, 150, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.setting1", "Basic Settings"), this.width / 2 - 165, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.pvp", "Allow PVP"), this.width / 2 - 165, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.onlineMode", "Online Mode"), this.width / 2 - 165, 85, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.spawnAnimals", "Spawn Animals"), this.width / 2 - 165, 110, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.spawnNPCs", "Spawn NPCs"), this.width / 2 - 165, 125, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.allowFlight", "Allow Flight"), this.width / 2 - 165, 150, 0xFFFFFFFF);
 
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting2"), this.width / 2 - 45, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.whitelist"), this.width / 2 - 45, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.ban"), this.width / 2 - 45, 85, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.op"), this.width / 2 - 45, 110, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.save"), this.width / 2 - 45, 135, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.setting2", "Command Support"), this.width / 2 - 45, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.whitelist", "Whitelist"), this.width / 2 - 45, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.ban", "Ban"), this.width / 2 - 45, 85, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.op", "Operator"), this.width / 2 - 45, 110, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.save", "Save"), this.width / 2 - 45, 135, 0xFFFFFFFF);
 
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.setting3"), this.width / 2 + 75, 35, 0x33CCFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.httpApi"), this.width / 2 + 75, 60, 0xFFFFFF);
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.lanInfo"), this.width / 2 + 75, 85, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.setting3", "Other (Beta)"), this.width / 2 + 75, 35, 0xFF33CCFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.httpApi", "HTTP API Info"), this.width / 2 + 75, 60, 0xFFFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.lanInfo", "LAN Output"), this.width / 2 + 75, 85, 0xFFFFFFFF);
 
-        matrixStack.drawString(fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
+        matrixStack.drawString(fontRenderer, text("easylan.text.motd", "MOTD (Server Info)"), this.width / 2 - 165, 190, 0xFFFFFFFF);
     }
 
     private void saveConfig() {
@@ -178,5 +178,13 @@ public class GuiEasyLanMain extends Screen {
         spawnNPCs = mobSpawningEnabled;
         motd = motdText;
         ConfigUtil.save();
+    }
+
+    private static Component text(String key, String fallback) {
+        String translated = I18n.get(key);
+        if (translated == null || translated.isBlank() || translated.equals(key)) {
+            translated = fallback;
+        }
+        return Component.literal(translated);
     }
 }
