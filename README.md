@@ -1,38 +1,81 @@
-# EasyLAN CI Hub
+# EasyLAN
+**A Minecraft Forge Mod for Custom LAN Servers Related settings for customizing the LAN server (built-in server)**<br>
+| [中文文档](https://github.com/XiaoXianHW/EasyLAN/blob/1.7.2/README_CN.md) |
 
-这个分支只用来放统一的 GitHub Actions 聚合构建入口，不承载任何 Mod 业务代码。
+- [CurseForge](https://www.curseforge.com/minecraft/mc-mods/easylan)
+- [Modrinth](https://modrinth.com/mod/easylan)
+- [MC百科](https://www.mcmod.cn/class/11373.html)
 
-## 用法
+<br>
 
-- 进入 `Actions`
-- 选择 `Aggregate Build`
-- 选择 `profile`
-  - `all`: 构建全部活动维护分支
-  - `forge`: 只构建 Forge 活动分支
-  - `fabric`: 只构建 Fabric 活动分支
-  - `neoforge`: 只构建 NeoForge 活动分支
-- 如果要更细控制，可以在 `branches` 里手填分支名
-  - 支持逗号、空格、换行分隔
-  - 只允许活动维护分支，不允许 `z-acrhive-*`
+## Configurable List
 
-## 构建行为
+### *Custom*
 
-- Workflow 会自动拉取目标代码分支
-- 自动发现各分支里的 `versions/*/project`
-- 自动按版本选择需要的 Java 运行时
-- 自动跳过 `1.7.2` 和 `1.7.10`
-- 每个版本都会单独构建并上传 jar
-- 最后会再汇总成一个总 zip，下载一次就够
+- Custom Port（**100-65535**）
+- Custom Max Player（**2-500000**）
+- Custom Motd（**100 Word Count**）
 
-## 当前活动维护分支
+### *Server Basic Setting*
 
-- `forge-1.7.2-1.11.2`
-- `forge-1.12.2`
-- `forge-1.13.2-1.15.2`
-- `forge-1.16.4-1.18.2`
-- `forge-1.19.2-1.21.11`
-- `fabric-1.14.4-1.15.2`
-- `fabric-1.16.4-1.16.5`
-- `fabric-1.17.1-1.20.1`
-- `fabric-1.20.6-1.21.11`
-- `neoforge-1.20.1-1.21.11`
+- Allow PVP（**True/False**）
+- Online Mode（**True/False**）
+- Spawn Animals（**True/False**）
+- Spawn NPCs（**True/False**）
+- Allow Flight（**True/False**）
+
+### *Server Command Support*
+
+- WhiteList（**/whitelist [on/off/add/remove/...]**）
+- Banned（**/ban|/ban-ip | /pardon|/pardon-ip**）
+- Operator（**/op | /deop**）
+- SaveAll（**/save-all | /save-off | /save-on**）
+
+### *Extensions*
+**Extensions have not been tested for compatibility, please try to disable them if you have problems with the game crashing.**
+
+- HttpAPI Info（HTTPApi Support | port: 28960 | address: 127.0.0.1）<br>
+  ~~(There are compatibility issues with HttpAPI, which may cause a crash when exiting the game. For details, please refer to https://github.com/XiaoXianHW/EasyLAN/issues/2)~~<br>
+ **Fixed in v1.5**
+- LAN output（Game Chat Output LAN Server Info）
+
+<br>
+
+**You can also configure this plugin through `.minecraft\config\easylan.cfg` (similar to server.properties)**
+
+## Support Version
+
+- 1.7.2 - Latest version (maybe [Forge]<br>
+  **Unsupported 1.13.2**<br>
+  **1.7.2 Untested, usability is not yet certain**
+- Please delete the `.minecraft\config\easylan.cfg` file when updating from an old version of EasyLAN to a new version, otherwise the game may crash (see the update log for details)
+
+<br>
+
+## Translation Contribution
+
+This MOD supports multiple languages;<br>
+To contribute translations, please refer to and upload your language files to `src/main/resources/assets/easylan/lang`<br>
+Contributed translations will be added in the **next Minecraft version** (or full version if it's a major refactoring update)
+
+- 1.7.2 - 1.12.2 (xx_XX.lang; **eg: zh_CN.lang**)
+- 1.14.4 - Latest version (xx_xx.json; **eg: zh_cn.json**)
+
+<br>
+
+## Developers
+Build
+```text
+git clone https://github.com/XiaoXianHW/EasyLAN.git
+./gradlew build
+```
+
+For IntelliJ IDEA
+```text
+./gradlew genIntellijRuns
+```
+
+For Eclipse
+```text
+./gradlew genEclipseRuns
+```
