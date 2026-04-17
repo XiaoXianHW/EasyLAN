@@ -1,5 +1,21 @@
 Set-StrictMode -Version Latest
 
+function Get-OptionalSharedProperty {
+    param(
+        [Parameter(Mandatory = $true)]
+        $Object,
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        $DefaultValue = $null
+    )
+
+    if ($Object.PSObject.Properties.Name -contains $Name) {
+        return $Object.$Name
+    }
+
+    return $DefaultValue
+}
+
 function Get-SharedSyncMap {
     param(
         [Parameter(Mandatory = $true)]
@@ -100,10 +116,43 @@ function Get-BranchSharedTargets {
     foreach ($source in @($Map.sources)) {
         foreach ($target in @($source.targets)) {
             if ($target.branch -eq $Branch) {
+                $versions = @(Get-OptionalSharedProperty -Object $target -Name 'versions' -DefaultValue @())
+
+                if ($versions.Count -gt 0) {
+                    $sourceTemplate = Get-OptionalSharedProperty -Object $target -Name 'sourceTemplate' -DefaultValue ''
+                    $destinationTemplate = Get-OptionalSharedProperty -Object $target -Name 'destinationTemplate' -DefaultValue ''
+
+                    if ([string]::IsNullOrWhiteSpace($sourceTemplate)) {
+                        throw "Missing sourceTemplate for $Branch in source $($source.name)"
+                    }
+
+                    if ([string]::IsNullOrWhiteSpace($destinationTemplate)) {
+                        throw "Missing destinationTemplate for $Branch in source $($source.name)"
+                    }
+
+                    foreach ($version in $versions) {
+                        $resolvedSource = $sourceTemplate.Replace('{{version}}', $version)
+                        $resolvedDestination = $destinationTemplate.Replace('{{version}}', $version)
+
+                        $result += [PSCustomObject]@{
+                            name = "$($source.name)-$version"
+                            source = $resolvedSource
+                            destination = $resolvedDestination
+                            branch = $Branch
+                            version = $version
+                        }
+                    }
+
+                    continue
+                }
+
+                $sourcePath = Get-OptionalSharedProperty -Object $source -Name 'source' -DefaultValue ''
+                $destinationPath = Get-OptionalSharedProperty -Object $target -Name 'destination' -DefaultValue ''
+
                 $result += [PSCustomObject]@{
                     name = $source.name
-                    source = $source.source
-                    destination = $target.destination
+                    source = $sourcePath
+                    destination = $destinationPath
                     branch = $Branch
                 }
             }
