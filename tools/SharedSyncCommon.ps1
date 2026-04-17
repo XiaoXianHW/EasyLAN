@@ -117,12 +117,14 @@ function Get-BranchSharedTargets {
         foreach ($target in @($source.targets)) {
             if ($target.branch -eq $Branch) {
                 $versions = @(Get-OptionalSharedProperty -Object $target -Name 'versions' -DefaultValue @())
+                $targetRenames = @(Get-OptionalSharedProperty -Object $target -Name 'renames' -DefaultValue @())
 
                 if ($versions.Count -gt 0) {
                     $sourceTemplate = Get-OptionalSharedProperty -Object $target -Name 'sourceTemplate' -DefaultValue ''
+                    $staticSource = Get-OptionalSharedProperty -Object $source -Name 'source' -DefaultValue ''
                     $destinationTemplate = Get-OptionalSharedProperty -Object $target -Name 'destinationTemplate' -DefaultValue ''
 
-                    if ([string]::IsNullOrWhiteSpace($sourceTemplate)) {
+                    if ([string]::IsNullOrWhiteSpace($sourceTemplate) -and [string]::IsNullOrWhiteSpace($staticSource)) {
                         throw "Missing sourceTemplate for $Branch in source $($source.name)"
                     }
 
@@ -131,7 +133,11 @@ function Get-BranchSharedTargets {
                     }
 
                     foreach ($version in $versions) {
-                        $resolvedSource = $sourceTemplate.Replace('{{version}}', $version)
+                        $resolvedSource = if ([string]::IsNullOrWhiteSpace($sourceTemplate)) {
+                            $staticSource
+                        } else {
+                            $sourceTemplate.Replace('{{version}}', $version)
+                        }
                         $resolvedDestination = $destinationTemplate.Replace('{{version}}', $version)
 
                         $result += [PSCustomObject]@{
@@ -140,6 +146,7 @@ function Get-BranchSharedTargets {
                             destination = $resolvedDestination
                             branch = $Branch
                             version = $version
+                            renames = $targetRenames
                         }
                     }
 
@@ -154,6 +161,7 @@ function Get-BranchSharedTargets {
                     source = $sourcePath
                     destination = $destinationPath
                     branch = $Branch
+                    renames = $targetRenames
                 }
             }
         }
@@ -162,12 +170,36 @@ function Get-BranchSharedTargets {
     return $result
 }
 
+function ConvertTo-RenameMap {
+    param(
+        [AllowNull()]
+        [object[]]$Renames = $null
+    )
+
+    $renameMap = @{}
+
+    foreach ($rename in $Renames) {
+        $sourceName = Get-OptionalSharedProperty -Object $rename -Name 'source' -DefaultValue ''
+        $destinationName = Get-OptionalSharedProperty -Object $rename -Name 'destination' -DefaultValue ''
+
+        if ([string]::IsNullOrWhiteSpace($sourceName) -or [string]::IsNullOrWhiteSpace($destinationName)) {
+            throw 'Invalid rename mapping entry in shared sync map.'
+        }
+
+        $renameMap[$sourceName] = $destinationName
+    }
+
+    return $renameMap
+}
+
 function Sync-DirectoryContents {
     param(
         [Parameter(Mandatory = $true)]
         [string]$SourcePath,
         [Parameter(Mandatory = $true)]
-        [string]$DestinationPath
+        [string]$DestinationPath,
+        [AllowNull()]
+        [object[]]$Renames = $null
     )
 
     if (-not (Test-Path $SourcePath)) {
@@ -184,8 +216,16 @@ function Sync-DirectoryContents {
     }
 
     New-Item -ItemType Directory -Path $DestinationPath -Force | Out-Null
+    $renameMap = ConvertTo-RenameMap -Renames $Renames
 
     foreach ($item in Get-ChildItem -LiteralPath $SourcePath -Force) {
-        Copy-Item -LiteralPath $item.FullName -Destination $DestinationPath -Recurse -Force
+        $destinationName = if ($renameMap.ContainsKey($item.Name)) {
+            $renameMap[$item.Name]
+        } else {
+            $item.Name
+        }
+
+        $itemDestination = Join-Path $DestinationPath $destinationName
+        Copy-Item -LiteralPath $item.FullName -Destination $itemDestination -Recurse -Force
     }
 }

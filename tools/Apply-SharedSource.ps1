@@ -31,6 +31,13 @@ if ($targets.Count -eq 0) {
 foreach ($target in $targets) {
     $sourcePath = Join-Path $SourceRepositoryRoot $target.source
     $destinationPath = Join-Path $TargetRepositoryRoot $target.destination
-    Sync-DirectoryContents -SourcePath $sourcePath -DestinationPath $destinationPath
+    $renames = @(Get-OptionalSharedProperty -Object $target -Name 'renames' -DefaultValue @())
+
+    if ($renames.Count -gt 0) {
+        Sync-DirectoryContents -SourcePath $sourcePath -DestinationPath $destinationPath -Renames $renames
+    } else {
+        Sync-DirectoryContents -SourcePath $sourcePath -DestinationPath $destinationPath
+    }
+
     Write-Host "Applied $($target.name) -> $($target.destination) for $Branch"
 }

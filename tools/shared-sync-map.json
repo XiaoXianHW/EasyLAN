@@ -47,66 +47,74 @@
       ]
     },
     {
-      "name": "shared-language",
+      "name": "shared-language-legacy",
+      "source": "shared-source/lang/legacy",
       "targets": [
         {
           "branch": "forge-1.7.2-1.11.2",
-          "versions": ["1.7.2", "1.7.10", "1.8", "1.8.9", "1.9.4", "1.10.2", "1.11.2"],
-          "sourceTemplate": "shared-source/lang/forge/{{version}}",
+          "versions": ["1.7.2", "1.7.10", "1.8", "1.8.9", "1.9.4", "1.10.2"],
+          "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang",
+          "renames": [
+            { "source": "en_us.lang", "destination": "en_US.lang" },
+            { "source": "ru_ru.lang", "destination": "ru_RU.lang" },
+            { "source": "zh_cn.lang", "destination": "zh_CN.lang" },
+            { "source": "zh_tw.lang", "destination": "zh_TW.lang" }
+          ]
+        },
+        {
+          "branch": "forge-1.7.2-1.11.2",
+          "versions": ["1.11.2"],
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "forge-1.12.2",
           "versions": ["1.12.2"],
-          "sourceTemplate": "shared-source/lang/forge/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
-        },
+        }
+      ]
+    },
+    {
+      "name": "shared-language-json",
+      "source": "shared-source/lang/json",
+      "targets": [
         {
           "branch": "forge-1.13.2-1.15.2",
           "versions": ["1.13.2", "1.14.2", "1.14.4", "1.15.2"],
-          "sourceTemplate": "shared-source/lang/forge/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "forge-1.16.4-1.18.2",
           "versions": ["1.16.4", "1.16.5", "1.17.1", "1.18.2"],
-          "sourceTemplate": "shared-source/lang/forge/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "forge-1.19.2-1.21.11",
           "versions": ["1.19.2", "1.19.4", "1.20.1", "1.20.6", "1.21.1", "1.21.5", "1.21.11"],
-          "sourceTemplate": "shared-source/lang/forge/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "fabric-1.14.4-1.15.2",
           "versions": ["1.14.4", "1.15.2"],
-          "sourceTemplate": "shared-source/lang/fabric/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "fabric-1.16.4-1.16.5",
           "versions": ["1.16.4", "1.16.5"],
-          "sourceTemplate": "shared-source/lang/fabric/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "fabric-1.17.1-1.20.1",
           "versions": ["1.17.1", "1.18.2", "1.19.2", "1.19.4", "1.20.1"],
-          "sourceTemplate": "shared-source/lang/fabric/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "fabric-1.20.6-1.21.11",
           "versions": ["1.20.6", "1.21.1", "1.21.5", "1.21.11"],
-          "sourceTemplate": "shared-source/lang/fabric/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         },
         {
           "branch": "neoforge-1.20.1-1.21.11",
           "versions": ["1.20.1", "1.20.6", "1.21.1", "1.21.5", "1.21.11"],
-          "sourceTemplate": "shared-source/lang/neoforge/{{version}}",
           "destinationTemplate": "versions/{{version}}/project/src/main/resources/assets/easylan/lang"
         }
       ]
