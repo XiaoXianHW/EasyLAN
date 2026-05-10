@@ -1,0 +1,25 @@
+# Build artefacts
+easylan-web
+easylan-web.exe
+*.db
+*.db-journal
+
+# Go
+*.test
+*.out
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*
+internal/frontend/dist/*
+!internal/frontend/dist/.gitkeep
+
+# Docker
+.docker-data/
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
