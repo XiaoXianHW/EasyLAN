@@ -8,20 +8,20 @@ $ErrorActionPreference = 'Stop'
 
 $activeBranchGroups = [ordered]@{
     forge = @(
-        'forge-1.7.2-1.11.2',
-        'forge-1.12.2',
-        'forge-1.13.2-1.15.2',
-        'forge-1.16.4-1.18.2',
-        'forge-1.19.2-1.21.11'
+        'forge/1.7.2-1.11.2',
+        'forge/1.12.2',
+        'forge/1.13.2-1.15.2',
+        'forge/1.16.4-1.18.2',
+        'forge/1.19.2-1.21.11'
     )
     fabric = @(
-        'fabric-1.14.4-1.15.2',
-        'fabric-1.16.4-1.16.5',
-        'fabric-1.17.1-1.20.1',
-        'fabric-1.20.6-1.21.11'
+        'fabric/1.14.4-1.15.2',
+        'fabric/1.16.4-1.16.5',
+        'fabric/1.17.1-1.20.1',
+        'fabric/1.20.6-1.21.11'
     )
     neoforge = @(
-        'neoforge-1.20.1-1.21.11'
+        'neoforge/1.20.1-1.21.11'
     )
 }
 
@@ -50,7 +50,7 @@ function Get-TargetBranches {
         }
 
         foreach ($branch in $customBranches) {
-            if ($branch -like 'z-acrhive-*') {
+            if ($branch -like 'acrhive/*') {
                 throw "Archive branches are not allowed: $branch"
             }
 
