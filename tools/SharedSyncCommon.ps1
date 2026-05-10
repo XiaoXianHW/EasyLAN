@@ -71,7 +71,7 @@ function Resolve-SharedBranches {
         }
 
         foreach ($branch in $customBranches) {
-            if ($branch -like 'z-acrhive-*') {
+            if ($branch -like 'acrhive/*') {
                 throw "Archive branches are not allowed: $branch"
             }
 
@@ -89,13 +89,13 @@ function Resolve-SharedBranches {
             return $availableBranches
         }
         'forge' {
-            return @($availableBranches | Where-Object { $_ -like 'forge-*' })
+            return @($availableBranches | Where-Object { $_ -like 'forge/*' })
         }
         'fabric' {
-            return @($availableBranches | Where-Object { $_ -like 'fabric-*' })
+            return @($availableBranches | Where-Object { $_ -like 'fabric/*' })
         }
         'neoforge' {
-            return @($availableBranches | Where-Object { $_ -like 'neoforge-*' })
+            return @($availableBranches | Where-Object { $_ -like 'neoforge/*' })
         }
         default {
             throw "Unsupported profile: $Profile"
