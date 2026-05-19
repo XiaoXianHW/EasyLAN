@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "Roboto Mono", Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
+}
+
+html,
+body {
+  background-color: #1f2228;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@layer components {
+  .pill {
+    @apply inline-flex items-center justify-center rounded-pill border border-hairline-strong px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .pill-primary {
+    @apply pill bg-white text-canvas hover:bg-white/90;
+  }
+
+  .pill-ghost {
+    @apply pill bg-surface-elevated hover:bg-surface-hover;
+  }
+
+  .pill-mono {
+    @apply pill font-mono uppercase tracking-button text-xs;
+  }
+
+  .card {
+    @apply rounded-md border border-hairline bg-surface-elevated p-6;
+  }
+
+  .label {
+    @apply text-[10px] uppercase tracking-button text-subtle font-mono;
+  }
+
+  .display-mono {
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+}
