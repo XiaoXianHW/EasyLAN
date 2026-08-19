@@ -10,7 +10,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '1.5'
+version = '1.6a'
 group = 'org.xiaoxian.easylan'
 archivesBaseName = 'EasyLAN'
 
@@ -82,6 +82,21 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
+
+processResources {
+    inputs.property 'version', project.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
 
 tasks.withType(JavaCompile).all {
     options.encoding = 'UTF-8'

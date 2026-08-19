@@ -12,12 +12,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
+    // The production jar is reobfuscated to SRG names, so every lookup needs the runtime name as well.
+    protected static final String[] LAN_ENDPOINT_METHODS = {
+            "addEndpoint", "func_151265_a", "addLanEndpoint", "startTcpServerListener"
+    };
+    protected static final String[] PLAYER_LIST_METHODS = {
+            "getPlayerList", "func_184103_al"
+    };
+    protected static final String[] PORT_METHODS = {
+            "getServerPort", "func_71215_F", "getPort"
+    };
+
     protected abstract String[] maxPlayerFieldNames();
 
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint", "addLanEndpoint" }) {
+        for (String methodName : LAN_ENDPOINT_METHODS) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
@@ -41,8 +52,11 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public boolean setMaxPlayers(Object server, int maxPlayers) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Object playerList = invokeNoArgs(server, PLAYER_LIST_METHODS);
         if (playerList == null) {
+            System.out.println("[EasyLAN] Unable to resolve the player list of "
+                    + server.getClass().getName()
+                    + ", the custom player limit was not applied.");
             return false;
         }
 
@@ -58,6 +72,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             } catch (ReflectiveOperationException ignored) {
             }
         }
+
+        System.out.println("[EasyLAN] No writable max player field was found on "
+                + playerList.getClass().getName()
+                + ", the custom player limit was not applied.");
         return false;
     }
 
@@ -68,7 +86,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return runtimePort;
         }
 
-        String reflectedPort = invokePortGetter(server, "getPort", "getServerPort");
+        String reflectedPort = invokePortGetter(server, PORT_METHODS);
         if (reflectedPort != null) {
             EasyLAN.getRuntimeState().setLanPort(reflectedPort);
             return reflectedPort;
@@ -149,9 +167,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     }
 
     private String readLanPortFromLog() {
+        // Only the vanilla LAN line, other mods print their own 'Started on <port>' messages.
         Pattern[] patterns = new Pattern[] {
-                Pattern.compile("Started serving on ([0-9]+)"),
-                Pattern.compile("Started on ([0-9]+)")
+                Pattern.compile("\\[Server thread/INFO].*Started on ([0-9]+)"),
+                Pattern.compile("Started serving on ([0-9]+)")
         };
 
         try (BufferedReader reader = new BufferedReader(new FileReader("logs/latest.log"))) {

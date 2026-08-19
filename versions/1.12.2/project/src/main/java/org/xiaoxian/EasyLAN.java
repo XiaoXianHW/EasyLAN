@@ -1,6 +1,6 @@
 package org.xiaoxian;
 
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -8,8 +8,6 @@ import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
-import org.xiaoxian.gui.GuiShareToLanEdit;
-import org.xiaoxian.gui.GuiWorldSelectionEdit;
 import org.xiaoxian.lan.ServerStarting;
 import org.xiaoxian.lan.ServerStopping;
 import org.xiaoxian.util.ConfigUtil;
@@ -24,7 +22,7 @@ import org.xiaoxian.util.ConfigUtil;
 public class EasyLAN {
     public static final String MOD_ID = "easylan";
     public static final String MOD_NAME = "EasyLAN";
-    public static final String VERSION = "1.5";
+    public static final String VERSION = "1.6a";
 
     private static final EasyLanConfig CONFIG = EasyLanConfig.defaultConfig();
     private static final EasyLanRuntimeState RUNTIME_STATE = new EasyLanRuntimeState();
@@ -50,11 +48,10 @@ public class EasyLAN {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         ConfigUtil.load();
-        MinecraftForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
 
-        GuiShareToLanEdit.PortText = CustomPort;
-        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            ClientRegistrar.register(CustomPort, CustomMaxPlayer);
+        }
     }
 
     @Mod.EventHandler
