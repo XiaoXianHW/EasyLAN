@@ -2,9 +2,15 @@ package org.xiaoxian.easylan.core.config;
 
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,9 +55,10 @@ public class EasyLanConfig {
             return;
         }
 
-        try (InputStream input = Files.newInputStream(configPath)) {
+        try {
+            byte[] raw = Files.readAllBytes(configPath);
             properties.clear();
-            properties.load(input);
+            loadWithCharsetFallback(raw);
         } catch (IOException ignored) {
         }
 
@@ -72,6 +79,54 @@ public class EasyLanConfig {
             }
         } catch (IOException ignored) {
         }
+    }
+
+    private void loadWithCharsetFallback(byte[] raw) throws IOException {
+        Charset bomCharset = detectBom(raw);
+        if (bomCharset != null) {
+            byte[] body = new byte[raw.length - bomLength(bomCharset)];
+            System.arraycopy(raw, bomLength(bomCharset), body, 0, body.length);
+            try (Reader reader = new InputStreamReader(new ByteArrayInputStream(body), bomCharset)) {
+                properties.load(reader);
+                return;
+            }
+        }
+
+        for (Charset charset : new Charset[] { StandardCharsets.UTF_8, Charset.defaultCharset() }) {
+            try (Reader reader = strictReader(raw, charset)) {
+                properties.load(reader);
+                return;
+            } catch (CharacterCodingException malformed) {
+                properties.clear();
+            }
+        }
+
+        try (Reader reader = new InputStreamReader(new ByteArrayInputStream(raw), StandardCharsets.ISO_8859_1)) {
+            properties.load(reader);
+        }
+    }
+
+    private Charset detectBom(byte[] raw) {
+        if (raw.length >= 3 && (raw[0] & 0xFF) == 0xEF && (raw[1] & 0xFF) == 0xBB && (raw[2] & 0xFF) == 0xBF) {
+            return StandardCharsets.UTF_8;
+        }
+        if (raw.length >= 2 && (raw[0] & 0xFF) == 0xFF && (raw[1] & 0xFF) == 0xFE) {
+            return StandardCharsets.UTF_16LE;
+        }
+        if (raw.length >= 2 && (raw[0] & 0xFF) == 0xFE && (raw[1] & 0xFF) == 0xFF) {
+            return StandardCharsets.UTF_16BE;
+        }
+        return null;
+    }
+
+    private int bomLength(Charset charset) {
+        return charset.equals(StandardCharsets.UTF_8) ? 3 : 2;
+    }
+
+    private Reader strictReader(byte[] raw, Charset charset) {
+        return new InputStreamReader(new ByteArrayInputStream(raw), charset.newDecoder()
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT));
     }
 
     public synchronized String getRawValue(String key) {

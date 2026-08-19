@@ -15,12 +15,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
+    // Production installs run intermediary mapped Minecraft, so every lookup also has to know that name.
+    protected static final String[] LAN_ENDPOINT_METHODS = {
+            "bind", "method_14354", "startTcpServerListener", "addEndpoint"
+    };
+    protected static final String[] PLAYER_LIST_METHODS = {
+            "getPlayerList", "method_3760"
+    };
+    protected static final String[] MAX_PLAYERS_METHODS = {
+            "getMaxPlayers", "method_14592"
+    };
+    protected static final String[] PORT_METHODS = {
+            "getPort", "method_3756", "getServerPort"
+    };
+
     protected abstract String[] maxPlayerFieldNames();
 
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "bind", "method_14354", "a", "startTcpServerListener", "addEndpoint" }) {
+        for (String methodName : LAN_ENDPOINT_METHODS) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
@@ -52,8 +66,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return resolveCurrentMaxPlayers(server) == maxPlayers;
         }
 
-        Object playerList = invokeNoArgs(server, "getPlayerList", "method_3760");
+        Object playerList = invokeNoArgs(server, PLAYER_LIST_METHODS);
         if (playerList == null) {
+            System.out.println("[EasyLAN] Unable to resolve the player list of " + server.getClass().getName()
+                    + ", the custom player limit was not applied.");
             return false;
         }
 
@@ -84,9 +100,9 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return value;
         }
 
-        Object resolvedPlayerList = playerList != null ? playerList : invokeNoArgs(server, "getPlayerList", "method_3760");
+        Object resolvedPlayerList = playerList != null ? playerList : invokeNoArgs(server, PLAYER_LIST_METHODS);
         if (resolvedPlayerList != null) {
-            value = invokeIntNoArgs(resolvedPlayerList, "getMaxPlayers", "method_14592");
+            value = invokeIntNoArgs(resolvedPlayerList, MAX_PLAYERS_METHODS);
             if (value != null) {
                 return value;
             }
@@ -102,7 +118,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return runtimePort;
         }
 
-        String reflectedPort = invokePortGetter(server, "getPort", "getServerPort");
+        String reflectedPort = invokePortGetter(server, PORT_METHODS);
         if (reflectedPort != null) {
             EasyLAN.getRuntimeState().setLanPort(reflectedPort);
             return reflectedPort;
@@ -253,9 +269,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     }
 
     private String readLanPortFromLog() {
+        // A bare "Started on <port>" also matches other mods such as voice chat, so require the vanilla wording.
         Pattern[] patterns = new Pattern[] {
-                Pattern.compile("Started serving on ([0-9]+)"),
-                Pattern.compile("Started on ([0-9]+)")
+                Pattern.compile("\\[Server thread/INFO].*Started serving on ([0-9]+)"),
+                Pattern.compile("Started serving on ([0-9]+)")
         };
 
         try (BufferedReader reader = new BufferedReader(new FileReader("logs/latest.log"))) {

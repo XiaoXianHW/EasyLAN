@@ -10,6 +10,7 @@ import static org.xiaoxian.EasyLAN.allowPVP;
 import static org.xiaoxian.EasyLAN.motd;
 import static org.xiaoxian.EasyLAN.onlineMode;
 import static org.xiaoxian.EasyLAN.spawnAnimals;
+import static org.xiaoxian.EasyLAN.spawnNPCs;
 
 public final class ServerRuleApplier {
     private static final String[] GAME_RULE_CLASSES = {
@@ -23,7 +24,8 @@ public final class ServerRuleApplier {
     public static void apply(MinecraftServer minecraftServer) {
         invokeBooleanSetter(minecraftServer, allowPVP, "setPvpAllowed", "setPvpEnabled");
         invokeBooleanSetter(minecraftServer, onlineMode, "setUsesAuthentication");
-        applyMobSpawningRule(minecraftServer, spawnAnimals);
+        // Vanilla has no animal only switch, doMobSpawning covers animals and NPCs at once.
+        applyMobSpawningRule(minecraftServer, spawnAnimals || spawnNPCs);
         invokeBooleanSetter(minecraftServer, allowFlight, "setFlightAllowed", "setAllowsFlight");
         invokeStringSetter(minecraftServer, motd, "setMotd");
     }

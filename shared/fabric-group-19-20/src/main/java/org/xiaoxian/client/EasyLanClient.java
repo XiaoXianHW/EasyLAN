@@ -14,6 +14,7 @@ public class EasyLanClient implements ClientModInitializer {
 
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             GuiWorldSelectionEdit.maybeReplace(client, screen);
+            GuiWorldSelectionEdit.maybeAddCreateWorldButton(client, screen);
             GuiShareToLanEdit.maybeReplace(client, screen);
         });
     }
