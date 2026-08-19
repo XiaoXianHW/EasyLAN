@@ -27,6 +27,7 @@ import static org.xiaoxian.EasyLAN.allowPVP;
 import static org.xiaoxian.EasyLAN.motd;
 import static org.xiaoxian.EasyLAN.onlineMode;
 import static org.xiaoxian.EasyLAN.spawnAnimals;
+import static org.xiaoxian.EasyLAN.spawnNPCs;
 import static org.xiaoxian.EasyLAN.whiteList;
 
 public class ServerStarting {
@@ -59,8 +60,8 @@ public class ServerStarting {
 
         minecraftServer.setUsesAuthentication(onlineMode);
         minecraftServer.getWorldData().getGameRules().set(GameRules.PVP, allowPVP, minecraftServer);
-        minecraftServer.getWorldData().getGameRules().set(GameRules.SPAWN_MOBS, spawnAnimals, minecraftServer);
-        minecraftServer.getWorldData().getGameRules().set(GameRules.SPAWN_MONSTERS, spawnAnimals, minecraftServer);
+        // Vanilla has no animal only switch, doMobSpawning covers animals and NPCs at once.
+        minecraftServer.getWorldData().getGameRules().set(GameRules.SPAWN_MOBS, spawnAnimals || spawnNPCs, minecraftServer);
         applyAllowFlight(minecraftServer, allowFlight);
         minecraftServer.setMotd(motd);
     }

@@ -1,12 +1,12 @@
 package org.xiaoxian;
 
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
-import org.xiaoxian.gui.GuiShareToLanEdit;
-import org.xiaoxian.gui.GuiWorldSelectionEdit;
 import org.xiaoxian.lan.ServerStarting;
 import org.xiaoxian.lan.ServerStopping;
 import org.xiaoxian.util.ConfigUtil;
@@ -35,13 +35,12 @@ public class EasyLAN {
 
     public EasyLAN() {
         ConfigUtil.load();
-        MinecraftForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
         MinecraftForge.EVENT_BUS.register(new ServerStarting());
         MinecraftForge.EVENT_BUS.register(new ServerStopping());
 
-        GuiShareToLanEdit.PortText = CustomPort;
-        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientRegistrar.register(CustomPort, CustomMaxPlayer);
+        }
     }
 
     public static EasyLanConfig getConfig() {

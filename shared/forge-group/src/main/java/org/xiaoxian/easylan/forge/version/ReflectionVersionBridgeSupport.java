@@ -12,12 +12,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
+    // Production installs run obfuscated Minecraft, so every lookup also has to know the SRG name.
+    protected static final String[] LAN_ENDPOINT_METHODS = {
+            "startTcpServerListener", "m_9711_", "addEndpoint"
+    };
+    protected static final String[] PLAYER_LIST_METHODS = {
+            "getPlayerList", "m_6846_"
+    };
+    protected static final String[] MAX_PLAYERS_METHODS = {
+            "getMaxPlayers", "m_11310_", "getMaxPlayersCount"
+    };
+    protected static final String[] PORT_METHODS = {
+            "getPort", "m_7010_", "getServerPort"
+    };
+
     protected abstract String[] maxPlayerFieldNames();
 
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint" }) {
+        for (String methodName : LAN_ENDPOINT_METHODS) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
@@ -41,8 +55,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public boolean setMaxPlayers(Object server, int maxPlayers) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Object playerList = invokeNoArgs(server, PLAYER_LIST_METHODS);
         if (playerList == null) {
+            System.out.println("[EasyLAN] Unable to resolve the player list of " + server.getClass().getName()
+                    + ", the custom player limit was not applied.");
             return false;
         }
 
@@ -58,12 +74,15 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             } catch (ReflectiveOperationException ignored) {
             }
         }
+
+        System.out.println("[EasyLAN] No writable max player field was found on " + playerList.getClass().getName()
+                + ", the custom player limit was not applied.");
         return false;
     }
 
     @Override
     public int resolveMaxPlayers(Object server) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Object playerList = invokeNoArgs(server, PLAYER_LIST_METHODS);
         if (playerList == null) {
             return -1;
         }
@@ -86,7 +105,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             }
         }
 
-        Object reflected = invokeNoArgs(playerList, "getMaxPlayers", "getMaxPlayersCount");
+        Object reflected = invokeNoArgs(playerList, MAX_PLAYERS_METHODS);
         if (reflected instanceof Number) {
             int resolved = ((Number) reflected).intValue();
             if (resolved > 0) {
@@ -104,7 +123,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return runtimePort;
         }
 
-        String reflectedPort = invokePortGetter(server, "getPort", "getServerPort");
+        String reflectedPort = invokePortGetter(server, PORT_METHODS);
         if (reflectedPort != null) {
             EasyLAN.getRuntimeState().setLanPort(reflectedPort);
             return reflectedPort;
@@ -185,9 +204,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     }
 
     private String readLanPortFromLog() {
+        // A bare "Started on <port>" also matches other mods such as voice chat, so require the vanilla wording.
         Pattern[] patterns = new Pattern[] {
-                Pattern.compile("Started serving on ([0-9]+)"),
-                Pattern.compile("Started on ([0-9]+)")
+                Pattern.compile("\\[Server thread/INFO].*Started serving on ([0-9]+)"),
+                Pattern.compile("Started serving on ([0-9]+)")
         };
 
         try (BufferedReader reader = new BufferedReader(new FileReader("logs/latest.log"))) {
