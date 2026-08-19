@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Set;
 
 public final class NetworkInfoProvider {
+    private static final int CONNECT_TIMEOUT_MILLIS = 3000;
+    private static final int READ_TIMEOUT_MILLIS = 3000;
+
     private NetworkInfoProvider() {
     }
 
@@ -46,6 +49,8 @@ public final class NetworkInfoProvider {
             URL url = new URL(address);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
+            connection.setReadTimeout(READ_TIMEOUT_MILLIS);
             connection.connect();
             if (connection.getResponseCode() != 200) {
                 return fallback;
@@ -68,18 +73,22 @@ public final class NetworkInfoProvider {
 
     private static InetAddress getLocalAddress(boolean preferIpv6) {
         List<InetAddress> addresses = new ArrayList<>();
-        Set<String> virtualKeywords = new HashSet<>(Arrays.asList("vmware", "virtual", "hyper-v", "vbox", "virtualbox"));
+        Set<String> virtualKeywords = new HashSet<>(Arrays.asList(
+                "vmware", "virtual", "hyper-v", "vbox", "virtualbox", "vethernet",
+                "docker", "wsl", "hamachi", "radmin", "zerotier", "tailscale", "tap-windows", "openvpn"));
 
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
-                String displayName = networkInterface.getDisplayName();
-                if (displayName == null) {
+                if (!networkInterface.isUp() || networkInterface.isLoopback() || networkInterface.isVirtual()) {
                     continue;
                 }
 
-                String lowerName = displayName.toLowerCase();
+                String displayName = networkInterface.getDisplayName();
+                String interfaceName = networkInterface.getName();
+                String lowerName = ((displayName == null ? "" : displayName) + " "
+                        + (interfaceName == null ? "" : interfaceName)).toLowerCase();
                 boolean isVirtual = false;
                 for (String keyword : virtualKeywords) {
                     if (lowerName.contains(keyword)) {
