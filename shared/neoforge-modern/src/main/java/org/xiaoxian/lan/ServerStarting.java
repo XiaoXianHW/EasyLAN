@@ -39,7 +39,8 @@ public class ServerStarting {
 
         minecraftServer.setPvpAllowed(allowPVP);
         minecraftServer.setUsesAuthentication(onlineMode);
-        minecraftServer.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals, minecraftServer);
+        // Vanilla has no per category spawn switch anymore, doMobSpawning covers animals and NPCs at once.
+        minecraftServer.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(spawnAnimals || spawnNPCs, minecraftServer);
         minecraftServer.setFlightAllowed(allowFlight);
         minecraftServer.setMotd(motd);
     }

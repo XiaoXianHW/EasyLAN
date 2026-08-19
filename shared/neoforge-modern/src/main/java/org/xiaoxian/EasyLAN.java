@@ -5,8 +5,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
 import org.xiaoxian.easylan.core.model.LanRuleProfile;
 import org.xiaoxian.easylan.core.runtime.EasyLanRuntimeState;
-import org.xiaoxian.gui.GuiShareToLanEdit;
-import org.xiaoxian.gui.GuiWorldSelectionEdit;
 import org.xiaoxian.lan.ServerStarting;
 import org.xiaoxian.lan.ServerStopping;
 import org.xiaoxian.util.ConfigUtil;
@@ -35,13 +33,32 @@ public class EasyLAN {
 
     public EasyLAN() {
         ConfigUtil.load();
-        NeoForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        NeoForge.EVENT_BUS.register(new GuiShareToLanEdit());
         NeoForge.EVENT_BUS.register(new ServerStarting());
         NeoForge.EVENT_BUS.register(new ServerStopping());
 
-        GuiShareToLanEdit.PortText = CustomPort;
-        GuiShareToLanEdit.MaxPlayerText = CustomMaxPlayer;
+        if (isClientDist()) {
+            ClientRegistrar.register(CustomPort, CustomMaxPlayer);
+        }
+    }
+
+    /**
+     * FMLEnvironment exposes the running side as a field on 1.20.1 and as a getter on newer versions,
+     * so it is read reflectively to keep this class usable on every supported version.
+     */
+    private static boolean isClientDist() {
+        try {
+            Class<?> environment = Class.forName("net.neoforged.fml.loading.FMLEnvironment");
+            Object dist;
+            try {
+                dist = environment.getMethod("getDist").invoke(null);
+            } catch (NoSuchMethodException ex) {
+                dist = environment.getField("dist").get(null);
+            }
+            return dist instanceof Enum && "CLIENT".equals(((Enum<?>) dist).name());
+        } catch (ReflectiveOperationException ex) {
+            System.out.println("[EasyLAN] Unable to detect the running side, assuming a dedicated server.");
+            return false;
+        }
     }
 
     public static EasyLanConfig getConfig() {
