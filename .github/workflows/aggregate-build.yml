@@ -116,23 +116,42 @@ jobs:
           chmod +x ./gradlew
           ./gradlew build
 
-      - name: Resolve artifact name
+      - name: Rename artifact for release
         id: artifact-name
         shell: bash
         env:
           BRANCH: ${{ matrix.branch }}
           VERSION: ${{ matrix.version }}
         run: |
-          safe_branch="${BRANCH//\//-}"
-          echo "name=easylan-${safe_branch}-${VERSION}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          libs="versions/${VERSION}/project/build/libs"
+          jar=""
+          for candidate in "$libs"/*.jar; do
+            case "$candidate" in
+              *-sources.jar|*-dev.jar|*-slim.jar) continue ;;
+            esac
+            jar="$candidate"
+          done
+
+          if [ -z "$jar" ]; then
+            echo "No jar was produced in $libs" >&2
+            exit 1
+          fi
+
+          base="$(basename "$jar" .jar)"
+          mod_version="${base##*-}"
+          loader="${BRANCH%%/*}"
+          name="EasyLAN-${loader}-${VERSION}-v${mod_version}"
+
+          mkdir -p release
+          cp "$jar" "release/${name}.jar"
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
 
       - name: Upload ${{ matrix.branch }} / ${{ matrix.version }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.artifact-name.outputs.name }}
-          path: |
-            versions/${{ matrix.version }}/project/build/libs/*.jar
-            !versions/${{ matrix.version }}/project/build/libs/*-sources.jar
+          path: release/${{ steps.artifact-name.outputs.name }}.jar
           if-no-files-found: error
           retention-days: 14
 
@@ -145,6 +164,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: artifacts
+          merge-multiple: true
 
       - name: Create bundle
         id: bundle
@@ -152,7 +172,7 @@ jobs:
         run: |
           $bundleName = "easylan-bundle-${{ github.run_number }}-$(Get-Date -Format 'yyyyMMdd-HHmmss').zip"
           $bundlePath = Join-Path $PWD $bundleName
-          $artifactGlob = Join-Path (Join-Path $PWD 'artifacts') '*'
+          $artifactGlob = Join-Path (Join-Path $PWD 'artifacts') '*.jar'
           Compress-Archive -Path $artifactGlob -DestinationPath $bundlePath
           "bundle_name=$bundleName" >> $env:GITHUB_OUTPUT
           "bundle_path=$bundlePath" >> $env:GITHUB_OUTPUT
