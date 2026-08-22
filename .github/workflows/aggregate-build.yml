@@ -93,6 +93,21 @@ jobs:
             -TargetRepositoryRoot $PWD `
             -Branch '${{ matrix.branch }}'
 
+      - name: Apply mod version from main
+        id: mod-version
+        shell: pwsh
+        run: |
+          $version = (Get-Content -LiteralPath (Join-Path $PWD 'ci-main/mod-version.txt') -Raw).Trim()
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            throw 'ci-main/mod-version.txt is empty.'
+          }
+
+          & (Join-Path $PWD 'ci-main/tools/Set-ModVersion.ps1') `
+            -ProjectDirectory (Join-Path $PWD 'versions/${{ matrix.version }}/project') `
+            -Version $version
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+
       - name: Prepare downloadServer cache
         shell: pwsh
         run: |
@@ -122,6 +137,7 @@ jobs:
         env:
           BRANCH: ${{ matrix.branch }}
           VERSION: ${{ matrix.version }}
+          MOD_VERSION: ${{ steps.mod-version.outputs.version }}
         run: |
           set -euo pipefail
           libs="versions/${VERSION}/project/build/libs"
@@ -138,10 +154,8 @@ jobs:
             exit 1
           fi
 
-          base="$(basename "$jar" .jar)"
-          mod_version="${base##*-}"
           loader="${BRANCH%%/*}"
-          name="EasyLAN-${loader}-${VERSION}-v${mod_version}"
+          name="EasyLAN-${loader}-${VERSION}-v${MOD_VERSION}"
 
           mkdir -p release
           cp "$jar" "release/${name}.jar"
