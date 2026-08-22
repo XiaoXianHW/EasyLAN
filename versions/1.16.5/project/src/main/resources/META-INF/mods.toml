@@ -5,7 +5,7 @@ license="GNU General Public License v3"
 
 [[mods]]
 modId="easylan"
-version="1.5"
+version="${file.jarVersion}"
 displayName="EasyLAN"
 displayURL="https://github.com/XiaoXianHW/EasyLAN"
 authors="XiaoXian"
