@@ -4,7 +4,7 @@ issueTrackerURL="https://github.com/XiaoXianHW/EasyLAN/issues"
 
 [[mods]]
 modId="easylan"
-version="v1.5"
+version="${file.jarVersion}"
 displayName="EasyLAN"
 displayURL="https://github.com/XiaoXianHW/EasyLAN"
 authors="XiaoXian"
