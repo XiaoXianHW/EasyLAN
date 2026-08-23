@@ -20,7 +20,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "bind", "method_14354", "a", "startTcpServerListener", "addEndpoint" }) {
+        for (String methodName : new String[] { "bind", "method_14354", "method_14352", "a", "startTcpServerListener", "addEndpoint" }) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
@@ -44,7 +44,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public boolean setMaxPlayers(Object server, int maxPlayers) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Object playerList = invokeNoArgs(server, "getPlayerList", "method_3760");
         if (playerList == null) {
             return false;
         }
@@ -71,7 +71,7 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             return runtimePort;
         }
 
-        String reflectedPort = invokePortGetter(server, "getPort", "getServerPort");
+        String reflectedPort = invokePortGetter(server, "getPort", "getServerPort", "method_3756");
         if (reflectedPort != null) {
             EasyLAN.getRuntimeState().setLanPort(reflectedPort);
             return reflectedPort;
@@ -86,12 +86,12 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public Screen resolveWorldSelectionParent(Screen screen) {
-        return resolveParentScreen(screen, new TitleScreen(), "lastScreen", "parent", "previousScreen");
+        return resolveParentScreen(screen, new TitleScreen(), "lastScreen", "parent", "previousScreen", "field_3221");
     }
 
     @Override
     public Screen resolveShareToLanParent(Screen screen) {
-        return resolveParentScreen(screen, new PauseScreen(true), "lastScreen", "parent", "previousScreen");
+        return resolveParentScreen(screen, new PauseScreen(true), "lastScreen", "parent", "previousScreen", "field_2548");
     }
 
     private String invokePortGetter(Object target, String... methodNames) {

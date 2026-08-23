@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 import static org.xiaoxian.util.DrawUtil.drawLine;
 
 public class TextBoxUtil extends EditBox {
-    private static final String[] DISPLAY_POS_FIELDS = { "displayPos", "f_94100_" };
+    private static final String[] DISPLAY_POS_FIELDS = { "displayPos", "field_2103", "f_94100_" };
 
     private final Field lineScrollOffsetField;
     private long lastUpdateTick = System.currentTimeMillis();
