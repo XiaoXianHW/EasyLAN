@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.lang.reflect.Field;
 
 public class TextBoxUtil extends EditBox {
-    private static final String[] DISPLAY_POS_FIELDS = { "displayPos", "field_146225_q" };
+    private static final String[] DISPLAY_POS_FIELDS = { "displayPos", "field_2103", "field_146225_q" };
 
     private final Field lineScrollOffsetField;
     private long lastUpdateTick = System.currentTimeMillis();
