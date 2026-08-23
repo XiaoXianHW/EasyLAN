@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     // Production installs run intermediary mapped Minecraft, so every lookup also has to know that name.
     protected static final String[] LAN_ENDPOINT_METHODS = {
-            "bind", "method_14354", "startTcpServerListener", "addEndpoint"
+            "bind", "method_14354", "method_14352", "startTcpServerListener", "addEndpoint"
     };
     protected static final String[] PLAYER_LIST_METHODS = {
             "getPlayerList", "method_3760"
@@ -102,12 +102,12 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public Screen resolveWorldSelectionParent(Screen screen) {
-        return resolveParentScreen(screen, new TitleScreen(), "lastScreen", "parent", "previousScreen");
+        return resolveParentScreen(screen, new TitleScreen(), "lastScreen", "parent", "previousScreen", "field_3221");
     }
 
     @Override
     public Screen resolveShareToLanParent(Screen screen) {
-        return resolveParentScreen(screen, new PauseScreen(true), "lastScreen", "parent", "previousScreen");
+        return resolveParentScreen(screen, new PauseScreen(true), "lastScreen", "parent", "previousScreen", "field_2548");
     }
 
     private String invokePortGetter(Object target, String... methodNames) {
