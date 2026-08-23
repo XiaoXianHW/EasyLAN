@@ -132,7 +132,7 @@ function Get-RepositoryUrl {
     return (git remote get-url origin).Trim()
 }
 
-$excludedVersions = @('1.7.2', '1.7.10')
+$excludedVersions = @()
 $repoUrl = Get-RepositoryUrl
 $targetBranches = @(Get-TargetBranches -RequestedProfile $Profile -RequestedBranches $Branches)
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) 'EasyLAN-aggregate-branches'
