@@ -14,7 +14,6 @@ import net.minecraft.server.commands.SaveOnCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,7 +30,6 @@ import static org.xiaoxian.EasyLAN.spawnNPCs;
 import static org.xiaoxian.EasyLAN.whiteList;
 
 public class ServerStarting {
-    @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         MinecraftServer minecraftServer = event.getServer();
 

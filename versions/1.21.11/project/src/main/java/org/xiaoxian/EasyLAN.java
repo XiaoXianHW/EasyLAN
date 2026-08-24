@@ -1,7 +1,8 @@
 package org.xiaoxian;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.xiaoxian.easylan.core.config.EasyLanConfig;
@@ -35,8 +36,8 @@ public class EasyLAN {
 
     public EasyLAN() {
         ConfigUtil.load();
-        MinecraftForge.EVENT_BUS.register(new ServerStarting());
-        MinecraftForge.EVENT_BUS.register(new ServerStopping());
+        ServerStartingEvent.BUS.addListener(new ServerStarting()::onServerStarting);
+        ServerStoppingEvent.BUS.addListener(new ServerStopping()::onServerStopping);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientRegistrar.register(CustomPort, CustomMaxPlayer);

@@ -1,6 +1,6 @@
 package org.xiaoxian;
 
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.client.event.ScreenEvent;
 import org.xiaoxian.gui.GuiShareToLanEdit;
 import org.xiaoxian.gui.GuiWorldSelectionEdit;
 
@@ -12,8 +12,8 @@ final class ClientRegistrar {
     }
 
     static void register(String customPort, String customMaxPlayer) {
-        MinecraftForge.EVENT_BUS.register(new GuiWorldSelectionEdit());
-        MinecraftForge.EVENT_BUS.register(new GuiShareToLanEdit());
+        ScreenEvent.Init.Post.BUS.addListener(new GuiWorldSelectionEdit()::onScreenInit);
+        ScreenEvent.Opening.BUS.addListener(new GuiShareToLanEdit()::onGuiOpenEvent);
 
         GuiShareToLanEdit.PortText = customPort;
         GuiShareToLanEdit.MaxPlayerText = customMaxPlayer;

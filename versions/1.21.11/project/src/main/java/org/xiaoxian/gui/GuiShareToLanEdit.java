@@ -14,7 +14,6 @@ import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
 
@@ -24,7 +23,6 @@ public class GuiShareToLanEdit {
     public static String MaxPlayerText = "";
     public static String MaxPlayerWarningText = "";
 
-    @SubscribeEvent
     public void onGuiOpenEvent(ScreenEvent.Opening event) {
         if (event.getScreen() instanceof ShareToLanScreen) {
             event.setNewScreen(new GuiShareToLanModified(new PauseScreen(true)));
