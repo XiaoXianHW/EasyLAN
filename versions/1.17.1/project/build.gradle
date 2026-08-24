@@ -17,6 +17,10 @@ archivesBaseName = 'easylan'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+tasks.withType(JavaCompile).configureEach {
+    options.release = 16
+}
+
 def repoRoot = projectDir.toPath().resolve('../../..').normalize().toFile()
 def existingSourceDirs = { Object... paths ->
     paths.collect { it instanceof File ? it : file(it) }.findAll { it.exists() }
