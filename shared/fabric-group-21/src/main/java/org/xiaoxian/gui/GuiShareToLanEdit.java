@@ -129,32 +129,6 @@ public class GuiShareToLanEdit {
             matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
         }
 
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            PortTextBox.keyPressed(keyCode, scanCode, modifiers);
-            MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
-            refreshLanButtonState();
-            syncTextState();
-            return super.keyPressed(keyCode, scanCode, modifiers);
-        }
-
-        @Override
-        public boolean charTyped(char typedChar, int keyCode) {
-            PortTextBox.charTyped(typedChar, keyCode);
-            MaxPlayerBox.charTyped(typedChar, keyCode);
-            refreshLanButtonState();
-            syncTextState();
-            return super.charTyped(typedChar, keyCode);
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-            PortTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-            MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
-            syncTextState();
-            return super.mouseClicked(mouseX, mouseY, mouseButton);
-        }
-
         private void syncTextState() {
             PortText = PortTextBox.getValue();
             MaxPlayerText = MaxPlayerBox.getValue();

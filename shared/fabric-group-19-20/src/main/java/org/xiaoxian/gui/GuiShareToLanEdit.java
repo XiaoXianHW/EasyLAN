@@ -57,10 +57,21 @@ public class GuiShareToLanEdit {
             PortTextBox = new TextBoxUtil(fontRenderer, this.width / 2 - 155, this.height - 70, 145, 20, "");
             PortTextBox.setMaxLength(5);
             PortTextBox.setValue(PortText);
+            PortTextBox.setResponder(value -> {
+                PortText = value;
+                refreshLanButtonState();
+            });
 
             MaxPlayerBox = new TextBoxUtil(fontRenderer, this.width / 2 + 5, this.height - 70, 145, 20, "");
             MaxPlayerBox.setMaxLength(6);
             MaxPlayerBox.setValue(MaxPlayerText);
+            MaxPlayerBox.setResponder(value -> {
+                MaxPlayerText = value;
+                refreshLanButtonState();
+            });
+
+            addRenderableWidget(PortTextBox);
+            addRenderableWidget(MaxPlayerBox);
 
             Button originalButton = findLanButton();
             if (originalButton != null) {
@@ -87,7 +98,7 @@ public class GuiShareToLanEdit {
 
             EditBox targetEditBox = null;
             for (GuiEventListener widget : this.children()) {
-                if (widget instanceof EditBox editBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
+                if (widget instanceof EditBox editBox && editBox != PortTextBox && editBox != MaxPlayerBox && editBox.getMessage().getString().equals(I18n.get("lanServer.port"))) {
                     targetEditBox = editBox;
                 }
             }
@@ -111,40 +122,11 @@ public class GuiShareToLanEdit {
                 }
             }
 
-            PortTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
-            MaxPlayerBox.render(matrixStack, mouseX, mouseY, partialTicks);
-
             matrixStack.drawString(Minecraft.getInstance().font, I18n.get("easylan.text.port"), this.width / 2 - 155, this.height - 85, 0xFFFFFF);
             matrixStack.drawString(fontRenderer, PortWarningText, this.width / 2 - 155, this.height - 45, 0xFF0000);
 
             matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
             matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
-        }
-
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            PortTextBox.keyPressed(keyCode, scanCode, modifiers);
-            MaxPlayerBox.keyPressed(keyCode, scanCode, modifiers);
-            refreshLanButtonState();
-            syncTextState();
-            return super.keyPressed(keyCode, scanCode, modifiers);
-        }
-
-        @Override
-        public boolean charTyped(char typedChar, int keyCode) {
-            PortTextBox.charTyped(typedChar, keyCode);
-            MaxPlayerBox.charTyped(typedChar, keyCode);
-            refreshLanButtonState();
-            syncTextState();
-            return super.charTyped(typedChar, keyCode);
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-            PortTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-            MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
-            syncTextState();
-            return super.mouseClicked(mouseX, mouseY, mouseButton);
         }
 
         private void syncTextState() {
