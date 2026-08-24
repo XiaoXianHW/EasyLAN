@@ -5,4 +5,9 @@ public class VersionBridgeImpl extends ReflectionVersionBridgeSupport {
     protected String[] maxPlayerFieldNames() {
         return new String[] { "maxPlayers", "f_11193_" };
     }
+
+    @Override
+    protected String[] playerListMethodNames() {
+        return new String[] { "getPlayerList", "m_6846_" };
+    }
 }
