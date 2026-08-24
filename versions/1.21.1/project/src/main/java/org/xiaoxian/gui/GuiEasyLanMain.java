@@ -125,6 +125,8 @@ public class GuiEasyLanMain extends Screen {
         MotdTextBox = new TextBoxUtil(fontRenderer,this.width / 2 - 70, 185, 230, 20,"");
         MotdTextBox.setMaxLength(100);
         MotdTextBox.setValue(MotdText);
+        MotdTextBox.setResponder(value -> MotdText = value);
+        addRenderableWidget(MotdTextBox);
     }
 
     @Override
@@ -156,28 +158,6 @@ public class GuiEasyLanMain extends Screen {
 
         // MOTD
         matrixStack.drawString(fontRenderer, I18n.get("easylan.text.motd"), this.width / 2 - 165, 190, 0xFFFFFF);
-        MotdTextBox.render(matrixStack, mouseX, mouseY, partialTicks);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        MotdTextBox.keyPressed(keyCode, scanCode, modifiers);
-        MotdText = MotdTextBox.getValue();
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean charTyped(char typedChar, int keyCode) {
-        MotdTextBox.charTyped(typedChar, keyCode);
-        MotdText = MotdTextBox.getValue();
-        return super.charTyped(typedChar, keyCode);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        MotdTextBox.mouseClicked(mouseX, mouseY, mouseButton);
-        MotdText = MotdTextBox.getValue();
-        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     public void SaveConfig() {
@@ -194,7 +174,7 @@ public class GuiEasyLanMain extends Screen {
         ConfigUtil.set("SaveCommands", String.valueOf(SaveCommands));
         ConfigUtil.set("Http-Api", String.valueOf(HttpAPI));
         ConfigUtil.set("Lan-output", String.valueOf(LanOutput));
-        motd = MotdTextBox.getValue();
+        motd = MotdText;
         ConfigUtil.set("Motd", motd);
         ConfigUtil.save();
     }

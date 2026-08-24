@@ -3,7 +3,6 @@ package org.xiaoxian.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -14,8 +13,7 @@ public class GuiWorldSelectionEdit {
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.Init.Post event) {
         final Screen screen = event.getScreen();
-        // CreateWorldScreen is opened directly when the player has no world yet, so it needs the button too.
-        if (!(screen instanceof SelectWorldScreen) && !(screen instanceof CreateWorldScreen)) {
+        if (!(screen instanceof SelectWorldScreen)) {
             return;
         }
 
