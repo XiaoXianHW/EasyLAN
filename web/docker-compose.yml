@@ -1,0 +1,42 @@
+# Local development services for EasyLAN web platform.
+#
+# Spins up MySQL 5.7 and Redis on the same docker network so developers
+# can test the production-style storage path without installing
+# anything globally.  The Go binary is NOT containerised here — run it
+# locally with these services pointed-at via env vars:
+#
+#   EASYLAN_STORAGE_DRIVER=mysql \
+#   EASYLAN_STORAGE_DSN="easylan:easylan@tcp(127.0.0.1:3306)/easylan?parseTime=true&charset=utf8mb4" \
+#   EASYLAN_CACHE_DRIVER=redis \
+#   EASYLAN_CACHE_URL=redis://127.0.0.1:6379/0 \
+#   ./easylan-web
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: easylan
+      MYSQL_USER: easylan
+      MYSQL_PASSWORD: easylan
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+00:00
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mysql-data:
+  redis-data:
