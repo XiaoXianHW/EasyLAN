@@ -168,6 +168,11 @@ public class ShareToLan {
         return VersionBridgeResolver.get().resolveLanPort(server);
     }
 
+    private static int resolveMaxPlayers(IntegratedServer server) {
+        int resolved = VersionBridgeResolver.get().resolveMaxPlayers(server);
+        return resolved > 0 ? resolved : server.getMaxPlayers();
+    }
+
     private static boolean isBlank(String value) {
         return value == null || value.isEmpty();
     }

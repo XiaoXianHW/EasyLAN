@@ -100,10 +100,15 @@ public class LanInfoHarness {
     }
     static class EasyLAN { static RuntimeState getRuntimeState() { return new RuntimeState(); } }
     static String getLanPort(IntegratedServer server) { return "25569"; }
-    static int resolveMaxPlayers(IntegratedServer server) { return 37; }
+    static class VersionBridgeResolver {
+        static int configuredMaxPlayers = 37;
+        static VersionBridgeResolver get() { return new VersionBridgeResolver(); }
+        int resolveMaxPlayers(IntegratedServer server) { return configuredMaxPlayers; }
+    }
     static boolean isBlank(String value) { return value == null || value.isEmpty(); }
     static String safeValue(Object value) { return value == null ? "" : value.toString(); }
     PRODUCTION_METHOD
+    PRODUCTION_RESOLVER
     public static void main(String[] args) {
         for (boolean http : new boolean[] {true, false}) {
             HttpAPI = http;
@@ -113,6 +118,11 @@ public class LanInfoHarness {
             String output = String.join("\n", messages);
             if (!http && output.contains("Http-Api")) throw new AssertionError("Disabled API advertised");
             if (output.contains("maxplayer: &a8")) throw new AssertionError("Chat used stale vanilla player count");
+        }
+        for (int unavailable : new int[] {0, -1}) {
+            VersionBridgeResolver.configuredMaxPlayers = unavailable;
+            if (resolveMaxPlayers(new IntegratedServer()) != 8)
+                throw new AssertionError("Unknown bridge limit must fall back to server limit");
         }
         System.out.println("PASS: configured count and local output survive public lookup failure, HTTP on/off");
     }
@@ -143,7 +153,13 @@ class LanChatRuntime(unittest.TestCase):
                 path = ROOT / f"versions/{version}/project/src/main/java/org/xiaoxian/lan/ShareToLan.java"
                 source = path.read_text()
                 method = "private void sendLanInfo" + source.split("private void sendLanInfo", 1)[1].split("private void startHttpApi", 1)[0]
-                self.run_java("LanInfoHarness", LAN_HARNESS.replace("PRODUCTION_METHOD", method))
+                # Use the actual production resolver too: a double for this
+                # helper could conceal a missing method in a version variant.
+                self.assertIn("private static int resolveMaxPlayers", source)
+                resolver = "private static int resolveMaxPlayers" + source.split("private static int resolveMaxPlayers", 1)[1].split("private static boolean isBlank", 1)[0]
+                if version == "1.21.11":
+                    self.assertIn('snapshot.putStatus("maxPlayer", String.valueOf(resolveMaxPlayers(server)))', source)
+                self.run_java("LanInfoHarness", LAN_HARNESS.replace("PRODUCTION_METHOD", method).replace("PRODUCTION_RESOLVER", resolver))
 
 
 if __name__ == "__main__":

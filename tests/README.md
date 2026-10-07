@@ -61,3 +61,8 @@ pattern as NeoForge and makes the two outputs agree. The previously passing
 - All six changed versions require new production JARs and runtime acceptance.
   In particular, the older 1.21.5 production smoke evidence does not validate
   this follow-up. Forge 1.21.11 must be built and exercised with Forge 61.2.0.
+- The first 1.21.5 full compile caught a missing resolver helper in the five
+  pre-1.21.11 variants. Those variants now contain the production resolver.
+  Their existing HTTP server getter is unchanged. The harness now extracts the
+  actual helper and checks fallback for unavailable bridge
+  values; it no longer supplies a resolver double that could hide this error.
