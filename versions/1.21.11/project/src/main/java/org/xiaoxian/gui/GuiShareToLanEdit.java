@@ -197,10 +197,12 @@ public class GuiShareToLanEdit {
             PortText = portTextBox.getValue();
             MaxPlayerText = maxPlayerTextBox.getValue();
 
+            // Use the actual requested port for the listener and LAN discovery.
+            int selectedPort = PortText.isEmpty() ? publishPort : Integer.parseInt(PortText);
             this.minecraft.setScreen(null);
             Component result;
-            if (integratedServer.publishServer(gameMode, commands, publishPort)) {
-                result = PublishCommand.getSuccessMessage(publishPort);
+            if (integratedServer.publishServer(gameMode, commands, selectedPort)) {
+                result = PublishCommand.getSuccessMessage(integratedServer.getPort());
                 org.xiaoxian.EasyLAN.CustomPort = PortText;
                 org.xiaoxian.EasyLAN.CustomMaxPlayer = MaxPlayerText;
                 ConfigUtil.save();

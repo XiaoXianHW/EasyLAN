@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.xiaoxian.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["IntegratedServerMixin"],
+  "injectors": {"defaultRequire": 1}
+}

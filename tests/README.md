@@ -66,3 +66,25 @@ pattern as NeoForge and makes the two outputs agree. The previously passing
   Their existing HTTP server getter is unchanged. The harness now extracts the
   actual helper and checks fallback for unavailable bridge
   values; it no longer supplies a resolver double that could hide this error.
+
+## 1.21.11 effective LAN settings
+
+The version-local screen previously published a random port before opening a
+second custom listener. It now passes the selected port to vanilla publication,
+and uses the server's actual published port for the success message and API.
+The setup path no longer opens a second listener.
+
+Minecraft 1.21.11 moved the integrated limit to the server getter. A required
+client Mixin now supplies per-server configured state to that getter, so vanilla
+status and the player-list admission check use the same limit. The bridge checks
+both getters before reporting success and no longer replaces a live player list.
+The deterministic regression suite compiles the production methods and checks
+requested/actual port agreement, bind failure, actual getter state, repeated
+changes, a new world, and negative controls for the original failures.
+
+The ForgeGradle 7 Mixin registration follows the official example:
+https://github.com/MinecraftForge/MDKExamples/blob/master/mixins-only/fg7/build.gradle
+
+The exact Forge 61.2.0 development dependency is currently blocked by the
+upstream CDN (HTTP 403). This patch is not yet compiled against that SDK or
+verified in a transformed production client. No old artifact validates it.
