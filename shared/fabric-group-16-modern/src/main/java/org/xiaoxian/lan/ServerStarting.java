@@ -46,7 +46,10 @@ public class ServerStarting {
             SaveOnCommand.register(dispatcher);
             SaveOffCommand.register(dispatcher);
         }
+    }
 
-        ServerRuleApplier.apply(server);
+    public static void onServerStarted(MinecraftServer minecraftServer) {
+        // SERVER_STARTING runs before levels exist; apply world rules only after setup.
+        ServerRuleApplier.apply(minecraftServer);
     }
 }
