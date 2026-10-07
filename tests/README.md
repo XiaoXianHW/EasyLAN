@@ -88,3 +88,18 @@ https://github.com/MinecraftForge/MDKExamples/blob/master/mixins-only/fg7/build.
 The exact Forge 61.2.0 development dependency is currently blocked by the
 upstream CDN (HTTP 403). This patch is not yet compiled against that SDK or
 verified in a transformed production client. No old artifact validates it.
+
+## Older modern Forge advertised port
+
+The five pre-1.21.11 targets now retain vanilla's hidden port EditBox and feed
+the selected port to its existing responder before invoking the original Start
+action. This preserves vanilla game-mode/commands behavior and makes publication
+and discovery use the chosen port. A failed/disabled publication or mismatched
+actual port cannot continue into EasyLAN's success/config/API setup. The extra
+listener is removed and HTTP status reads the actual server port.
+
+`test_inherited_lan_port.py` compiles the unchanged production helpers and
+checks custom/default ports, failed binds, disabled actions, missing responders,
+unexpected published-port mismatches, and stale port state. A negative control
+omitting the responder update must fail. The earlier 1.21.5 artifact built at
+`5c1a2f0` precedes this correction and is not a final acceptance candidate.

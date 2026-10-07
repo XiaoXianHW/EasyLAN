@@ -2,6 +2,7 @@ package org.xiaoxian.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -42,6 +43,7 @@ public class GuiShareToLanEdit {
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
         private final Font fontRenderer = Minecraft.getInstance().font;
+        private EditBox vanillaPortTextBox;
 
         public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
@@ -50,6 +52,7 @@ public class GuiShareToLanEdit {
         @Override
         public void init() {
             super.init();
+            vanillaPortTextBox = null;
 
             PortText = CustomPort;
             MaxPlayerText = CustomMaxPlayer;
@@ -96,7 +99,9 @@ public class GuiShareToLanEdit {
                 Button finalOriginalButton = originalButton;
                 Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
                     syncTextState();
-                    finalOriginalButton.onPress();
+                    if (!publishVanillaPort(finalOriginalButton)) {
+                        return;
+                    }
                     CustomPort = PortText;
                     CustomMaxPlayer = MaxPlayerText;
                     ConfigUtil.save();
@@ -116,6 +121,7 @@ public class GuiShareToLanEdit {
                 }
             }
 
+            vanillaPortTextBox = targetEditBox;
             if (targetEditBox != null) {
                 this.removeWidget(targetEditBox);
             }
@@ -136,6 +142,25 @@ public class GuiShareToLanEdit {
 
             drawString(matrixStack, fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFF);
             drawString(matrixStack, fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFF0000);
+        }
+
+        private boolean publishVanillaPort(Button originalButton) {
+            if (vanillaPortTextBox == null) {
+                PortWarningText = I18n.get("easylan.text.port.invalid");
+                return false;
+            }
+
+            // Keep vanilla's responder and publication logic, including game mode
+            // and commands, while giving it the user's selected port.
+            vanillaPortTextBox.setValue(PortText);
+            if (!originalButton.active) {
+                PortWarningText = I18n.get("easylan.text.port.used");
+                return false;
+            }
+            originalButton.onPress();
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            return server != null && server.isPublished()
+                    && (PortText.isEmpty() || server.getPort() == Integer.parseInt(PortText));
         }
 
         private void syncTextState() {
