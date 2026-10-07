@@ -77,7 +77,7 @@ public class ShareToLan {
             }
 
             ChatUtil.sendMsg(" ");
-            ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + server.getMaxPlayers());
+            ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + resolveMaxPlayers(server));
             ChatUtil.sendMsg("&e" + I18n.get("easylan.text.onlineMode") + ": &a" + onlineMode);
 
             if (HttpAPI) {
