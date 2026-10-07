@@ -34,6 +34,7 @@ public class EasyLAN implements ModInitializer {
     public void onInitialize() {
         ConfigUtil.load();
         ServerLifecycleEvents.SERVER_STARTING.register(ServerStarting::onServerStarting);
+        ServerLifecycleEvents.SERVER_STARTED.register(ServerStarting::onServerStarted);
         ServerLifecycleEvents.SERVER_STOPPING.register(ServerStopping::onServerStopping);
     }
 

@@ -31,7 +31,10 @@ public class ServerStarting {
             SaveOnCommand.register(dispatcher);
             SaveOffCommand.register(dispatcher);
         }
+    }
 
+    public static void onServerStarted(MinecraftServer minecraftServer) {
+        // SERVER_STARTING runs before levels exist; getGameRules() may dereference the overworld.
         ServerRuleApplier.apply(minecraftServer);
     }
 }
