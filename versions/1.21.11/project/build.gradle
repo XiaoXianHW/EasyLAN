@@ -1,6 +1,7 @@
 plugins {
+    id 'java'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+    id 'net.minecraftforge.gradle' version '[7.0.3,8)'
 }
 
 version = mod_version
@@ -41,25 +42,31 @@ sourceSets {
 
 minecraft {
     mappings channel: mapping_channel, version: mapping_version
-    reobf = false
-    copyIdeResources = true
 
     runs {
         configureEach {
-            workingDirectory project.file('run')
+            workingDir = layout.projectDirectory.dir('run')
 
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            systemProperty 'forge.logging.console.level', 'debug'
         }
 
-        client {
-            property 'forge.enabledGameTestNamespaces', mod_id
+        register('client') {
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
         }
     }
 }
 
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.5'
     implementation ('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
 }
