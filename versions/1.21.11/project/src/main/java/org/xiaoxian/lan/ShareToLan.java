@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.model.EasyLanStatusSnapshot;
 import org.xiaoxian.easylan.neoforge.version.VersionBridgeResolver;
@@ -35,19 +34,24 @@ public class ShareToLan {
             return;
         }
 
-        ServerConnectionListener connection = server.getConnection();
-        String customPort = GuiShareToLanEdit.PortText;
         String customMaxPlayer = GuiShareToLanEdit.MaxPlayerText;
 
         EasyLAN.getRuntimeState().openExecutorService(2);
 
-        if (!isBlank(customPort)) {
-            startLanPort(connection, Integer.parseInt(customPort));
+        // The screen already published the actual requested endpoint. Do not
+        // create another listener or overwrite it with an unverified input value.
+        String publishedPort = getLanPort(server);
+        if (!LanOutput && !isBlank(publishedPort)) {
+            ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + publishedPort + "&f]");
         }
 
         if (!isBlank(customMaxPlayer)) {
             setMaxPlayer(server, Integer.parseInt(customMaxPlayer));
         }
+
+        System.out.println("[EasyLAN] Published LAN settings: port=" + server.getPort()
+                + ", serverMaxPlayers=" + server.getMaxPlayers()
+                + ", playerListMaxPlayers=" + server.getPlayerList().getMaxPlayers());
 
         if (HttpAPI) {
             EasyLAN.getRuntimeState().openUpdateService();
@@ -111,7 +115,7 @@ public class ShareToLan {
     private void updateApiInfo(final IntegratedServer server) {
         EasyLanStatusSnapshot snapshot = EasyLAN.getRuntimeState().getStatusSnapshot();
         EasyLAN.getRuntimeState().openUpdateService().scheduleAtFixedRate(() -> {
-            String resolvedPort = isBlank(GuiShareToLanEdit.PortText) ? getLanPort(server) : GuiShareToLanEdit.PortText;
+            String resolvedPort = getLanPort(server);
 
             snapshot.putStatus("port", safeValue(resolvedPort));
             snapshot.putStatus("version", safeValue(server.getServerVersion()));
@@ -143,18 +147,6 @@ public class ShareToLan {
 
         if (!LanOutput) {
             ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPlayer") + " &f[&e" + maxPlayers + "&f]");
-        }
-    }
-
-    private void startLanPort(ServerConnectionListener connection, int port) {
-        try {
-            VersionBridgeResolver.get().openLanEndpoint(connection, port);
-            if (!LanOutput) {
-                ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortText + "&f]");
-            }
-        } catch (IOException ex) {
-            ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPortError"));
-            System.out.println("[EasyLAN] addLanEndpoint Error: " + ex.getMessage());
         }
     }
 
