@@ -132,7 +132,7 @@ public class GuiEasyLanMain extends Screen {
     @Override
     public void render(@Nonnull GuiGraphics matrixStack, int mouseX, int mouseY, float partialTicks) {
         // Older versions do not paint a background in Screen#render, so the previous screen would bleed through.
-        matrixStack.fill(0, 0, this.width, this.height, 0xC0101010);
+        matrixStack.fill(0, 0, this.width, this.height, 0xFF101010);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         // 标题

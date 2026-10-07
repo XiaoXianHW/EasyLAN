@@ -65,17 +65,12 @@ public class ShareToLan {
         EasyLAN.getRuntimeState().openExecutorService(2).submit(() -> {
             String lanIPv4 = NetworkUtil.getLocalIpv4();
             String lanIPv6 = NetworkUtil.getLocalIpv6();
-            String publicIPv4 = NetworkUtil.getPublicIPv4();
-            boolean publicReachable = NetworkUtil.checkIpIsPublic();
             String lanPort = getLanPort(server);
 
             ChatUtil.sendMsg("&e[&6EasyLAN&e] &aSuccessfully");
             ChatUtil.sendMsg("&4---------------------");
             ChatUtil.sendMsg("&e" + I18n.get("easylan.local") + "IPv4: &a" + lanIPv4);
             ChatUtil.sendMsg("&e" + I18n.get("easylan.local") + "IPv6: &a" + lanIPv6);
-            ChatUtil.sendMsg(" ");
-            ChatUtil.sendMsg("&e" + I18n.get("easylan.public") + "IPv4: &a" + publicIPv4);
-            ChatUtil.sendMsg("&e" + I18n.get("easylan.chat.isPublic") + ": &a" + publicReachable);
             ChatUtil.sendMsg(" ");
             ChatUtil.sendMsg("&e" + I18n.get("easylan.text.port") + ": &a" + safeValue(lanPort));
 
@@ -94,6 +89,10 @@ public class ShareToLan {
                 ChatUtil.sendMsg("&ePlayerList:&a localhost:" + safeValue(EasyLAN.getRuntimeState().getHttpApiPort()) + "/playerlist");
             }
             ChatUtil.sendMsg("&4---------------------");
+
+            // Public address services must not delay the local LAN status block.
+            ChatUtil.sendMsg("&e" + I18n.get("easylan.public") + "IPv4: &a" + NetworkUtil.getPublicIPv4());
+            ChatUtil.sendMsg("&e" + I18n.get("easylan.chat.isPublic") + ": &a" + NetworkUtil.checkIpIsPublic());
         });
     }
 
