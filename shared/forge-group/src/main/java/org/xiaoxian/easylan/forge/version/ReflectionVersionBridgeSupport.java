@@ -22,7 +22,9 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint" }) {
+        // String-based reflection is not remapped when the mod jar is reobfuscated.
+        // Include production SRG names for 1.16.x and 1.17/1.18, respectively.
+        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint", "func_151265_a", "m_9711_" }) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
