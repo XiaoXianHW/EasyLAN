@@ -2,15 +2,11 @@ package org.xiaoxian.easylan.neoforge.version;
 
 import org.xiaoxian.EasyLAN;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     /** Mojang name, then the SRG name used by NeoForge 1.20.1. */
@@ -111,22 +107,11 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public String resolveLanPort(Object server) {
-        String runtimePort = EasyLAN.getRuntimeState().getLanPort();
-        if (runtimePort != null && !runtimePort.isEmpty()) {
-            return runtimePort;
-        }
-
-        String reflectedPort = invokePortGetter(server, PORT_METHODS);
-        if (reflectedPort != null) {
-            EasyLAN.getRuntimeState().setLanPort(reflectedPort);
-            return reflectedPort;
-        }
-
-        String logPort = readLanPortFromLog();
-        if (logPort != null) {
-            EasyLAN.getRuntimeState().setLanPort(logPort);
-        }
-        return logPort;
+        // Never let a requested/cached port or a previous world's log override
+        // the current integrated server's published endpoint.
+        String publishedPort = invokePortGetter(server, PORT_METHODS);
+        EasyLAN.getRuntimeState().setLanPort(publishedPort);
+        return publishedPort;
     }
 
     private String invokePortGetter(Object target, String... methodNames) {
@@ -245,26 +230,4 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
         return null;
     }
 
-    private String readLanPortFromLog() {
-        Pattern[] patterns = new Pattern[] {
-                Pattern.compile("\\[Server thread/INFO].*Started serving on ([0-9]+)"),
-                Pattern.compile("Started serving on ([0-9]+)")
-        };
-
-        try (BufferedReader reader = new BufferedReader(new FileReader("logs/latest.log"))) {
-            String line;
-            String lastPort = null;
-            while ((line = reader.readLine()) != null) {
-                for (Pattern pattern : patterns) {
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.find()) {
-                        lastPort = matcher.group(1);
-                    }
-                }
-            }
-            return lastPort;
-        } catch (IOException ignored) {
-            return null;
-        }
-    }
 }

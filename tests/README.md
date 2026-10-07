@@ -70,3 +70,25 @@ getters, saved-world exit/reopen, and absence of mixin errors or obsolete max-fi
 warnings. Runtime logs include the actual three getter values for this purpose.
 HTTP endpoint and second-client verification remain separate and must not bypass
 an access restriction or accept an unapproved multiplayer warning.
+
+## Remaining NeoForge publish-port paths
+
+The same dual-listener defect affected all four older targets. Version 1.21.5
+now publishes its selected custom port directly. The 1.20.1 override and shared
+1.20.6/1.21.1 screen preserve the hidden vanilla port EditBox and send custom
+input through its existing responder before invoking vanilla's Start action.
+They only continue EasyLAN setup when the server was actually published. The
+shared setup no longer opens a second listener, and port resolution ignores
+cached inputs and previous-world log entries.
+
+`test_neoforge_older_settings.py` executes both inherited-screen handlers and the
+1.21.5 direct handler, including failed publication and missing vanilla input.
+Negative controls omit the vanilla input update and must fail. Shared bridge
+checks cover Mojang and 1.20.1 SRG names plus stale-port clearing.
+
+Exact production bytecode for 47.1.106, 20.6.139, 21.1.248 and 21.5.98 confirms
+that the older server maximum delegates to PlayerList's writable maximum field.
+Those versions keep their existing limit mechanism and receive no new mixin.
+All versions now log the actual published port and server/player-list maximum.
+Older rebuilt artifacts and production GUI retests remain required; the focused
+Java doubles do not establish a full Minecraft runtime pass.

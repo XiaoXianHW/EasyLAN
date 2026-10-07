@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -42,6 +43,7 @@ public class GuiShareToLanEdit {
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
         private final Font fontRenderer = Minecraft.getInstance().font;
+        private EditBox vanillaPortTextBox;
 
         public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
@@ -88,12 +90,7 @@ public class GuiShareToLanEdit {
 
                 Button finalOriginalButton = originalButton;
                 Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
-                    syncTextState();
-                    finalOriginalButton.onPress();
-                    CustomPort = PortText;
-                    CustomMaxPlayer = MaxPlayerText;
-                    ConfigUtil.save();
-                    new ShareToLan().handleLanSetup();
+                    startLan(finalOriginalButton);
                 }).bounds(x, y, width, height).build();
 
                 this.addRenderableWidget(newButton);
@@ -109,6 +106,7 @@ public class GuiShareToLanEdit {
                 }
             }
 
+            vanillaPortTextBox = targetEditBox;
             if (targetEditBox != null) {
                 this.removeWidget(targetEditBox);
             }
@@ -129,6 +127,26 @@ public class GuiShareToLanEdit {
 
             matrixStack.drawString(fontRenderer, I18n.get("easylan.text.maxplayer"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
             matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF5555);
+        }
+
+        private void startLan(Button originalButton) {
+            syncTextState();
+            if (vanillaPortTextBox == null) {
+                org.xiaoxian.util.ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPortError"));
+                return;
+            }
+            // Keep vanilla's port responder, even though its input is hidden.
+            // The original Start action must bind and advertise this same port.
+            vanillaPortTextBox.setValue(PortText);
+            originalButton.onPress();
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server == null || !server.isPublished()) {
+                return;
+            }
+            CustomPort = PortText;
+            CustomMaxPlayer = MaxPlayerText;
+            ConfigUtil.save();
+            new ShareToLan().handleLanSetup();
         }
 
         private void syncTextState() {
