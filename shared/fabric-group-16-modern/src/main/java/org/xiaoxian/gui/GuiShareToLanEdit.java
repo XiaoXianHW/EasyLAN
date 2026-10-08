@@ -2,6 +2,7 @@ package org.xiaoxian.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
@@ -9,6 +10,10 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.HttpUtil;
+import net.minecraft.world.level.GameType;
 import org.xiaoxian.easylan.fabric.version.VersionBridgeResolver;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
@@ -16,6 +21,8 @@ import org.xiaoxian.util.TextBoxUtil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +79,11 @@ public class GuiShareToLanEdit {
                 this.buttons.remove(originalButton);
                 this.children.remove(originalButton);
 
-                Button finalOriginalButton = originalButton;
                 Button newButton = new Button(x, y, width, height, new TextComponent(I18n.get("lanServer.start")), button -> {
                     syncTextState();
-                    finalOriginalButton.onPress();
+                    if (!publishSelectedPort()) {
+                        return;
+                    }
                     CustomPort = PortText;
                     CustomMaxPlayer = MaxPlayerText;
                     ConfigUtil.save();
@@ -142,6 +150,54 @@ public class GuiShareToLanEdit {
             MaxPlayerBox.mouseClicked(mouseX, mouseY, mouseButton);
             syncTextState();
             return super.mouseClicked(mouseX, mouseY, mouseButton);
+        }
+
+        private boolean publishSelectedPort() {
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server == null || server.isPublished()) {
+                return false;
+            }
+
+            // 1.16 has no vanilla port field. Keep its selected game mode and
+            // commands, but give publishServer the requested port directly.
+            final String mode;
+            final boolean commands;
+            try {
+                mode = (String) readVanillaOption(String.class);
+                commands = (Boolean) readVanillaOption(Boolean.TYPE);
+            } catch (ReflectiveOperationException exception) {
+                PortWarningText = I18n.get("easylan.chat.CtPortError");
+                return false;
+            }
+            int selectedPort = PortText.isEmpty() ? HttpUtil.getAvailablePort() : Integer.parseInt(PortText);
+            this.minecraft.setScreen(null);
+            boolean published = server.publishServer(GameType.byName(mode), commands, selectedPort)
+                    && server.isPublished() && server.getPort() == selectedPort;
+            Component result = published
+                    ? new TranslatableComponent("commands.publish.started", server.getPort())
+                    : new TranslatableComponent("commands.publish.failed");
+            this.minecraft.gui.getChat().addMessage(result);
+            this.minecraft.updateTitle();
+            return published;
+        }
+
+        private Object readVanillaOption(Class<?> optionType) throws ReflectiveOperationException {
+            Field selected = null;
+            // Restrict this lookup to vanilla's declared instance fields. Their
+            // types are stable in named and intermediary production mappings.
+            for (Field field : ShareToLanScreen.class.getDeclaredFields()) {
+                if (!Modifier.isStatic(field.getModifiers()) && field.getType() == optionType) {
+                    if (selected != null) {
+                        throw new NoSuchFieldException("Ambiguous LAN option: " + optionType.getName());
+                    }
+                    selected = field;
+                }
+            }
+            if (selected == null) {
+                throw new NoSuchFieldException("Missing LAN option: " + optionType.getName());
+            }
+            selected.setAccessible(true);
+            return selected.get(this);
         }
 
         private void syncTextState() {

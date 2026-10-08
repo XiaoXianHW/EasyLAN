@@ -49,7 +49,7 @@ class ReportedRegressionGuards(unittest.TestCase):
                 source = (group / "src/main/java/org/xiaoxian/lan/ShareToLan.java").read_text()
                 self.assertIn("ServerRuleApplier.apply(server);", source)
                 gui = (group / "src/main/java/org/xiaoxian/gui/GuiShareToLanEdit.java").read_text()
-                self.assertLess(gui.index("finalOriginalButton.onPress("), gui.index("new ShareToLan().handleLanSetup();"))
+                self.assertLess(gui.index("if (!publish"), gui.index("new ShareToLan().handleLanSetup();"))
 
     def test_modern_world_creation_not_injected(self):
         if not (ROOT / "versions/1.20.6").exists():
