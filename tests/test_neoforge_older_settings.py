@@ -11,7 +11,7 @@ GUI_FILES = [ROOT / 'shared/neoforge-modern/src/main/java/org/xiaoxian/gui/GuiSh
 INHERITED_HARNESS = r'''
 public class InheritedHarness {
     static class EditBox { String value; EditBox(String v){value=v;} String getValue(){return value;} void setValue(String v){value=v;} }
-    static class IntegratedServer { boolean published; boolean fail; int port=-1; boolean isPublished(){return published;} }
+    static class IntegratedServer { boolean published; boolean fail; int port=-1; boolean isPublished(){return published;} int getPort(){return port;} }
     static class Minecraft {
         static Minecraft INSTANCE=new Minecraft(); IntegratedServer server=new IntegratedServer();
         static Minecraft getInstance(){return INSTANCE;} IntegratedServer getSingleplayerServer(){return server;}
@@ -33,17 +33,20 @@ public class InheritedHarness {
         }
     }); }
     public static void main(String[] args) {
-        for(String input:new String[]{"25599",""}) {
+        for(String input:new String[]{"100","1023","1024","25599",""}) {
             Minecraft.INSTANCE=new Minecraft();var h=new InheritedHarness();h.PortTextBox.setValue(input);
-            h.startLan(h.original());int expected=input.isEmpty()?37563:25599;
+            h.startLan(h.original());int expected=input.isEmpty()?37563:Integer.parseInt(input);
             if(Minecraft.getInstance().server.port!=expected)throw new AssertionError("Vanilla responder must receive custom port");
         }
         Minecraft.INSTANCE=new Minecraft();var failed=new InheritedHarness();Minecraft.INSTANCE.server.fail=true;
         int count=ShareToLan.setups;failed.startLan(failed.original());
         if(count!=ShareToLan.setups)throw new AssertionError("Do not setup/report success after bind failure");
+        Minecraft.INSTANCE=new Minecraft();var mismatch=new InheritedHarness();
+        mismatch.startLan(new Button(()->{Minecraft.INSTANCE.server.published=true;Minecraft.INSTANCE.server.port=37563;}));
+        if(count!=ShareToLan.setups)throw new AssertionError("Wrong published port must not be accepted");
         var missing=new InheritedHarness();missing.vanillaPortTextBox=null;
         missing.startLan(new Button(()->{throw new AssertionError("No vanilla port binding available");}));
-        if(ChatUtil.errors!=1)throw new AssertionError("Missing input must report binding failure");
+        if(ChatUtil.errors!=2)throw new AssertionError("Missing input must report binding failure");
     }
 }
 '''

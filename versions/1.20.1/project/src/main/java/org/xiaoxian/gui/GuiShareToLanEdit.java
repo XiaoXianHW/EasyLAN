@@ -143,6 +143,10 @@ public class GuiShareToLanEdit {
             if (server == null || !server.isPublished()) {
                 return;
             }
+            if (!PortText.isEmpty() && server.getPort() != Integer.parseInt(PortText)) {
+                org.xiaoxian.util.ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPortError"));
+                return;
+            }
             CustomPort = PortText;
             CustomMaxPlayer = MaxPlayerText;
             ConfigUtil.save();

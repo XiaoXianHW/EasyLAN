@@ -76,9 +76,9 @@ public class StartHarness {
     Object gameMode; boolean commands;
     PRODUCTION_METHOD
     public static void main(String[] args) {
-        for (String input : new String[] {"25599", ""}) {
+        for (String input : new String[] {"100", "1023", "1024", "25599", ""}) {
             StartHarness h = new StartHarness(); h.portTextBox = new EditBox(input); h.startLan();
-            int expected = input.isEmpty() ? 37563 : 25599;
+            int expected = input.isEmpty() ? 37563 : Integer.parseInt(input);
             if (h.minecraft.server.port != expected || h.minecraft.gui.chat.result.port != expected)
                 throw new AssertionError("Requested, published and vanilla-message ports must agree");
             if (h.minecraft.server.calls != 1) throw new AssertionError("Publish exactly one listener");
