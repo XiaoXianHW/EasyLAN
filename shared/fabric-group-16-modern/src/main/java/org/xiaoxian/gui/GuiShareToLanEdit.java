@@ -154,7 +154,7 @@ public class GuiShareToLanEdit {
 
         private boolean publishSelectedPort() {
             IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-            if (server == null || server.isPublished()) {
+            if (server == null || server.isPublished() || !checkPortAndEnableButton(PortText)) {
                 return false;
             }
 
