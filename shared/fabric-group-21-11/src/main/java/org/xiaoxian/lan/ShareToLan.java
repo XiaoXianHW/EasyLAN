@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerConnectionListener;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.model.EasyLanStatusSnapshot;
 import org.xiaoxian.easylan.fabric.version.VersionBridgeResolver;
@@ -32,18 +31,22 @@ public class ShareToLan {
 
     public void handleLanSetup() {
         IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-        if (server == null) {
+        if (server == null || !server.isPublished()) {
             return;
         }
 
-        ServerConnectionListener connection = server.getConnection();
         String customPort = GuiShareToLanEdit.PortText;
         String customMaxPlayer = GuiShareToLanEdit.MaxPlayerText;
 
-        EasyLAN.getRuntimeState().openExecutorService(2);
+        String actualPort = getLanPort(server);
+        if (!isBlank(customPort) && Integer.parseInt(customPort) != server.getPort()) {
+            ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPortError"));
+            return;
+        }
 
-        if (!isBlank(customPort)) {
-            startLanPort(connection, Integer.parseInt(customPort));
+        EasyLAN.getRuntimeState().openExecutorService(2);
+        if (!isBlank(customPort) && !LanOutput) {
+            ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + actualPort + "&f]");
         }
 
         if (!isBlank(customMaxPlayer)) {
@@ -76,11 +79,11 @@ public class ShareToLan {
             ChatUtil.sendMsg("&e" + I18n.get("easylan.text.port") + ": &a" + safeValue(lanPort));
 
             if (!isBlank(GuiShareToLanEdit.PortText)) {
-                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.CtPort") + ": &a" + GuiShareToLanEdit.PortText);
+                ChatUtil.sendMsg("&e" + I18n.get("easylan.text.CtPort") + ": &a" + safeValue(lanPort));
             }
 
             ChatUtil.sendMsg(" ");
-            ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + server.getMaxPlayers());
+            ChatUtil.sendMsg("&e" + I18n.get("easylan.text.maxplayer") + ": &a" + server.getPlayerList().getMaxPlayers());
             ChatUtil.sendMsg("&e" + I18n.get("easylan.text.onlineMode") + ": &a" + onlineMode);
 
             if (HttpAPI) {
@@ -112,7 +115,7 @@ public class ShareToLan {
     private void updateApiInfo(final IntegratedServer server) {
         EasyLanStatusSnapshot snapshot = EasyLAN.getRuntimeState().getStatusSnapshot();
         EasyLAN.getRuntimeState().openUpdateService().scheduleAtFixedRate(() -> {
-            String resolvedPort = isBlank(GuiShareToLanEdit.PortText) ? getLanPort(server) : GuiShareToLanEdit.PortText;
+            String resolvedPort = getLanPort(server);
 
             snapshot.putStatus("port", safeValue(resolvedPort));
             snapshot.putStatus("version", safeValue(server.getServerVersion()));
@@ -125,7 +128,7 @@ public class ShareToLan {
             snapshot.putStatus("allowFlight", String.valueOf(allowFlight));
             snapshot.putStatus("difficulty", safeValue(server.getWorldData().getDifficulty()));
             snapshot.putStatus("gameType", safeValue(server.getDefaultGameType()));
-            snapshot.putStatus("maxPlayer", String.valueOf(server.getMaxPlayers()));
+            snapshot.putStatus("maxPlayer", String.valueOf(server.getPlayerList().getMaxPlayers()));
             snapshot.putStatus("onlinePlayer", String.valueOf(server.getPlayerCount()));
 
             List<String> playerIds = new ArrayList<>();
@@ -138,25 +141,13 @@ public class ShareToLan {
 
     private void setMaxPlayer(IntegratedServer server, int maxPlayers) {
         boolean success = VersionBridgeResolver.get().setMaxPlayers(server, maxPlayers);
-        if (!success) {
+        if (!success || server.getPlayerList().getMaxPlayers() != maxPlayers) {
             ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPlayerError"));
             return;
         }
 
         if (!LanOutput) {
             ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPlayer") + " &f[&e" + maxPlayers + "&f]");
-        }
-    }
-
-    private void startLanPort(ServerConnectionListener connection, int port) {
-        try {
-            VersionBridgeResolver.get().openLanEndpoint(connection, port);
-            if (!LanOutput) {
-                ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.get("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortText + "&f]");
-            }
-        } catch (IOException ex) {
-            ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.get("easylan.chat.CtPortError"));
-            System.out.println("[EasyLAN] addLanEndpoint Error: " + ex.getMessage());
         }
     }
 
@@ -169,7 +160,10 @@ public class ShareToLan {
     }
 
     private static String getLanPort(IntegratedServer server) {
-        return VersionBridgeResolver.get().resolveLanPort(server);
+        int port = server.getPort();
+        String value = server.isPublished() && port > 0 ? String.valueOf(port) : null;
+        EasyLAN.getRuntimeState().setLanPort(value);
+        return value;
     }
 
     private static boolean isBlank(String value) {

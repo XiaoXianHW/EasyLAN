@@ -1,6 +1,7 @@
 package org.xiaoxian.gui;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -41,6 +42,7 @@ public class GuiShareToLanEdit {
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
         private final Font fontRenderer = Minecraft.getInstance().font;
+        private EditBox vanillaPortTextBox;
 
         public GuiShareToLanModified(Screen parentScreen) {
             super(parentScreen);
@@ -49,6 +51,7 @@ public class GuiShareToLanEdit {
         @Override
         public void init() {
             super.init();
+            vanillaPortTextBox = null;
 
             PortText = CustomPort;
             MaxPlayerText = CustomMaxPlayer;
@@ -86,10 +89,12 @@ public class GuiShareToLanEdit {
                 Button finalOriginalButton = originalButton;
                 Button newButton = Button.builder(text("lanServer.start", "Start LAN World"), button -> {
                     syncTextState();
+                    if (!publishVanillaPort(finalOriginalButton)) {
+                        return;
+                    }
                     CustomPort = PortText;
                     CustomMaxPlayer = MaxPlayerText;
                     ConfigUtil.save();
-                    finalOriginalButton.onPress(new KeyEvent(257, 0, 0));
                     new ShareToLan().handleLanSetup();
                 }).bounds(x, y, width, height).build();
                 newButton.active = checkPortAndEnableButton(PortTextBox.getValue()) && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
@@ -104,6 +109,7 @@ public class GuiShareToLanEdit {
                 }
             }
 
+            vanillaPortTextBox = targetEditBox;
             if (targetEditBox != null) {
                 this.removeWidget(targetEditBox);
             }
@@ -128,6 +134,28 @@ public class GuiShareToLanEdit {
 
             matrixStack.drawString(fontRenderer, text("easylan.text.maxplayer", "Max Player"), this.width / 2 + 5, this.height - 85, 0xFFFFFFFF);
             matrixStack.drawString(fontRenderer, MaxPlayerWarningText, this.width / 2 + 5, this.height - 45, 0xFFFF0000);
+        }
+
+        private boolean publishVanillaPort(Button originalButton) {
+            IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+            if (server == null || server.isPublished()) {
+                return false;
+            }
+            if (vanillaPortTextBox == null) {
+                PortWarningText = I18n.get("easylan.text.port.invalid");
+                return false;
+            }
+
+            // Preserve vanilla's game mode, commands, listener and discovery logic.
+            // The removed widget still owns the responder that updates its port.
+            vanillaPortTextBox.setValue(PortText);
+            if (!originalButton.active) {
+                PortWarningText = I18n.get("easylan.text.port.used");
+                return false;
+            }
+            originalButton.onPress(new KeyEvent(257, 0, 0));
+            return server.isPublished()
+                    && (PortText.isEmpty() || server.getPort() == Integer.parseInt(PortText));
         }
 
         private void syncTextState() {
