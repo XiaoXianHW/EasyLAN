@@ -14,6 +14,10 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.EasyLAN;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.GameType;
+import org.xiaoxian.easylan.forge.version.LanPublication;
+import org.xiaoxian.util.ChatUtil;
 import org.xiaoxian.easylan.core.validation.ValidationRules;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ConfigUtil;
@@ -41,6 +45,7 @@ public class GuiShareToLanEdit {
     }
 
     public static class GuiShareToLanModified extends ShareToLanScreen {
+        private boolean publishing;
         FontRenderer fontRenderer = Minecraft.getInstance().font;
 
         public GuiShareToLanModified(Screen parentScreen) {
@@ -87,18 +92,57 @@ public class GuiShareToLanEdit {
                 this.children.remove(originalButton);
 
                 // 添加新按钮
-                Button finalOriginalButton = originalButton;
                 Button newButton = new Button(x, y, width, height, new StringTextComponent(I18n.get("lanServer.start")), button -> {
-                    new ShareToLan().handleLanSetup();
-                    finalOriginalButton.onPress();
-                    EasyLAN.CustomPort = PortText;
-                    EasyLAN.CustomMaxPlayer = MaxPlayerText;
-                    ConfigUtil.set("Port", PortText);
-                    ConfigUtil.set("MaxPlayer", MaxPlayerText);
-                    ConfigUtil.save();
+                    startLan();
                 });
 
                 this.addButton(newButton);
+                newButton.active = checkPortAndEnableButton(PortTextBox.getValue())
+                        && checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue());
+            }
+        }
+
+        private void startLan() {
+            Minecraft minecraft = Minecraft.getInstance();
+            IntegratedServer server = minecraft.getSingleplayerServer();
+            if (publishing || server == null || server.isPublished()) {
+                return;
+            }
+            if (!checkPortAndEnableButton(PortTextBox.getValue())
+                    || !checkMaxPlayerAndEnableButton(MaxPlayerBox.getValue())) {
+                return;
+            }
+
+            publishing = true;
+            try {
+                GameType gameMode = LanPublication.selectedGameMode(this, ShareToLanScreen.class, GameType.class);
+                boolean commands = LanPublication.selectedCommands(this, ShareToLanScreen.class);
+                int port = LanPublication.publish(PortTextBox.getValue(), gameMode, commands,
+                        LanPublication::availablePort,
+                        (mode, allowCommands, selectedPort) -> server.publishServer(mode, allowCommands, selectedPort));
+                if (port < 0) {
+                    ChatUtil.sendMsg(I18n.get("commands.publish.failed"));
+                    return;
+                }
+
+                // Vanilla now owns the only listener and advertises this same port.
+                EasyLAN.getRuntimeState().setLanPort(String.valueOf(server.getPort()));
+                ChatUtil.sendMsg(I18n.get("commands.publish.started", server.getPort()));
+                new ShareToLan().handleLanSetup();
+                PortText = PortTextBox.getValue();
+                MaxPlayerText = MaxPlayerBox.getValue();
+                EasyLAN.CustomPort = PortText;
+                EasyLAN.CustomMaxPlayer = MaxPlayerText;
+                ConfigUtil.set("Port", PortText);
+                ConfigUtil.set("MaxPlayer", MaxPlayerText);
+                ConfigUtil.save();
+                minecraft.setScreen(null);
+                minecraft.updateTitle();
+            } catch (ReflectiveOperationException | IOException | IllegalArgumentException ex) {
+                ChatUtil.sendMsg(I18n.get("commands.publish.failed"));
+                System.err.println("[EasyLAN] LAN publication failed: " + ex);
+            } finally {
+                publishing = false;
             }
         }
 

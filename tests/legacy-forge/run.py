@@ -28,12 +28,18 @@ public class EasyLAN {
         subprocess.run(['javac', '--release', str(release), '-d', str(output), str(stub),
                         str(shared / 'VersionBridge.java'), str(shared / 'ReflectionVersionBridgeSupport.java'),
                         str(root / f'versions/{version}/project/src/main/java/org/xiaoxian/easylan/forge/version/VersionBridgeImpl.java'),
-                        str(Path(__file__).with_name('ReflectionBridgeRegression.java'))], check=True)
+                        str(Path(__file__).with_name('ReflectionBridgeRegression.java')),
+                        str(shared / 'LanPublication.java'),
+                        str(root / 'shared/core/src/main/java/org/xiaoxian/easylan/core/ValidationRules.java'),
+                        str(Path(__file__).with_name('LanPublicationRegression.java'))], check=True)
         bridge_class = output / 'org/xiaoxian/easylan/forge/version/VersionBridgeImpl.class'
         major = struct.unpack('>H', bridge_class.read_bytes()[6:8])[0]
         assert major == release + 44, (version, major)
         subprocess.run(['java', '-cp', str(output), 'ReflectionBridgeRegression', version], check=True)
+        subprocess.run(['java', '-ea', '-cp', str(output), 'LanPublicationRegression'], check=True)
     build = (root / 'versions/1.17.1/project/build.gradle').read_text()
     assert 'options.release = 16' in build, '1.17.1 must emit Java 16-compatible bytecode'
     print('1.17.1 Java 16 build setting and isolated bridge class version: PASS')
     print('These are isolated Java regression tests, not packaged mod or in-game verification.')
+
+subprocess.run(['python3', str(Path(__file__).with_name('check_publication_sources.py'))], check=True)
