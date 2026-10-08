@@ -143,10 +143,18 @@ public class GuiShareToLanEdit {
                 return false;
             }
 
+            if (!checkPortAndEnableButton(PortText)) {
+                return false;
+            }
+
             // Keep vanilla's responder and publication logic, including game mode
             // and commands, while giving it the user's selected port.
             vanillaPortTextBox.setValue(PortText);
-            if (!originalButton.active) {
+            // Vanilla stores parsed low ports but disables its button below 1024.
+            // EasyLAN deliberately supports available ports starting at 100.
+            boolean validLowPort = !PortText.isEmpty()
+                    && Integer.parseInt(PortText) >= 100 && Integer.parseInt(PortText) < 1024;
+            if (!originalButton.active && !validLowPort) {
                 PortWarningText = I18n.get("easylan.text.port.used");
                 return false;
             }

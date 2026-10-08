@@ -44,7 +44,7 @@ public class InheritedPortHarness {
     EditBox vanillaPortTextBox;
     String PortText, PortWarningText = "";
     int vanillaPort = 37563, publishes;
-    boolean available = true, bindSucceeds = true, ignoreSelectedPort;
+    boolean available = true, bindSucceeds = true, ignoreSelectedPort, forceInactive;
     Button original = new Button();
     InheritedPortHarness(String input) {
         PortText = input;
@@ -52,7 +52,7 @@ public class InheritedPortHarness {
         vanillaPortTextBox = new EditBox();
         vanillaPortTextBox.responder = value -> {
             vanillaPort = value.isEmpty() ? 37563 : Integer.parseInt(value);
-            original.active = available;
+            original.active = available && vanillaPort >= 1024 && !forceInactive;
         };
         original.action = () -> {
             publishes++;
@@ -64,19 +64,31 @@ public class InheritedPortHarness {
     }
     PUBLISH_METHOD
     PORT_METHOD
+    VALIDATE_METHOD
+    private boolean isPortAvailable(int port) { return available; }
     public static void main(String[] args) {
-        for (String input : new String[] {"25599", ""}) {
+        for (String input : new String[] {"25599", "100", "1023", "1024", "65535", ""}) {
             var h = new InheritedPortHarness(input);
             if (!h.publishVanillaPort(h.original)) throw new AssertionError("Valid publication rejected");
-            int expected = input.isEmpty() ? 37563 : 25599;
+            int expected = input.isEmpty() ? 37563 : Integer.parseInt(input);
             if (Minecraft.instance.server.port != expected || h.publishes != 1)
                 throw new AssertionError("Vanilla must publish requested port exactly once");
         }
-        var fail = new InheritedPortHarness("25599"); fail.bindSucceeds = false;
-        if (fail.publishVanillaPort(fail.original)) throw new AssertionError("Bind failure reported success");
-        var unavailable = new InheritedPortHarness("25599"); unavailable.available = false;
-        if (unavailable.publishVanillaPort(unavailable.original) || unavailable.publishes != 0)
-            throw new AssertionError("Disabled vanilla action must not be called");
+        for (String input : new String[] {"25599", "100"}) {
+            var fail = new InheritedPortHarness(input); fail.bindSucceeds = false;
+            if (fail.publishVanillaPort(fail.original)) throw new AssertionError("Bind failure reported success");
+            var unavailable = new InheritedPortHarness(input); unavailable.available = false;
+            if (unavailable.publishVanillaPort(unavailable.original) || unavailable.publishes != 0)
+                throw new AssertionError("Unavailable port must not be published");
+        }
+        var disabled = new InheritedPortHarness("25599"); disabled.forceInactive = true;
+        if (disabled.publishVanillaPort(disabled.original) || disabled.publishes != 0)
+            throw new AssertionError("Do not ignore a disabled non-low-port action");
+        for (String invalid : new String[] {"99", "65536", "abc"}) {
+            var h = new InheritedPortHarness(invalid);
+            if (h.publishVanillaPort(h.original) || h.publishes != 0)
+                throw new AssertionError("Reject invalid EasyLAN port " + invalid);
+        }
         var missing = new InheritedPortHarness("25599"); missing.vanillaPortTextBox = null;
         if (missing.publishVanillaPort(missing.original) || missing.publishes != 0)
             throw new AssertionError("Missing responder must not publish a random port");
@@ -103,10 +115,11 @@ class InheritedLanPort(unittest.TestCase):
             lan = (base / "lan/ShareToLan.java").read_text()
             publish = method(gui, "private boolean publishVanillaPort(")
             port = method(lan, "private static String getLanPort(")
-            implementations.add((publish, port))
+            validate = method(gui, "private boolean checkPortAndEnableButton(")
+            implementations.add((publish, port, validate))
         self.assertEqual(len(implementations), 1, "Each source variant must use the tested helper")
-        publish, port = implementations.pop()
-        harness = HARNESS.replace("PUBLISH_METHOD", publish).replace("PORT_METHOD", port)
+        publish, port, validate = implementations.pop()
+        harness = HARNESS.replace("PUBLISH_METHOD", publish).replace("PORT_METHOD", port).replace("VALIDATE_METHOD", validate)
         result = run_java({"InheritedPortHarness.java": harness}, "InheritedPortHarness")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         broken = harness.replace("vanillaPortTextBox.setValue(PortText);", "/* original port bug */")

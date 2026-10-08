@@ -103,3 +103,6 @@ checks custom/default ports, failed binds, disabled actions, missing responders,
 unexpected published-port mismatches, and stale port state. A negative control
 omitting the responder update must fail. The earlier 1.21.5 artifact built at
 `5c1a2f0` precedes this correction and is not a final acceptance candidate.
+EasyLAN's existing available-port range of 100–65535 is preserved: vanilla's
+inactive flag is tolerated only for 100–1023 after EasyLAN's real range and bind
+availability checks succeed. Other disabled/invalid actions remain blocked.
