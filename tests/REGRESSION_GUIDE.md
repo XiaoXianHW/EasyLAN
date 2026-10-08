@@ -58,3 +58,16 @@ Fabric1.21.5 实机在首次创建世界时崩溃：SERVER_STARTING 阶段调用
 SERVER_STARTING，配置读取仍保留在模组初始化。发布 LAN 后仍会重新应用规则。
 同生命周期调用的相关 Fabric 家族一并改为此顺序。各版本必须验证首次创建世界、
 读取已有存档、退出再进，以及生成规则、MOTD、online mode 与命令是否生效。
+
+## 1.16.4/1.16.5：独立缓存的 TCP MOTD
+
+这两个版本的 `MinecraftServer.runServer` 在 Fabric `SERVER_STARTED` 之前缓存
+`ServerStatus.description`；`setMotd` 只改字段，周期刷新也不更新 description。
+因此 HTTP 的 `getMotd()` 和 LAN 广播正确时，已保存服务器的 TCP 描述仍可能是旧内容。
+本次在 1.16 专用规则应用器中通过强类型 `getStatus().setDescription(...)` 同步现有缓存，
+不替换状态对象或修改其中的玩家、版本及图标。空字符串和空白按原样保留，null 转为空字符串。
+
+`test_cached_motd.py` 编译并运行完整生产规则应用器，包含遗漏缓存更新和遗漏字段更新的
+负面对照、重新应用、世界重新加载对应的新服务器实例，以及端口/人数和其他状态不变断言。
+这些离线测试只验证应用器逻辑。两个版本均需重新构建、检查生产重映射，再分别验证真实接收端
+的 LAN 展示与已保存服务器 TCP 描述；HTTP 断言仍单独记录，不互相替代，也不绕过权限警告。

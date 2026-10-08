@@ -1,5 +1,6 @@
 package org.xiaoxian.lan;
 
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
@@ -25,7 +26,11 @@ public final class ServerRuleApplier {
         }
         applyNpcSetting(server);
         server.setFlightAllowed(allowFlight);
-        server.setMotd(motd);
+        // Keep an explicit blank MOTD; never pass a null string to chat/status serialization.
+        server.setMotd(motd == null ? "" : motd);
+        // 1.16 caches this description before SERVER_STARTED. setMotd only updates
+        // the field used by LAN announcements/HTTP, not the saved-server ping reply.
+        server.getStatus().setDescription(new TextComponent(server.getMotd()));
     }
 
     private static void applyNpcSetting(MinecraftServer server) {

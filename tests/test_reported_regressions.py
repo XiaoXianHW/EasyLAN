@@ -40,7 +40,7 @@ class ReportedRegressionGuards(unittest.TestCase):
         for group in GROUPS:
             with self.subTest(group=group.name):
                 source = (group / "src/main/java/org/xiaoxian/lan/ServerRuleApplier.java").read_text()
-                self.assertRegex(source, r"(?:server|minecraftServer)\.setMotd\(motd\);")
+                self.assertRegex(source, r'(?:server|minecraftServer)\.setMotd\(motd(?: == null \? "" : motd)?\);')
                 self.assertNotIn('"setMotd"', source)
 
     def test_motd_reapplied_after_vanilla_lan_publish(self):
