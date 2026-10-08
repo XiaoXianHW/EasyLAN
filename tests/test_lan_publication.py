@@ -77,7 +77,7 @@ public class Harness {
         vanillaPortTextBox = new EditBox();
         vanillaPortTextBox.responder = value -> {
             vanillaPort = value.isEmpty() ? 37563 : Integer.parseInt(value);
-            original.active = available;
+            original.active = available && vanillaPort >= 1024;
         };
         original.action = () -> {
             publishes++;
@@ -87,10 +87,12 @@ public class Harness {
             }
         };
     }
+    boolean isPortAvailable(int port) { return available; }
+    VALIDATION_METHOD
     PUBLISH_METHOD
     PORT_METHOD
     public static void main(String[] args) {
-        for (String input : new String[] {"25599", "02559", ""}) {
+        for (String input : new String[] {"25599", "02559", "100", "1023", "1024", ""}) {
             Harness h = new Harness(input);
             if (!h.publishVanillaPort(h.original)) throw new AssertionError("Valid publication rejected");
             int expected = input.isEmpty() ? 37563 : Integer.parseInt(input);
@@ -99,8 +101,18 @@ public class Harness {
             if (h.publishVanillaPort(h.original) || h.publishes != 1)
                 throw new AssertionError("Repeated click published again");
         }
-        Harness fail = new Harness("25599"); fail.bindSucceeds = false;
-        if (fail.publishVanillaPort(fail.original)) throw new AssertionError("Bind failure reported success");
+        for (String input : new String[] {"100", "25599"}) {
+            Harness fail = new Harness(input); fail.bindSucceeds = false;
+            if (fail.publishVanillaPort(fail.original)) throw new AssertionError("Bind failure reported success");
+        }
+        for (String input : new String[] {"99", "65536", "abc", " "}) {
+            Harness invalid = new Harness(input);
+            if (invalid.publishVanillaPort(invalid.original) || invalid.publishes != 0)
+                throw new AssertionError("Invalid input published");
+        }
+        Harness lowUnavailable = new Harness("100"); lowUnavailable.available=false;
+        if (lowUnavailable.publishVanillaPort(lowUnavailable.original) || lowUnavailable.publishes != 0)
+            throw new AssertionError("Low port bind restrictions must be honored");
         Harness unavailable = new Harness("25599"); unavailable.available = false;
         if (unavailable.publishVanillaPort(unavailable.original) || unavailable.publishes != 0)
             throw new AssertionError("Disabled action called");
@@ -126,6 +138,7 @@ class ShareToLanScreen {
     private static String ignoredStatic = "wrong";
     private String selectedMode = "creative";
     private boolean selectedCommands = true;
+    void select(String mode, boolean commands) { selectedMode=mode; selectedCommands=commands; }
 }
 public class Harness extends ShareToLanScreen {
     static class Component { String key; int port; Component(String k, int p) { key=k; port=p; } }
@@ -157,13 +170,15 @@ public class Harness extends ShareToLanScreen {
     static class State { String port = "stale"; void setLanPort(String v) { port=v; } }
     static class EasyLAN { static State state = new State(); static State getRuntimeState() { return state; } }
     Minecraft minecraft = new Minecraft();
-    String PortText, PortWarningText;
+    String PortText, PortWarningText; boolean available = true;
     Harness(String input) { PortText=input; Minecraft.instance=minecraft; }
+    boolean isPortAvailable(int port) { return available; }
+    VALIDATION_METHOD
     PUBLISH_METHOD
     OPTION_METHOD
     PORT_METHOD
     public static void main(String[] args) {
-        for (String input : new String[] {"25599", "02559", ""}) {
+        for (String input : new String[] {"25599", "02559", "100", "1023", "1024", ""}) {
             Harness h = new Harness(input);
             if (!h.publishSelectedPort()) throw new AssertionError("Publish failed");
             int expected = input.isEmpty() ? 37563 : Integer.parseInt(input);
@@ -173,6 +188,22 @@ public class Harness extends ShareToLanScreen {
             if (!s.commands || !"creative".equals(s.mode)) throw new AssertionError("Lost vanilla selections");
             if (h.publishSelectedPort() || s.calls != 1) throw new AssertionError("Repeated click published again");
         }
+        for (String mode : new String[] {"survival", "creative", "adventure", "spectator"}) {
+            for (boolean commands : new boolean[] {false, true}) {
+                Harness selected = new Harness("25599"); selected.select(mode, commands);
+                if (!selected.publishSelectedPort() || !mode.equals(selected.minecraft.server.mode)
+                        || selected.minecraft.server.commands != commands)
+                    throw new AssertionError("Lost selected game mode or commands");
+            }
+        }
+        for (String input : new String[] {"99", "65536", "abc", " "}) {
+            Harness invalid = new Harness(input);
+            if (invalid.publishSelectedPort() || invalid.minecraft.server.calls != 0)
+                throw new AssertionError("Invalid input published");
+        }
+        Harness lowUnavailable = new Harness("100"); lowUnavailable.available=false;
+        if (lowUnavailable.publishSelectedPort() || lowUnavailable.minecraft.server.calls != 0)
+            throw new AssertionError("Low port bind restrictions must be honored");
         Harness fail = new Harness("25599"); fail.minecraft.server.succeeds=false;
         if (fail.publishSelectedPort() || !"commands.publish.failed".equals(fail.minecraft.gui.chat.result.key))
             throw new AssertionError("Failed publication accepted");
@@ -199,6 +230,7 @@ class LanPublication(unittest.TestCase):
                 template = INHERITED if inherited else LEGACY
                 publish = method(gui, 'private boolean publishVanillaPort(' if inherited else 'private boolean publishSelectedPort(')
                 harness = template.replace('PUBLISH_METHOD', publish).replace('PORT_METHOD', method(lan, 'private static String getLanPort('))
+                harness = harness.replace('VALIDATION_METHOD', method(gui, 'private boolean checkPortAndEnableButton('))
                 if not inherited:
                     harness = harness.replace('OPTION_METHOD', method(gui, 'private Object readVanillaOption('))
                 result = run_java({'Harness.java': harness}, 'Harness')

@@ -137,7 +137,7 @@ public class GuiShareToLanEdit {
 
         private boolean publishVanillaPort(Button originalButton) {
             IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-            if (server == null || server.isPublished()) {
+            if (server == null || server.isPublished() || !checkPortAndEnableButton(PortText)) {
                 return false;
             }
             if (vanillaPortTextBox == null) {
@@ -148,7 +148,10 @@ public class GuiShareToLanEdit {
             // Preserve vanilla's game mode, commands, listener and discovery logic.
             // The removed widget still owns the responder that updates its port.
             vanillaPortTextBox.setValue(PortText);
-            if (!originalButton.active) {
+            // EasyLAN permits 100-1023; vanilla's UI rejects that range even
+            // after storing it. Our validation above includes a real bind check.
+            boolean validatedLowPort = !PortText.isEmpty() && Integer.parseInt(PortText) < 1024;
+            if (!originalButton.active && !validatedLowPort) {
                 PortWarningText = I18n.get("easylan.text.port.used");
                 return false;
             }
