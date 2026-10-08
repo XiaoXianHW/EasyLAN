@@ -38,9 +38,12 @@ public class GuiShareToLanEdit {
 
     @SubscribeEvent
     public void onGuiOpenEvent(GuiOpenEvent event) {
-        Screen guiScreen = event.getGui();
-        if (guiScreen instanceof ShareToLanScreen) {
-            event.setGui(new GuiShareToLanEdit.GuiShareToLanModified(event.getGui()));
+        Screen incomingScreen = event.getGui();
+        if (incomingScreen instanceof ShareToLanScreen
+                && !(incomingScreen instanceof GuiShareToLanModified)) {
+            // Forge posts this event before replacing Minecraft's current screen.
+            // Keep that previous screen as Cancel's destination, never the incoming LAN form.
+            event.setGui(new GuiShareToLanModified(Minecraft.getInstance().currentScreen));
         }
     }
 

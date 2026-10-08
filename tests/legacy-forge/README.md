@@ -54,3 +54,21 @@ Settings, API startup and success messages run only after successful publication
 Focused tests compile the real production `LanPublication` helper at Java releases 8/8/16/17. They cover all four game modes, cheats on/off, one publication only, blank default selection, failed publication without a success branch, invalid and boundary ports, and missing/ambiguous private-field layouts. Source guards for all four versions pass and fail against pre-fix commit `360d048` (including the original callback and second-endpoint checks). These checks do not establish GUI behavior, final production mapping, actual multicast discovery, or complete runtime acceptance.
 
 For every newly built production JAR, repeat the manual procedure and require the requested port, vanilla `Started serving on` / publication chat, EasyLAN chat, HTTP snapshot, and LAN discovery advertisement to agree. Verify selected game mode and cheats on/off, blank-port automatic selection, a bind failure with no success output or API startup, repeated clicks, and world exit/reopen. HTTP/socket acceptance remains separately required when available.
+
+## LAN Cancel navigation correction (2026-10-08 UTC)
+
+A live production-JAR check of 1.16.4 at `ee0abff` reproduced Cancel reopening the LAN form, including a second Cancel click. The incoming vanilla `ShareToLanScreen` had incorrectly been passed as the modified screen's parent. Cancel reopened that vanilla screen, and the event hook replaced it with another modified LAN form. Escape still returned to the unshared world. A separate live 1.16.5 check at the same commit passed Cancel; do not generalize the reproduced failure to all four versions.
+
+Only the 1.16.4 production hook is changed: it now passes the actual previous screen to the modified LAN screen and leaves an already modified LAN screen unchanged. The other three versions retain their existing new-pause-screen behavior because no broken flow was reproduced there. The change does not alter publication, port, player limit, MOTD, input widgets, or the vanilla Cancel/Escape callbacks.
+
+Lifecycle verification before the edit used the official cached Forge source archives for 35.1.37, 36.2.42, 37.1.1 and 40.2.9. In each archive, `patches/net/minecraft/client/Minecraft.java.patch` posts `GuiOpenEvent` / `ScreenOpenEvent` before assigning the incoming screen. `getGui()` / `getScreen()` refers to the requested new screen; `Minecraft.currentScreen` (1.16.4 mappings) / `Minecraft.screen` still refers to the previous one. Mapped vanilla bytecode confirms Cancel opens `ShareToLanScreen.lastScreen`. Escape uses the inherited close route; from 1.16.5 onward Forge's empty `popGuiLayer` calls `setScreen(null)` after the normal screen-open path has cleared layers.
+
+Run the focused navigation regression, including the old-source negative control:
+
+```sh
+python3 tests/legacy-forge/check_navigation.py --baseline ee0abff
+```
+
+This compiles each version's actual, unchanged event-hook method and modified-screen constructor, extracted from the production source, against minimal screen/event lifecycle doubles at releases 8/8/16/17. All four test repeated open/Cancel cycles, Back to Game, repeated Escape close transitions, and unrelated/null screens. The repaired 1.16.4 additionally tests the exact previous screen passed to the constructor, null parent, reopening an existing modified screen, and repeated event delivery. Deliberately using the incoming parent or removing the already-modified guard must fail for 1.16.4. The old 1.16.4 hook fails the parent check; the other three old hooks pass their unchanged navigation expectations. These tests isolate the LAN handler; other handlers can also replace the destination pause screen (as the existing 1.16.4 exit-menu handler does).
+
+These are event/constructor regression tests, not actual rendered button/input tests. A full build and fresh live Cancel/reopen/Escape/Back-to-Game retest are required for the replacement 1.16.4 JAR. Keep the pre-fix runtime screenshots and superseded artifacts as historical evidence, not final acceptance.

@@ -43,3 +43,4 @@ public class EasyLAN {
     print('These are isolated Java regression tests, not packaged mod or in-game verification.')
 
 subprocess.run(['python3', str(Path(__file__).with_name('check_publication_sources.py'))], check=True)
+subprocess.run(['python3', str(Path(__file__).with_name('check_navigation.py'))], check=True)
