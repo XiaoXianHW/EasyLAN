@@ -90,7 +90,7 @@ public class GuiShareToLanEdit {
                 this.removeWidget(originalButton);
 
                 Button finalOriginalButton = originalButton;
-                Button newButton = Button.builder(Component.translatable(I18n.get("lanServer.start")), button -> {
+                Button newButton = Button.builder(Component.translatable("lanServer.start"), button -> {
                     syncTextState();
                     if (!publishVanillaPort(finalOriginalButton)) {
                         return;
