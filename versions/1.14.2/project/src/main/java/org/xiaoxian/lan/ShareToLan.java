@@ -3,7 +3,6 @@ package org.xiaoxian.lan;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.NetworkSystem;
 import net.minecraft.server.integrated.IntegratedServer;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.forge.version.VersionBridgeResolver;
@@ -41,19 +40,14 @@ public class ShareToLan {
     }
 
     public void handleLanSetup() {
-        executorService = EasyLAN.getRuntimeState().openExecutorService(2);
-
         Minecraft mc = Minecraft.getInstance();
         IntegratedServer server = mc.getIntegratedServer();
-        if (server == null) {
+        if (server == null || !server.getPublic()) {
             return;
         }
 
-        NetworkSystem networkSystem = server.getNetworkSystem();
-
-        if (!GuiShareToLanEdit.PortTextBox.getText().isEmpty()) {
-            startLanPort(networkSystem, Integer.parseInt(GuiShareToLanEdit.PortTextBox.getText()));
-        }
+        executorService = EasyLAN.getRuntimeState().openExecutorService(2);
+        EasyLAN.getRuntimeState().setLanPort(String.valueOf(server.getServerPort()));
 
         if (!GuiShareToLanEdit.MaxPlayerBox.getText().isEmpty()) {
             setMaxPlayer(server);
@@ -121,9 +115,7 @@ public class ShareToLan {
 
     private void updateApiInfo(IntegratedServer server) {
         updateService.scheduleAtFixedRate(() -> {
-            String resolvedPort = GuiShareToLanEdit.PortTextBox.getText().isEmpty()
-                    ? getLanPort(server)
-                    : GuiShareToLanEdit.PortTextBox.getText();
+            String resolvedPort = getLanPort(server);
 
             HTTP_API_SERVER.set("port", safeValue(resolvedPort));
             HTTP_API_SERVER.set("version", safeValue(server.getMinecraftVersion()));
@@ -161,18 +153,6 @@ public class ShareToLan {
         }
     }
 
-    private void startLanPort(NetworkSystem connection, int port) {
-        try {
-            VersionBridgeResolver.get().openLanEndpoint(connection, port);
-            if (!LanOutput) {
-                ChatUtil.sendMsg("&e[&6EasyLAN&e] &a" + I18n.format("easylan.chat.CtPort") + " &f[&e" + GuiShareToLanEdit.PortTextBox.getText() + "&f]");
-            }
-        } catch (IOException ex) {
-            ChatUtil.sendMsg("&e[&6EasyLAN&e] &c" + I18n.format("easylan.chat.CtPortError"));
-            System.out.println("[EasyLAN] addLanEndpoint Error: " + ex.getMessage());
-        }
-    }
-
     public static String getLanPort() {
         Minecraft minecraft = Minecraft.getInstance();
         IntegratedServer server = minecraft.getIntegratedServer();
@@ -183,7 +163,7 @@ public class ShareToLan {
     }
 
     private static String getLanPort(IntegratedServer server) {
-        return VersionBridgeResolver.get().resolveLanPort(server);
+        return server.getPublic() ? String.valueOf(server.getServerPort()) : null;
     }
 
     private static String safeValue(Object value) {
