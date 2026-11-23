@@ -67,6 +67,23 @@ if ($buildGradlePatched) {
     $patched += 'build.gradle'
 }
 
+# Legacy Forge branches pass a Java constant to @Mod(version = ...), so the in-game
+# mod list ignores the Gradle version unless the constant is patched as well.
+$javaSourceDirectory = Join-Path $ProjectDirectory 'src/main/java'
+if (Test-Path -LiteralPath $javaSourceDirectory) {
+    $modClassFiles = Get-ChildItem -LiteralPath $javaSourceDirectory -Recurse -File -Filter 'EasyLAN.java'
+    foreach ($modClassFile in $modClassFiles) {
+        $modClassPatched = Update-VersionInFile `
+            -Path $modClassFile.FullName `
+            -Pattern '(?m)^([ \t]*public[ \t]+static[ \t]+final[ \t]+String[ \t]+VERSION[ \t]*=[ \t]*")[^"\r\n]*(";)' `
+            -Replacement "`${1}$Version`${2}"
+
+        if ($modClassPatched) {
+            $patched += [System.IO.Path]::GetRelativePath($ProjectDirectory, $modClassFile.FullName)
+        }
+    }
+}
+
 if ($patched.Count -gt 0) {
     Write-Host "Applied mod version $Version in $ProjectDirectory via $($patched -join ', ')"
     return
