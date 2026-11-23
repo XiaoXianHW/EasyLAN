@@ -8,12 +8,16 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiShareToLan;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.world.GameType;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.xiaoxian.EasyLAN;
 import org.xiaoxian.easylan.core.validation.ValidationRules;
+import org.xiaoxian.easylan.forge.version.LanPublication;
 import org.xiaoxian.lan.ShareToLan;
 import org.xiaoxian.util.ButtonUtil;
+import org.xiaoxian.util.ChatUtil;
 import org.xiaoxian.util.ConfigUtil;
 import org.xiaoxian.util.TextBoxUtil;
 
@@ -38,6 +42,8 @@ public class GuiShareToLanEdit {
 
     public static class GuiShareToLanModified extends GuiShareToLan {
         private final FontRenderer localFontRenderer = Minecraft.getInstance().fontRenderer;
+
+        private boolean publishing;
 
         public GuiShareToLanModified(GuiScreen parentScreen) {
             super(parentScreen);
@@ -70,19 +76,57 @@ public class GuiShareToLanEdit {
                 buttons.remove(originalButton);
                 children.remove(originalButton);
 
-                GuiButton finalOriginalButton = originalButton;
-                addButton(new ButtonUtil(x, y, width, height, I18n.format("lanServer.start")) {
+                GuiButton newButton = addButton(new ButtonUtil(x, y, width, height, I18n.format("lanServer.start")) {
                     @Override
                     public void onClick(double mouseX, double mouseY) {
-                        new ShareToLan().handleLanSetup();
-                        finalOriginalButton.onClick(mouseX, mouseY);
-                        EasyLAN.CustomPort = PortText;
-                        EasyLAN.CustomMaxPlayer = MaxPlayerText;
-                        ConfigUtil.set("Port", PortText);
-                        ConfigUtil.set("MaxPlayer", MaxPlayerText);
-                        ConfigUtil.save();
+                        startLan();
                     }
                 });
+                newButton.enabled = checkPortAndEnableButton(PortTextBox.getText())
+                        && checkMaxPlayerAndEnableButton(MaxPlayerBox.getText());
+            }
+        }
+
+        private void startLan() {
+            Minecraft minecraft = Minecraft.getInstance();
+            IntegratedServer server = minecraft.getIntegratedServer();
+            if (publishing || server == null || server.getPublic()) {
+                return;
+            }
+            if (!checkPortAndEnableButton(PortTextBox.getText())
+                    || !checkMaxPlayerAndEnableButton(MaxPlayerBox.getText())) {
+                return;
+            }
+
+            publishing = true;
+            try {
+                GameType gameMode = LanPublication.selectedGameMode(this, GuiShareToLan.class, GameType.class);
+                boolean commands = LanPublication.selectedCommands(this, GuiShareToLan.class);
+                int port = LanPublication.publish(PortTextBox.getText(), gameMode, commands,
+                        LanPublication::availablePort,
+                        (mode, allowCommands, selectedPort) -> server.shareToLAN(mode, allowCommands, selectedPort));
+                if (port < 0) {
+                    ChatUtil.sendMsg(I18n.format("commands.publish.failed"));
+                    return;
+                }
+
+                // Vanilla now owns the only listener and advertises this same port.
+                EasyLAN.getRuntimeState().setLanPort(String.valueOf(server.getServerPort()));
+                ChatUtil.sendMsg(I18n.format("commands.publish.started", server.getServerPort()));
+                new ShareToLan().handleLanSetup();
+                PortText = PortTextBox.getText();
+                MaxPlayerText = MaxPlayerBox.getText();
+                EasyLAN.CustomPort = PortText;
+                EasyLAN.CustomMaxPlayer = MaxPlayerText;
+                ConfigUtil.set("Port", PortText);
+                ConfigUtil.set("MaxPlayer", MaxPlayerText);
+                ConfigUtil.save();
+            } catch (ReflectiveOperationException | IOException | IllegalArgumentException ex) {
+                ChatUtil.sendMsg(I18n.format("commands.publish.failed"));
+                System.err.println("[EasyLAN] LAN publication failed: " + ex);
+            } finally {
+                publishing = false;
+                minecraft.displayGuiScreen(null);
             }
         }
 
@@ -119,26 +163,6 @@ public class GuiShareToLanEdit {
         public boolean charTyped(char typedChar, int keyCode) {
             PortTextBox.charTyped(typedChar, keyCode);
             MaxPlayerBox.charTyped(typedChar, keyCode);
-
-            if (!PortTextBox.getText().isEmpty()) {
-                try {
-                    if (!ValidationRules.isValidPort(Integer.parseInt(PortTextBox.getText()))) {
-                        PortTextBox.setText("");
-                    }
-                } catch (NumberFormatException ignored) {
-                    PortTextBox.setText("");
-                }
-            }
-
-            if (!MaxPlayerBox.getText().isEmpty()) {
-                try {
-                    if (!ValidationRules.isValidMaxPlayer(Integer.parseInt(MaxPlayerBox.getText()))) {
-                        MaxPlayerBox.setText("");
-                    }
-                } catch (NumberFormatException ignored) {
-                    MaxPlayerBox.setText("");
-                }
-            }
 
             GuiButton startButton = findButton();
             if (startButton != null) {

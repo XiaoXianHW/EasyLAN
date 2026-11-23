@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,10 +15,16 @@ import java.util.regex.Pattern;
 public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
     protected abstract String[] maxPlayerFieldNames();
 
+    protected String[] playerListMethodNames() {
+        return new String[] { "getPlayerList" };
+    }
+
     @Override
     public void openLanEndpoint(Object connection, int port) throws IOException {
         IOException lastError = null;
-        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint" }) {
+        // String-based reflection is not remapped when the mod jar is reobfuscated.
+        // Include production SRG names for 1.16.x and 1.17/1.18, respectively.
+        for (String methodName : new String[] { "startTcpServerListener", "addEndpoint", "func_151265_a", "m_9711_" }) {
             try {
                 Method method = findMethod(connection.getClass(), methodName, InetAddress.class, Integer.TYPE);
                 if (method == null) {
@@ -41,7 +48,10 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
 
     @Override
     public boolean setMaxPlayers(Object server, int maxPlayers) {
-        Object playerList = invokeNoArgs(server, "getPlayerList");
+        Object playerList = invokeNoArgs(server, playerListMethodNames());
+        if (playerList == null) {
+            playerList = findPlayerListField(server);
+        }
         if (playerList == null) {
             return false;
         }
@@ -59,6 +69,34 @@ public abstract class ReflectionVersionBridgeSupport implements VersionBridge {
             }
         }
         return false;
+    }
+
+    private Object findPlayerListField(Object server) {
+        Class<?> current = server.getClass();
+        while (current != null) {
+            for (Field field : current.getDeclaredFields()) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    continue;
+                }
+
+                try {
+                    field.setAccessible(true);
+                    Object value = field.get(server);
+                    if (value == null || value == server) {
+                        continue;
+                    }
+
+                    for (String fieldName : maxPlayerFieldNames()) {
+                        if (findField(value.getClass(), fieldName) != null) {
+                            return value;
+                        }
+                    }
+                } catch (ReflectiveOperationException | RuntimeException ignored) {
+                }
+            }
+            current = current.getSuperclass();
+        }
+        return null;
     }
 
     @Override
